@@ -9,12 +9,11 @@ import { useState } from "react";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
+import { useForm } from "react-hook-form";
 
 export default function FogotPassword() {
-  const [username, setUsername] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [code, setCode] = useState("");
   const navigation = useNavigation();
+  const { control, handleSubmit } = useForm();
 
   const onSubmitPressed = () => {
     console.warn("onSubmitPressed");
@@ -29,13 +28,19 @@ export default function FogotPassword() {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
         <Text style={styles.title}>Reset your password</Text>
-        <CustomInput placeholder="Code" value={code} setValue={setCode} />
         <CustomInput
-          placeholder="Enter your new password"
-          value={newPassword}
-          setValue={setNewPassword}
+          name="code"
+          placeholder="Enter your code"
+          control={control}
+          rules={{ required: "Code is required" }}
         />
-        <CustomButton text="Submit" onPress={onSubmitPressed} />
+        <CustomInput
+          name="newPassword"
+          placeholder="Enter your new password"
+          control={control}
+          rules={{ required: "Password is required" }}
+        />
+        <CustomButton text="Submit" onPress={handleSubmit(onSubmitPressed)} />
         <CustomButton
           text="Back to Sign in"
           onPress={onSignInPressed}

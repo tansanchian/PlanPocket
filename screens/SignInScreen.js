@@ -8,17 +8,21 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { globalStyles } from "../styles/global";
-import { useState } from "react";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
+import { useForm } from "react-hook-form";
 
 export default function SignInScreen() {
   const { height } = useWindowDimensions();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
   const navigation = useNavigation();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const onSignInPressed = () => {
     console.warn("Sign in");
     navigation.navigate("HomeScreen");
@@ -38,32 +42,6 @@ export default function SignInScreen() {
     navigation.navigate("SignUp");
   };
 
-  // const validateForm = () => {
-  //   let errors = {};
-
-  //   if (!username) errors.username = "Username is required";
-  //   if (!password) errors.password = "Password is required";
-
-  //   setErrors(errors);
-
-  //   return Object.keys(errors).length === 0;
-  // };
-
-  // const handleSubmit = () => {
-  //   if (validateForm()) {
-  //     console.log("Submitted", username, password);
-  //     setUsername("");
-  //     setPassword("");
-  //     setErrors({});
-  //   }
-  //         {/* {errors.username && (
-  //           <Text style={styles.errorText}>{errors.username}</Text>
-  //         )}
-  //         {errors.password && (
-  //           <Text style={styles.errorText}>{errors.password}</Text>
-  //         )} */}
-  // };
-
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <KeyboardAvoidingView
@@ -78,18 +56,28 @@ export default function SignInScreen() {
             resizeMode="contain"
           />
           <CustomInput
+            name="username"
             placeholder="Username"
-            value={username}
-            setValue={setUsername}
-            secureTextEntry={false}
+            control={control}
+            rules={{ required: "Username is required" }}
           />
           <CustomInput
+            name="password"
             placeholder="Password"
-            value={password}
-            setValue={setPassword}
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 3,
+                message: "Password should be minium 3 characters",
+              },
+            }}
             secureTextEntry={true}
           />
-          <CustomButton text="Sign In" onPress={onSignInPressed} />
+          <CustomButton
+            text="Sign In"
+            onPress={handleSubmit(onSignInPressed)}
+          />
           <CustomButton
             text="Forgot password?"
             onPress={onForgotPasswordPressed}
