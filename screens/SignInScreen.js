@@ -34,7 +34,7 @@ export default function SignInScreen() {
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate("Home");
+      navigation.navigate("HomeScreen");
       console.log(response);
     } catch (error) {
       console.log(error);
