@@ -6,26 +6,42 @@ import {
   Platform,
   ScrollView,
   useWindowDimensions,
+  ActivityIndicator,
 } from "react-native";
+import { useState } from "react";
 import { globalStyles } from "../styles/global";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
+import { auth } from "../App";
+import { signInWithEmailAndPassword } from "@firebase/auth";
 
 export default function SignInScreen() {
   const { height } = useWindowDimensions();
   const navigation = useNavigation();
-
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
+  const [loading, setLoading] = useState(false);
+  const password = watch("password");
+  const email = watch("email");
 
-  const onSignInPressed = () => {
-    console.warn("Sign in");
-    navigation.navigate("HomeScreen");
+  const onSignInPressed = async () => {
+    setLoading(true);
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      navigation.navigate("Home");
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      alert("Sign in failed: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
   const onSignInGoogle = () => {
     console.warn("onSignInGoogle");
@@ -56,10 +72,16 @@ export default function SignInScreen() {
             resizeMode="contain"
           />
           <CustomInput
-            name="username"
-            placeholder="Username"
+            name="email"
+            placeholder="Email"
             control={control}
-            rules={{ required: "Username is required" }}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "Invalid email address",
+              },
+            }}
           />
           <CustomInput
             name="password"
@@ -74,10 +96,14 @@ export default function SignInScreen() {
             }}
             secureTextEntry={true}
           />
-          <CustomButton
-            text="Sign In"
-            onPress={handleSubmit(onSignInPressed)}
-          />
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <CustomButton
+              text="Sign In"
+              onPress={handleSubmit(onSignInPressed)}
+            />
+          )}
           <CustomButton
             text="Forgot password?"
             onPress={onForgotPasswordPressed}
