@@ -11,7 +11,7 @@ export default function FogotPassword() {
 
   const onSendPressed = async () => {
     await sendPasswordResetEmail(auth, email)
-      .then(() => alert("password reset email sent!"))
+      .then(() => alert("Password reset email sent!"))
       .catch((error) => console.log(error.message));
   };
   const onSignInPressed = () => {

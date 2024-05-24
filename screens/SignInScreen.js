@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { globalStyles } from "../styles/global";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { auth } from "../App";
 import { signInWithEmailAndPassword } from "@firebase/auth";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 export default function SignInScreen() {
   const { height } = useWindowDimensions();
@@ -29,6 +30,9 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const password = watch("password");
   const email = watch("email");
+  const [username, setUsername] = useState([]);
+
+  // useEffect (() => )
 
   const onSignInPressed = async () => {
     setLoading(true);

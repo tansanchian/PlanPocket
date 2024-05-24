@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
+import { getDatabase, ref, onValue } from "firebase/database";
 
 const HomeScreen = () => {
   return (

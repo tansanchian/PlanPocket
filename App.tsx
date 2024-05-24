@@ -12,6 +12,8 @@ const firebaseConfig = {
   storageBucket: "planpocket-17a1a.appspot.com",
   messagingSenderId: "949052540769",
   appId: "1:949052540769:web:e9e7d5dc1f99f198ade720",
+  databaseURL:
+    "https://planpocket-17a1a-default-rtdb.asia-southeast1.firebasedatabase.app",
 };
 
 export const app = initializeApp(firebaseConfig);

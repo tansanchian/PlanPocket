@@ -1,20 +1,70 @@
-import { View, Text } from "react-native";
-import React, { Fragment } from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/MainApp/HomeScreen";
 import FriendScreen from "../screens/MainApp/FriendScreen";
 import MessagerScreen from "../screens/MainApp/MessagerScreen";
 import TimeTableScreen from "../screens/MainApp/TimeTableScreen";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Tab = createBottomTabNavigator();
 
 const Tabs = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Friend" component={FriendScreen} />
-      <Tab.Screen name="Messager" component={MessagerScreen} />
-      <Tab.Screen name="TimeTable" component={TimeTableScreen} />
+    <Tab.Navigator
+      screenOptions={{
+        tabBarLabelPosition: "left",
+        tabBarShowLabel: true,
+        tabBarActiveTintColor: "black",
+        tabBarInactiveTintColor: "gray",
+        tabBarLabelStyle: {
+          fontWeight: "bold",
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="TimeTable"
+        component={TimeTableScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="calendar-clock"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Inbox"
+        component={MessagerScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="message" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Friend"
+        component={FriendScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons
+              name="account-group"
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };

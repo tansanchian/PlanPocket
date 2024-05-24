@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
@@ -6,6 +12,8 @@ import { useForm } from "react-hook-form";
 import { auth } from "../App";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
+import { ref, set } from "firebase/database";
+import { getDatabase } from "@firebase/database";
 
 export default function SignUpScreen() {
   const navigation = useNavigation();
@@ -13,6 +21,7 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
   const password = watch("password");
   const email = watch("email");
+  const username = watch("username");
 
   const onPrivacyPolicyPressed = () => {
     console.warn("onPrivacyPolicyPressed");
@@ -26,6 +35,12 @@ export default function SignUpScreen() {
   const onSignInFacebook = () => {
     console.warn("onSignInFaceBook");
   };
+
+  const createProfile = async (response) => {
+    const db = getDatabase();
+    set(ref(db, `/users/${response.user.uid}`), { username: username });
+  };
+
   const onRegisterPressed = async () => {
     setLoading(true);
     try {
@@ -34,8 +49,16 @@ export default function SignUpScreen() {
         email,
         password
       );
-      console.log(response);
+
+      if (response.user) {
+        await createProfile(response);
+      }
+      alert("Account Registered");
+      navigation.navigate("SignIn");
     } catch (error) {
+      if (error.code == "auth/email-already-in-use") {
+        alert("Email already in use");
+      }
       console.log(error);
     } finally {
       setLoading(false);
@@ -75,8 +98,8 @@ export default function SignUpScreen() {
           rules={{
             required: "Password is required",
             minLength: {
-              value: 8,
-              message: "Password should be at least 8 characters long",
+              value: 6,
+              message: "Password should be at least 6 characters long",
             },
           }}
           secureTextEntry={true}
@@ -91,10 +114,14 @@ export default function SignUpScreen() {
           }}
           secureTextEntry={true}
         />
-        <CustomButton
-          text="Register"
-          onPress={handleSubmit(onRegisterPressed)}
-        />
+        {loading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <CustomButton
+            text="Register"
+            onPress={handleSubmit(onRegisterPressed)}
+          />
+        )}
         <Text style={styles.text}>
           By registering, you confirm that you accept our{" "}
           <Text style={styles.link} onPress={onTermsOfUsePressed}>
