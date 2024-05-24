@@ -1,32 +1,43 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, useState } from "react-native";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../App";
 
 export default function FogotPassword() {
   const navigation = useNavigation();
 
-  const onSendPressed = () => {
-    console.warn("onSendPressed");
-    navigation.navigate("ResetPassword");
+  const onSendPressed = async () => {
+    await sendPasswordResetEmail(auth, email)
+      .then(() => alert("password reset email sent!"))
+      .catch((error) => console.log(error.message));
   };
   const onSignInPressed = () => {
     console.warn("onSignInPressed");
     navigation.navigate("SignIn");
   };
 
-  const { control, handleSubmit } = useForm();
+  const { control, handleSubmit, watch } = useForm();
+
+  const email = watch("email");
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
         <Text style={styles.title}>Reset your password</Text>
         <CustomInput
-          name="username"
-          placeholder="Username"
+          name="email"
+          placeholder="Email"
           control={control}
-          rules={{ required: "Username is required" }}
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+              message: "Invalid email address",
+            },
+          }}
         />
         <CustomButton text="Send" onPress={handleSubmit(onSendPressed)} />
         <CustomButton
