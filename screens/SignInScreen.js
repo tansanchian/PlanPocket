@@ -30,9 +30,18 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const password = watch("password");
   const email = watch("email");
-  const [username, setUsername] = useState([]);
-
-  // useEffect (() => )
+  const dbRef = ref(getDatabase());
+  const getUser = (userId) => {
+    get(child(dbRef, `users/${userId}/username`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.val();
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
 
   const onSignInPressed = async () => {
     setLoading(true);
