@@ -4,6 +4,7 @@ import Navigation from "./navigation/Navigation";
 import { initializeApp } from "@firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { AuthProvider } from "./components/AuthContext";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB4iAMZakxTcCruMaxwge14kWpgDTkADHY",
@@ -24,9 +25,11 @@ export const auth = initializeAuth(app, {
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.root}>
-      <Navigation />
-    </SafeAreaView>
+    <AuthProvider>
+      <SafeAreaView style={styles.root}>
+        <Navigation />
+      </SafeAreaView>
+    </AuthProvider>
   );
 }
 

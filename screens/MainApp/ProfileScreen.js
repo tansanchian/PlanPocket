@@ -2,16 +2,16 @@ import { View, Text, StyleSheet, Button } from "react-native";
 import React from "react";
 import { Logout } from "../../components/Logout";
 
-const FriendScreen = () => {
+const ProfileScreen = () => {
   return (
     <View style={styles.form}>
       <Logout />
-      <Text style={styles.text}>Welcome to FriendScreen</Text>
+      <Text style={styles.text}>Welcome to ProfileScreen</Text>
     </View>
   );
 };
 
-export default FriendScreen;
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   form: {

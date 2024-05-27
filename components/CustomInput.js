@@ -8,6 +8,7 @@ const CustomInput = ({
   name,
   placeholder,
   secureTextEntry,
+  design = "",
 }) => {
   return (
     <Controller
@@ -21,7 +22,7 @@ const CustomInput = ({
         <>
           <View
             style={[
-              styles.container,
+              styles[`container${design}`],
               { borderColor: error ? "red" : "#e8e8e8" },
             ]}
           >
@@ -56,9 +57,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 5,
   },
+  containerHALF: {
+    backgroundColor: "white",
+    width: "50%",
+    borderColor: "#e8e8e8",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+  },
   input: {},
   errorText: {
     color: "red",
     alignSelf: "stretch",
+    textAlignVertical: "bottom",
   },
 });

@@ -8,7 +8,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { globalStyles } from "../styles/global";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
@@ -17,9 +17,11 @@ import { useForm } from "react-hook-form";
 import { auth } from "../App";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { getDatabase, ref, onValue } from "firebase/database";
+import { AuthContext } from "../components/AuthContext";
 
 export default function SignInScreen() {
   const { height } = useWindowDimensions();
+  const { login } = useContext(AuthContext);
   const navigation = useNavigation();
   const {
     control,
@@ -30,19 +32,35 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
   const password = watch("password");
   const email = watch("email");
-  const [username, setUsername] = useState([]);
-
-  // useEffect (() => )
+  const dbRef = ref(getDatabase());
+  const getUser = (userId) => {
+    get(child(dbRef, `users/${userId}/username`))
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          return snapshot.val();
+        } else {
+          console.log("No data available");
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   const onSignInPressed = async () => {
     setLoading(true);
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate("Tabs");
+      const customToken = await response.user.getIdToken();
+      login(customToken);
       console.log(response);
     } catch (error) {
       console.log(error);
-      alert("Sign in failed: " + error.message);
+      if (error.code == "auth/invalid-credential") {
+        alert("Sign in failed: incorrect password or username!");
+      } else {
+        alert("Sign in failed: " + error.message);
+      }
     } finally {
       setLoading(false);
     }

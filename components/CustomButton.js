@@ -4,6 +4,7 @@ import React from "react";
 const CustomButton = ({
   onPress,
   text,
+  design = "MAIN",
   type = "PRIMARY",
   bgColor,
   fgColor,
@@ -12,7 +13,7 @@ const CustomButton = ({
     <Pressable
       onPress={onPress}
       style={[
-        styles.container,
+        styles[`container_${design}`],
         styles[`container_${type}`],
         bgColor ? { backgroundColor: bgColor } : {},
       ]}
@@ -33,8 +34,15 @@ const CustomButton = ({
 export default CustomButton;
 
 const styles = StyleSheet.create({
-  container: {
+  container_MAIN: {
     width: "100%",
+    padding: 15,
+    marginVertical: 5,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  container_HALF: {
+    width: "50%",
     padding: 15,
     marginVertical: 5,
     alignItems: "center",

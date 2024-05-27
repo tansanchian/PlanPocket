@@ -5,6 +5,8 @@ import FriendScreen from "../screens/MainApp/FriendScreen";
 import MessagerScreen from "../screens/MainApp/MessagerScreen";
 import TimeTableScreen from "../screens/MainApp/TimeTableScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AddScheduleScreen from "../screens/MainApp/AddScheduleScreen";
+import Schedule from "./Schedule";
 
 const Tab = createBottomTabNavigator();
 
@@ -43,6 +45,7 @@ const Tabs = () => {
           ),
         }}
       />
+      <Tab.Screen name="Add" component={Schedule} />
       <Tab.Screen
         name="Inbox"
         component={MessagerScreen}
