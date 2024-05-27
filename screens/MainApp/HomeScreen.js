@@ -1,12 +1,10 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { getDatabase, ref, onValue } from "firebase/database";
-import { Logout } from "../../components/Logout";
 
 const HomeScreen = () => {
   return (
     <View style={styles.form}>
-      <Logout />
       <Text style={styles.text}>Welcome to HomeScreen</Text>
     </View>
   );

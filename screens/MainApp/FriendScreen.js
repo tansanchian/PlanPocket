@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet, Button } from "react-native";
 import React from "react";
-import { Logout } from "../../components/Logout";
 
 const FriendScreen = () => {
   return (
     <View style={styles.form}>
-      <Logout />
       <Text style={styles.text}>Welcome to FriendScreen</Text>
     </View>
   );

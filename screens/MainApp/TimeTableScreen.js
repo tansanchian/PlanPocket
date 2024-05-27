@@ -1,7 +1,6 @@
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
-import { Logout } from "../../components/Logout";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -62,7 +61,6 @@ const TimeTableScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Logout />
       <Agenda
         items={items}
         loadItemsForMonth={loadItems}

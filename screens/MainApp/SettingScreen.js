@@ -1,15 +1,15 @@
 import { View, Text, StyleSheet, Button } from "react-native";
 import React from "react";
 
-const ProfileScreen = () => {
+const SettingScreen = () => {
   return (
     <View style={styles.form}>
-      <Text style={styles.text}>Welcome to ProfileScreen</Text>
+      <Text style={styles.text}>Welcome to SettingScreen</Text>
     </View>
   );
 };
 
-export default ProfileScreen;
+export default SettingScreen;
 
 const styles = StyleSheet.create({
   form: {
