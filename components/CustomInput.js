@@ -19,6 +19,7 @@ const CustomInput = ({
   design = "",
   keyboard,
   editable = true,
+  values = "",
 }) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -77,7 +78,7 @@ const CustomInput = ({
         name={name}
         rules={rules}
         render={({
-          field: { value, onChange, onBlur },
+          field: { value = values, onChange, onBlur },
           fieldState: { error },
         }) => (
           <>

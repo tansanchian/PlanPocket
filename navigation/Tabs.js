@@ -7,29 +7,38 @@ import TimeTableScreen from "../screens/MainApp/TimeTableScreen";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AddScheduleScreen from "../screens/MainApp/AddScheduleScreen";
 import Schedule from "./Schedule";
+import { Platform, View } from "react-native";
 
 const Tab = createBottomTabNavigator();
 
+const screenOptions = {
+  tabBarShowLabel: false,
+  headerShown: false,
+  tabBarActiveTintColor: "#735DA5",
+  tabBarInactiveTintColor: "#D3C5E5",
+  tabBarStyle: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    left: 0,
+    elevation: 0,
+    height: Platform.OS === "ios" ? 90 : 60,
+    backgroundColor: "white",
+  },
+};
+
 const Tabs = () => {
   return (
-    <Tab.Navigator
-      screenOptions={{
-        tabBarLabelPosition: "left",
-        tabBarShowLabel: true,
-        tabBarActiveTintColor: "black",
-        tabBarInactiveTintColor: "gray",
-        tabBarLabelStyle: {
-          fontWeight: "bold",
-        },
-      }}
-    >
+    <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            return (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            );
+          },
         }}
       />
       <Tab.Screen
@@ -45,7 +54,31 @@ const Tabs = () => {
           ),
         }}
       />
-      <Tab.Screen name="Add" component={Schedule} />
+      <Tab.Screen
+        name="Add"
+        component={Schedule}
+        options={{
+          tabBarIcon: ({ color, size }) => {
+            return (
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#735DA5",
+                  height: Platform.OS === "ios" ? 70 : 60,
+                  width: Platform.OS === "ios" ? 70 : 60,
+                  top: Platform.OS === "ios" ? -20 : -30,
+                  borderRadius: Platform.OS === "ios" ? 35 : 30,
+                  borderWidth: 2,
+                  borderColor: "white",
+                }}
+              >
+                <MaterialCommunityIcons name="home" color="white" size={size} />
+              </View>
+            );
+          },
+        }}
+      />
       <Tab.Screen
         name="Inbox"
         component={MessagerScreen}

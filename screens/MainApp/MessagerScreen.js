@@ -1,10 +1,15 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
+import Header from "../../components/Header";
+import { globalStyles } from "../../styles/global";
 
 const MessagerScreen = () => {
   return (
-    <View style={styles.form}>
-      <Text style={styles.text}>Welcome to MessagerScreen</Text>
+    <View style={styles.container}>
+      <Header title="Messenger" />
+      <View style={globalStyles.globalContainer}>
+        <Text style={styles.text}>Welcome to MessagerScreen</Text>
+      </View>
     </View>
   );
 };
@@ -12,16 +17,16 @@ const MessagerScreen = () => {
 export default MessagerScreen;
 
 const styles = StyleSheet.create({
-  form: {
+  container: {
+    marginTop: 20,
     flex: 1,
-    backgroundColor: "pink",
-    padding: 20,
-    justifyContent: "center",
+    backgroundColor: "white",
   },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
+    justifyContent: "center",
     margin: 10,
   },
 });

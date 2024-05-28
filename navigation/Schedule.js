@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator();
 
 const Schedule = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="AddSchedule" component={AddScheduleScreen} />
       <Stack.Screen name="ScheduleForm" component={ScheduleForm} />
     </Stack.Navigator>

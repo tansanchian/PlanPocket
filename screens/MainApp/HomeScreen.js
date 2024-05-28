@@ -1,11 +1,15 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
+import Header from "../../components/Header";
+import { globalStyles } from "../../styles/global";
 
 const HomeScreen = () => {
   return (
-    <View style={styles.form}>
-      <Text style={styles.text}>Welcome to HomeScreen</Text>
+    <View style={styles.container}>
+      <Header title="Home" />
+      <View style={globalStyles.globalContainer}>
+        <Text style={styles.text}>Welcome to HomeScreen</Text>
+      </View>
     </View>
   );
 };
@@ -13,16 +17,16 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  form: {
+  container: {
+    marginTop: 20,
     flex: 1,
-    backgroundColor: "pink",
-    padding: 20,
-    justifyContent: "center",
+    backgroundColor: "white",
   },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
+    justifyContent: "center",
     margin: 10,
   },
 });

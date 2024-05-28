@@ -5,6 +5,7 @@ import {
   Image,
   useWindowDimensions,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
@@ -20,38 +21,46 @@ const CoverScreen = () => {
     navigation.navigate("SignUp");
   };
   return (
-    <View style={globalStyles.globalContainer}>
-      <Image
-        source={require("../assets/Logo.png")}
-        style={{ resizeMode: "contain", height: 500 }}
-      />
-      <View
-        style={{
-          alignSelf: "flex-start",
-          flexDirection: "row",
-          marginTop: 10,
-        }}
-      >
+    <ScrollView
+      contentContainerStyle={{ minHeight: "100%" }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={globalStyles.globalContainer}>
         <Image
           source={require("../assets/Logo.png")}
-          style={styles.illustration}
+          style={{ resizeMode: "contain", height: 500 }}
         />
-        <Text style={{ textAlignVertical: "bottom", fontSize: 20 }}>
-          <Text style={{ fontWeight: "bold" }}>Plan</Text>Pocket
+        <View
+          style={{
+            alignSelf: "flex-start",
+            flexDirection: "row",
+            marginTop: 10,
+          }}
+        >
+          <Image
+            source={require("../assets/Logo.png")}
+            style={styles.illustration}
+          />
+          <Text style={{ textAlignVertical: "bottom", fontSize: 20 }}>
+            <Text style={{ fontWeight: "bold" }}>Plan</Text>Pocket
+          </Text>
+        </View>
+        <Text style={styles.title}>Everything you need is in one place</Text>
+        <Text style={styles.description}>
+          Manage both your time and finances effectively while ensuring your
+          activties within your budget!
         </Text>
+        <TouchableOpacity style={styles.loginButton} onPress={onPressLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.registerButton}
+          onPress={onPressRegister}
+        >
+          <Text style={styles.registerButtonText}>Register</Text>
+        </TouchableOpacity>
       </View>
-      <Text style={styles.title}>Everything you need is in one place</Text>
-      <Text style={styles.description}>
-        Manage both your time and finances effectively while ensuring your
-        activties within your budget!
-      </Text>
-      <TouchableOpacity style={styles.loginButton} onPress={onPressLogin}>
-        <Text style={styles.loginButtonText}>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.registerButton} onPress={onPressRegister}>
-        <Text style={styles.registerButtonText}>Register</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -66,7 +75,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   illustrationContainer: {
-    flex: 3,
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,

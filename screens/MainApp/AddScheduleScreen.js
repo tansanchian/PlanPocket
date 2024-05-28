@@ -2,6 +2,8 @@ import { View, Text, StyleSheet } from "react-native";
 import React, { useState, useEffect } from "react";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import Header from "../../components/Header";
+import { globalStyles } from "../../styles/global";
 
 const AddScheduleScreen = () => {
   const navigation = useNavigation();
@@ -12,9 +14,12 @@ const AddScheduleScreen = () => {
   };
 
   return (
-    <View style={styles.form}>
-      <Text style={styles.text}>No Current Event</Text>
-      <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
+    <View style={styles.container}>
+      <Header title="AddSchedule" />
+      <View style={globalStyles.globalContainer}>
+        <Text style={styles.text}>No Current Event</Text>
+        <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
+      </View>
     </View>
   );
 };
@@ -22,11 +27,10 @@ const AddScheduleScreen = () => {
 export default AddScheduleScreen;
 
 const styles = StyleSheet.create({
-  form: {
+  container: {
+    marginTop: 20,
     flex: 1,
-    backgroundColor: "pink",
-    padding: 20,
-    justifyContent: "center",
+    backgroundColor: "white",
   },
   text: {
     fontSize: 24,

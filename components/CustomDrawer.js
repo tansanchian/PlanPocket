@@ -60,7 +60,7 @@ const CustomDrawer = (props) => {
         >
           <View style={styles.customBotton}>
             <AntDesign name="book" size={20} />
-            <Text style={{ marginLeft: 5 }}>About Us</Text>
+            <Text style={{ marginLeft: 5, fontWeight: "bold" }}>About Us</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
@@ -69,7 +69,7 @@ const CustomDrawer = (props) => {
         >
           <View style={styles.customBotton}>
             <AntDesign name="logout" size={20} />
-            <Text style={{ marginLeft: 5 }}>Sign Out</Text>
+            <Text style={{ marginLeft: 5, fontWeight: "bold" }}>Log Out</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -94,18 +94,17 @@ const styles = StyleSheet.create({
   },
   image: {
     borderRadius: 50,
-    borderColor: "black",
+    borderColor: "#735DA5",
     borderWidth: 2,
     maxWidth: 100,
     maxHeight: 100,
   },
   username: {
-    padding: 20,
+    padding: 10,
     color: "black",
   },
   list: {
-    padding: 15,
-    marginHorizontal: -15,
+    marginTop: 10,
   },
   custom: {
     padding: 20,

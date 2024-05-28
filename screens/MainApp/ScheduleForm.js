@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
-import { StatusBar } from "expo-status-bar";
 import React, { useState, useEffect } from "react";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
@@ -15,13 +14,14 @@ import {
   push,
   update,
 } from "@firebase/database";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { Directions, TouchableOpacity } from "react-native-gesture-handler";
 
 const ScheduleForm = () => {
   const navigation = useNavigation();
   const [available, setAvailable] = useState(true);
   const [username, setUsername] = useState("");
   const [created, setCreated] = useState(false);
+  const [activeButton, setActiveButton] = useState(null);
 
   const { control, handleSubmit, watch } = useForm();
   const purpose = watch("Purpose");
@@ -118,18 +118,47 @@ const ScheduleForm = () => {
           control={control}
           rules={{ required: "Purpose is required" }}
         />
-        <Text style={styles.text}>Budget Availablity</Text>
-        <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
-          <CustomButton
-            text="Budget Applicable"
-            design="HALF"
-            onPress={onApplicablePressed}
-          />
-          <CustomButton
-            text="Budget Not-Applicable"
-            design="HALF"
-            onPress={onNotApplicablePressed}
-          />
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: "bold",
+            textAlign: "centre",
+          }}
+        >
+          Budget Availablity
+        </Text>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                borderRadius: 25,
+                paddingVertical: 15,
+                alignItems: "center",
+                marginVertical: 10,
+                backgroundColor: available ? "#735DA5" : "#D3C5E5",
+              }}
+              onPress={onApplicablePressed}
+            >
+              <Text style={{ color: "white" }}>Budget available</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 0.05 }} />
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                borderRadius: 25,
+                paddingVertical: 15,
+                marginVertical: 10,
+                alignItems: "center",
+                backgroundColor: available ? "#D3C5E5" : "#735DA5",
+              }}
+              onPress={onNotApplicablePressed}
+            >
+              <Text style={{ color: "white", textAlign: "center" }}>
+                Budget Not available
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
         {available && (
           <>

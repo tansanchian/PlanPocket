@@ -1,6 +1,7 @@
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
+import Header from "../../components/Header";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -60,7 +61,8 @@ const TimeTableScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
+      <Header title="Timetable" />
       <Agenda
         items={items}
         loadItemsForMonth={loadItems}
@@ -76,6 +78,11 @@ const TimeTableScreen = () => {
 export default TimeTableScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    flex: 1,
+    backgroundColor: "white",
+  },
   item: {
     backgroundColor: "white",
     flex: 1,
