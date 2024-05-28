@@ -11,6 +11,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import { getDatabase, ref, child, get } from "firebase/database";
 import { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
+import { useWindowDimensions } from "react-native";
 
 const Drawers = createDrawerNavigator();
 
@@ -18,6 +19,8 @@ const Drawer = () => {
   const [username, setUsername] = useState("");
   const auth = getAuth();
   const user = auth.currentUser;
+  const dimensions = useWindowDimensions();
+
   useEffect(() => {
     if (user) {
       const fetchUsername = async () => {
@@ -43,7 +46,7 @@ const Drawer = () => {
     <Drawers.Navigator
       drawerContent={(props) => <CustomDrawer {...props} username={username} />}
       screenOptions={{
-        swipeEdgeWidth: 1080,
+        swipeEdgeWidth: dimensions.width,
         headerShown: false,
         drawerLabelStyle: { marginLeft: -25 },
         drawerActiveBackgroundColor: "purple",

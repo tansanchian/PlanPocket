@@ -3,7 +3,6 @@ import {
   View,
   TextInput,
   StyleSheet,
-  Button,
   Platform,
   TouchableOpacity,
 } from "react-native";
@@ -25,18 +24,19 @@ const CustomInput = ({
 
   const onChanges = (event, selectedDate) => {
     const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === "ios");
+    setShowDatePicker(false);
     setDate(currentDate);
   };
 
-  const showDatepicker = () => {
+  const onPressDatePicker = () => {
     setShowDatePicker(true);
   };
+
   if (keyboard == "time") {
     return (
       <TouchableOpacity
         style={[styles[`container${design}`]]}
-        onPress={showDatepicker}
+        onPress={onPressDatePicker}
       >
         <View pointerEvents="none">
           <TextInput
@@ -56,7 +56,7 @@ const CustomInput = ({
     return (
       <TouchableOpacity
         style={[styles[`container${design}`]]}
-        onPress={showDatepicker}
+        onPress={onPressDatePicker}
       >
         <View pointerEvents="none">
           <TextInput
