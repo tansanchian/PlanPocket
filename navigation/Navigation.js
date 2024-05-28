@@ -6,6 +6,7 @@ import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import ForgotPassword from "../screens/ForgotPassworScreen";
 import ResetPassword from "../screens/ResetPasswordScreen";
+import CoverScreen from "../screens/CoverScreen";
 import Drawer from "./Drawer";
 import { AuthContext } from "../components/AuthContext";
 
@@ -25,6 +26,7 @@ export default function Navigation() {
     <NavigationContainer>
       {userToken === null ? (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Cover" component={CoverScreen} />
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />

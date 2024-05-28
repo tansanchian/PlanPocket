@@ -7,6 +7,7 @@ import {
   ScrollView,
   useWindowDimensions,
   ActivityIndicator,
+  Text,
 } from "react-native";
 import { useState, useEffect, useContext } from "react";
 import { globalStyles } from "../styles/global";
@@ -66,21 +67,47 @@ export default function SignInScreen() {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={{ minHeight: "100%" }}
+      showsVerticalScrollIndicator={false}
+    >
       <KeyboardAvoidingView
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-        style={globalStyles.container}
+        style={{ flex: 1 }}
       >
-        <View style={styles.form}>
+        <View style={globalStyles.globalContainer}>
           <Image
             source={require("../assets/Logo.png")}
             style={(styles.img, { height: height * 0.3 })}
             resizeMode="contain"
           />
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              fontSize: 30,
+              fontWeight: "bold",
+              textAlign: "left",
+              marginVertical: 5,
+            }}
+          >
+            Login
+          </Text>
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              fontSize: 15,
+              color: "grey",
+              textAlign: "left",
+              marginVertical: 5,
+            }}
+          >
+            Login to continue using the app
+          </Text>
+          <Text style={styles.text}>Email</Text>
           <CustomInput
             name="email"
-            placeholder="Email"
+            placeholder="Enter your email"
             control={control}
             rules={{
               required: "Email is required",
@@ -90,9 +117,10 @@ export default function SignInScreen() {
               },
             }}
           />
+          <Text style={styles.text}>Password</Text>
           <CustomInput
             name="password"
-            placeholder="Password"
+            placeholder="Enter Password"
             control={control}
             rules={{
               required: "Password is required",
@@ -103,6 +131,11 @@ export default function SignInScreen() {
             }}
             secureTextEntry={true}
           />
+          <CustomButton
+            text="Forgot password?"
+            onPress={onForgotPasswordPressed}
+            type="RIGHT"
+          />
           {loading ? (
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
@@ -111,11 +144,17 @@ export default function SignInScreen() {
               onPress={handleSubmit(onSignInPressed)}
             />
           )}
-          <CustomButton
-            text="Forgot password?"
-            onPress={onForgotPasswordPressed}
-            type="TERTIARY"
-          />
+          <Text
+            style={{
+              fontSize: 18,
+              color: "gray",
+              textAlign: "center",
+              fontWeight: "bold",
+              marginVertical: 10,
+            }}
+          >
+            Or Login with
+          </Text>
           <CustomButton
             text="Sign In with Google"
             onPress={onSignInGoogle}
@@ -129,7 +168,7 @@ export default function SignInScreen() {
             fgColor="#DD4D44"
           />
           <CustomButton
-            text="Don't have an account? Create one"
+            text="Don't have an account? Register"
             onPress={onSignUpPressed}
             type="TERTIARY"
           />
@@ -140,15 +179,23 @@ export default function SignInScreen() {
 }
 
 const styles = StyleSheet.create({
-  form: {
-    backgroundColor: "#F9FBFC",
-    padding: 20,
+  container: {
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3eef6",
+    paddingHorizontal: 20,
   },
   img: {
     width: "100%",
     height: 100,
     maxWidth: 300,
     maxHeight: 200,
+  },
+  text: {
+    alignSelf: "flex-start",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
   },
 });

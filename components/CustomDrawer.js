@@ -40,7 +40,7 @@ const CustomDrawer = (props) => {
         contentContainerStyle={styles.content}
       >
         <ImageBackground
-          source={require("../assets/menu.jpg")}
+          source={require("../assets/menu.png")}
           style={styles.bgImage}
         >
           <Image
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    backgroundColor: "purple",
+    backgroundColor: "white",
   },
   bgImage: {
     flex: 1,
@@ -100,11 +100,10 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   username: {
-    padding: 10,
-    color: "white",
+    padding: 20,
+    color: "black",
   },
   list: {
-    backgroundColor: "white",
     padding: 15,
     marginHorizontal: -15,
   },

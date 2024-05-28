@@ -10,9 +10,12 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 8,
     lineHeight: 20,
   },
-  container: {
+  globalContainer: {
     flex: 1,
-    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3eef6",
+    paddingHorizontal: 20,
   },
   input: {
     borderWidth: 1,

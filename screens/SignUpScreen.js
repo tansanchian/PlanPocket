@@ -4,6 +4,8 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  Image,
+  useWindowDimensions,
 } from "react-native";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
@@ -14,8 +16,10 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { ref, set } from "firebase/database";
 import { getDatabase } from "@firebase/database";
+import { globalStyles } from "../styles/global";
 
 export default function SignUpScreen() {
+  const { height } = useWindowDimensions();
   const navigation = useNavigation();
   const { control, handleSubmit, watch } = useForm();
   const [loading, setLoading] = useState(false);
@@ -70,18 +74,39 @@ export default function SignUpScreen() {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Create Account</Text>
+    <ScrollView
+      contentContainerStyle={{ minHeight: "100%" }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={globalStyles.globalContainer}>
+        <Image
+          source={require("../assets/Logo.png")}
+          style={(styles.img, { height: height * 0.3 })}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>Register</Text>
+        <Text
+          style={{
+            alignSelf: "flex-start",
+            fontSize: 15,
+            color: "grey",
+            textAlign: "left",
+            marginVertical: 5,
+          }}
+        >
+          Enter Your Personal Information
+        </Text>
+        <Text style={styles.text}>Username</Text>
         <CustomInput
           name="username"
-          placeholder="Username"
+          placeholder="Enter your name"
           control={control}
           rules={{ required: "Username is required" }}
         />
+        <Text style={styles.text}>Email</Text>
         <CustomInput
           name="email"
-          placeholder="Email"
+          placeholder="Enter your email"
           control={control}
           rules={{
             required: "Email is required",
@@ -91,9 +116,10 @@ export default function SignUpScreen() {
             },
           }}
         />
+        <Text style={styles.text}>Password</Text>
         <CustomInput
           name="password"
-          placeholder="Password"
+          placeholder="Enter password"
           control={control}
           rules={{
             required: "Password is required",
@@ -104,9 +130,10 @@ export default function SignUpScreen() {
           }}
           secureTextEntry={true}
         />
+        <Text style={styles.text}>Confirm password</Text>
         <CustomInput
           name="password-repeat"
-          placeholder="Repeat Password"
+          placeholder="Enter confirm Password"
           control={control}
           rules={{
             validate: (value) =>
@@ -122,7 +149,7 @@ export default function SignUpScreen() {
             onPress={handleSubmit(onRegisterPressed)}
           />
         )}
-        <Text style={styles.text}>
+        <Text style={styles.policyText}>
           By registering, you confirm that you accept our{" "}
           <Text style={styles.link} onPress={onTermsOfUsePressed}>
             Terms
@@ -162,11 +189,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 24,
+    alignSelf: "flex-start",
+    fontSize: 30,
     fontWeight: "bold",
-    color: "#051C60",
-    margin: 10,
+    textAlign: "left",
+    marginVertical: 5,
   },
-  text: { color: "#gray", marginVertical: 10 },
+  policyText: { color: "#gray", marginVertical: 10 },
   link: { color: "#FDB075" },
+  text: {
+    alignSelf: "flex-start",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
+  },
 });

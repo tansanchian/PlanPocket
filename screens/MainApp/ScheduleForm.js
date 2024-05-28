@@ -111,14 +111,14 @@ const ScheduleForm = () => {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
         <Text style={styles.title}>Add Schedule</Text>
-        <Text>Purpose</Text>
+        <Text style={styles.text}>Purpose</Text>
         <CustomInput
           name="Purpose"
           placeholder="Purpose"
           control={control}
           rules={{ required: "Purpose is required" }}
         />
-        <Text>Budget Availablity</Text>
+        <Text style={styles.text}>Budget Availablity</Text>
         <View style={{ alignSelf: "flex-start", flexDirection: "row" }}>
           <CustomButton
             text="Budget Applicable"
@@ -133,7 +133,6 @@ const ScheduleForm = () => {
         </View>
         {available && (
           <>
-            <Text>Budget</Text>
             <CustomInput
               name="Budget"
               placeholder="Budget"
@@ -142,14 +141,14 @@ const ScheduleForm = () => {
             />
           </>
         )}
-        <Text>Time</Text>
+        <Text style={styles.text}>Time</Text>
         <CustomInput
           name="Time"
           placeholder="12.00PM"
           control={control}
           keyboard="time"
         />
-        <Text>Date</Text>
+        <Text style={styles.text}>Date</Text>
         <CustomInput
           name="Date"
           placeholder="12.00PM"
@@ -184,5 +183,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  text: {
+    alignSelf: "flex-start",
+    fontSize: 20,
+    fontWeight: "bold",
+    textAlign: "left",
   },
 });

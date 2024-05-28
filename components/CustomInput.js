@@ -18,6 +18,7 @@ const CustomInput = ({
   secureTextEntry,
   design = "",
   keyboard,
+  editable = true,
 }) => {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -93,6 +94,8 @@ const CustomInput = ({
                 onChangeText={onChange}
                 placeholder={placeholder}
                 secureTextEntry={secureTextEntry}
+                editable={editable}
+                keyboardType={keyboard}
               />
             </View>
             {error && (
@@ -111,12 +114,14 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     width: "100%",
+
     borderColor: "#e8e8e8",
     borderWidth: 1,
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginVertical: 5,
+    borderRadius: 25,
   },
   containerHALF: {
     backgroundColor: "white",
@@ -127,11 +132,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginVertical: 5,
+    borderRadius: 25,
   },
   input: {},
   errorText: {
     color: "red",
     alignSelf: "stretch",
     textAlignVertical: "bottom",
+    borderRadius: 25,
   },
 });

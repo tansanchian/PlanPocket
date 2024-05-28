@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Animated,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 
 const CustomButton = ({
@@ -10,7 +17,7 @@ const CustomButton = ({
   fgColor,
 }) => {
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={onPress}
       style={[
         styles[`container_${design}`],
@@ -27,7 +34,7 @@ const CustomButton = ({
       >
         {text}
       </Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 
@@ -35,18 +42,24 @@ export default CustomButton;
 
 const styles = StyleSheet.create({
   container_MAIN: {
+    paddingVertical: 15,
+    borderRadius: 25,
+    marginVertical: 10,
     width: "100%",
-    padding: 15,
-    marginVertical: 5,
     alignItems: "center",
-    borderRadius: 5,
   },
   container_HALF: {
+    paddingVertical: 15,
+    borderRadius: 25,
+    marginVertical: 10,
     width: "50%",
-    padding: 15,
-    marginVertical: 5,
     alignItems: "center",
-    borderRadius: 5,
+  },
+  container_RIGHT: {
+    alignItems: "flex-end",
+  },
+  text_RIGHT: {
+    color: "grey",
   },
   text: {
     fontWeight: "bold",
@@ -54,7 +67,7 @@ const styles = StyleSheet.create({
   },
 
   container_PRIMARY: {
-    backgroundColor: "#3B71F3",
+    backgroundColor: "#735DA5",
   },
 
   container_TERTIARY: {},
