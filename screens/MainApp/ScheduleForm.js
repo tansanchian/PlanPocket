@@ -1,109 +1,135 @@
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
-import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  TextInput,
+  Platform,
+  Switch,
+} from "react-native";
+
+import React, { useState } from "react";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
-import { getAuth } from "@firebase/auth";
-import {
-  getDatabase,
-  ref,
-  get,
-  set,
-  child,
-  push,
-  update,
-} from "@firebase/database";
-import { Directions, TouchableOpacity } from "react-native-gesture-handler";
+import { writeScheduleDatabase } from "../../components/Database";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const ScheduleForm = () => {
   const navigation = useNavigation();
   const [available, setAvailable] = useState(true);
-  const [username, setUsername] = useState("");
-  const [created, setCreated] = useState(false);
-  const [activeButton, setActiveButton] = useState(null);
+  const [time, setTime] = useState(new Date());
+  const [date, setDate] = useState(new Date());
+  const [toTime, setToTime] = useState(() => {
+    const currentTime = new Date();
+    currentTime.setHours(currentTime.getHours() + 1);
+    return currentTime;
+  });
+  const [toDate, setToDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showToDatePicker, setToShowDatePicker] = useState(false);
+  const [showToTimePicker, setToShowTimePicker] = useState(false);
+  const [highlightFromDate, setHighlightFromDate] = useState(false);
+
+  const [isAllDayEnabled, setIsAllDayEnabled] = useState(false);
+  const toggleAllDaySwitch = () => {
+    setIsAllDayEnabled((previousState) => !previousState);
+    setHighlightFromDate(false);
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setDate(currentDate);
+    setHighlightFromDate(new Date(date) < new Date(currentDate));
+  };
+
+  const onTimeChange = (event, selectedTime) => {
+    const currentDate = selectedTime || time;
+    setShowTimePicker(false);
+    setTime(currentDate);
+    setHighlightFromDate(new Date(date) < new Date(currentDate));
+  };
+
+  const onPressDatePicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const onPressTimePicker = () => {
+    setShowTimePicker(true);
+  };
+
+  const onToDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setToShowDatePicker(false);
+    setToDate(currentDate);
+    setHighlightFromDate(new Date(date) > new Date(currentDate));
+  };
+
+  const onToTimeChange = (event, selectedTime) => {
+    const currentDate = selectedTime || time;
+    setToShowTimePicker(false);
+    setToTime(currentDate);
+    setHighlightFromDate(new Date(date) > new Date(currentDate));
+  };
+
+  const onToPressDatePicker = () => {
+    setToShowDatePicker(true);
+  };
+
+  const onToPressTimePicker = () => {
+    setToShowTimePicker(true);
+  };
 
   const { control, handleSubmit, watch } = useForm();
   const purpose = watch("Purpose");
-  const budget = watch("Budget");
-  const time = watch("Time");
+  const budget = available ? watch("Budget") : "";
   const others = watch("Others");
 
-  useEffect(() => {
-    const getUser = async () => {
-      const auth = getAuth();
-      const db = getDatabase();
-      const userId = auth.currentUser.uid;
-      const dbRef = ref(db, `users/${userId}/username`);
-      try {
-        const snapshot = await get(dbRef);
-        if (snapshot.exists()) {
-          setUsername(snapshot.val());
-        } else {
-          console.log("No data available");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    getUser();
-  });
-
   const onAddSchedulePressed = async () => {
-    const auth = getAuth();
-    const db = getDatabase();
-    const userId = auth.currentUser?.uid;
-
-    if (userId && !created) {
-      const postData = {
+    try {
+      const result = await writeScheduleDatabase(
         purpose,
-        budget: available ? budget : null,
-        time,
-        others,
-      };
-
-      try {
-        const newPostKey = push(child(ref(db), "profile")).key;
-        await set(
-          ref(db, `/users/${userId}/profile/schedules/${newPostKey}`),
-          postData
-        );
-        setCreated(true);
-        Alert.alert("Success", "New Schedule created successfully!");
-      } catch (error) {
-        console.error("Error creating Schedule:", error);
-        Alert.alert("Error", "Failed to create schedule");
+        budget,
+        !isAllDayEnabled
+          ? time.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "12.00am",
+        date.toLocaleDateString("fr-FR"),
+        !isAllDayEnabled
+          ? toTime.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "11.59pm",
+        toDate.toLocaleDateString("fr-FR"),
+        others
+      );
+      if (result) {
+        Alert.alert("Success", "Schedule added successfully");
+      } else {
+        Alert.alert("Error", "Failed to add schedule");
       }
-    } else if (created) {
-      const postData = {
-        purpose,
-        budget: available ? budget : null,
-        time,
-        others,
-      };
-      const newPostKey = push(child(ref(db), "profile")).key;
-      const updates = {};
-      updates[`/users/${userId}/profile/schedules/${newPostKey}`] = postData;
-      update(ref(db), updates);
-      Alert.alert("Success", "Updated current Schedule successfully!");
-    } else {
-      Alert.alert("Error", "User not authenticated");
+    } catch (error) {
+      Alert.alert("Error", "Failed to add schedule: " + error.message);
     }
   };
 
   const onBackPressed = () => {
-    console.warn("onBackPressed");
     navigation.navigate("AddSchedule");
   };
 
   const onApplicablePressed = () => {
-    console.warn("onApplicablePressed");
     setAvailable(true);
   };
 
   const onNotApplicablePressed = () => {
-    console.warn("onNotApplicablePressed");
     setAvailable(false);
   };
 
@@ -170,23 +196,130 @@ const ScheduleForm = () => {
             />
           </>
         )}
-        <Text style={styles.text}>Time</Text>
-        <CustomInput
-          name="Time"
-          placeholder="12.00PM"
-          control={control}
-          keyboard="time"
-        />
-        <Text style={styles.text}>Date</Text>
-        <CustomInput
-          name="Date"
-          placeholder="12.00PM"
-          control={control}
-          keyboard="date"
-        />
-        <Text>Others</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View style={{ flex: 1, alignItems: "flex-start" }}>
+            <Text style={styles.text}>All-day</Text>
+          </View>
+          <View style={{ alignItems: "flex-end" }}>
+            <Switch
+              trackColor={{ false: "#fff", true: "#fff" }}
+              thumbColor={isAllDayEnabled ? "#735DA5" : "#D3C5E5"}
+              ios_backgroundColor="#735DA5"
+              onValueChange={toggleAllDaySwitch}
+              value={isAllDayEnabled}
+            />
+          </View>
+        </View>
+        <View
+          style={[
+            styles.allDayContainer,
+            highlightFromDate && { borderColor: "red", borderWidth: 1 },
+          ]}
+        >
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onPressDatePicker}>
+              <View pointerEvents="none">
+                <TextInput value={date.toLocaleDateString("fr-FR")} />
+              </View>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={onDateChange}
+              />
+            )}
+          </View>
+          <View style={{ flex: 0.05 }}></View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onPressTimePicker}>
+              <View pointerEvents="none">
+                <TextInput
+                  style={{ alignSelf: "flex-end" }}
+                  value={
+                    !isAllDayEnabled
+                      ? time.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : ""
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+            {showTimePicker && !isAllDayEnabled && (
+              <DateTimePicker
+                value={time}
+                mode="time"
+                onChange={onTimeChange}
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+              />
+            )}
+          </View>
+        </View>
+        <View style={styles.allDayContainer}>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onToPressDatePicker}>
+              <View pointerEvents="none">
+                <TextInput value={toDate.toLocaleDateString("fr-FR")} />
+              </View>
+            </TouchableOpacity>
+            {showToDatePicker && (
+              <DateTimePicker
+                value={toDate}
+                mode="date"
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+                onChange={onToDateChange}
+              />
+            )}
+          </View>
+          <View style={{ flex: 0.05 }}></View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onToPressTimePicker}>
+              <View pointerEvents="none">
+                <TextInput
+                  style={{ alignSelf: "flex-end" }}
+                  value={
+                    !isAllDayEnabled
+                      ? toTime.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : ""
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+            {showToTimePicker && !isAllDayEnabled && (
+              <DateTimePicker
+                value={toTime}
+                mode="time"
+                onChange={onToTimeChange}
+                display={Platform.OS === "ios" ? "spinner" : "default"}
+              />
+            )}
+          </View>
+        </View>
+        <Text style={styles.text}>Others</Text>
+        <View>
+          <Text>Location</Text>
+        </View>
         <CustomInput name="Others" control={control} placeholder="Others" />
-        <CustomButton text="Add" onPress={handleSubmit(onAddSchedulePressed)} />
+        <CustomButton
+          text="Add"
+          onPress={
+            highlightFromDate
+              ? () => Alert.alert("Error", "From date cannot be after to date")
+              : handleSubmit(onAddSchedulePressed)
+          }
+        />
         <CustomButton text="Back" onPress={onBackPressed} type="TERTIARY" />
       </View>
     </ScrollView>
@@ -218,5 +351,30 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "left",
+  },
+  container2: {
+    backgroundColor: "white",
+    width: "100%",
+
+    borderColor: "#e8e8e8",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 25,
+  },
+  switch: {},
+  allDayContainer: {
+    flexDirection: "row",
+    backgroundColor: "white",
+    width: "100%",
+    borderColor: "#e8e8e8",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 25,
   },
 });

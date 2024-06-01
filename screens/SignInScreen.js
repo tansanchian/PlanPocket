@@ -2,14 +2,14 @@ import {
   View,
   StyleSheet,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   useWindowDimensions,
   ActivityIndicator,
   Text,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { globalStyles } from "../styles/global";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
@@ -26,23 +26,20 @@ export default function SignInScreen() {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const password = watch("password");
-  const email = watch("email");
 
-  const onSignInPressed = async () => {
+  const onSignInPressed = async (data) => {
     setLoading(true);
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
+      const response = await signInWithEmailAndPassword(auth, data.email, data.password);
       const customToken = await response.user.getIdToken();
       login(customToken);
       console.log(response);
     } catch (error) {
       console.log(error);
-      if (error.code == "auth/invalid-credential") {
+      if (error.code === "auth/invalid-credential") {
         alert("Sign in failed: incorrect password or username!");
       } else {
         alert("Sign in failed: " + error.message);
@@ -51,11 +48,12 @@ export default function SignInScreen() {
       setLoading(false);
     }
   };
+
   const onSignInGoogle = () => {
     console.warn("onSignInGoogle");
   };
   const onSignInFacebook = () => {
-    console.warn("onSignInFaceBook");
+    console.warn("onSignInFacebook");
   };
   const onForgotPasswordPressed = () => {
     console.warn("onForgotPasswordPressed");
@@ -67,19 +65,18 @@ export default function SignInScreen() {
   };
 
   return (
-    <ScrollView
-      contentContainerStyle={{ minHeight: "100%" }}
-      showsVerticalScrollIndicator={false}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
     >
-      <KeyboardAvoidingView
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-        style={{ flex: 1 }}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
       >
         <View style={globalStyles.globalContainer}>
           <Image
             source={require("../assets/Logo.png")}
-            style={(styles.img, { height: height * 0.3 })}
+            style={[styles.img, { height: height * 0.3 }]}
             resizeMode="contain"
           />
           <Text
@@ -173,8 +170,8 @@ export default function SignInScreen() {
             type="TERTIARY"
           />
         </View>
-      </KeyboardAvoidingView>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

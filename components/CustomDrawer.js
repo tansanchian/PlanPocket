@@ -102,6 +102,7 @@ const styles = StyleSheet.create({
   username: {
     padding: 10,
     color: "black",
+    left: 12
   },
   list: {
     marginTop: 10,

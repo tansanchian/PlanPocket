@@ -8,20 +8,17 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Modal,
+  Alert,
+  TextInput
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { getDatabase, ref, child, get, set } from "firebase/database";
-import { getAuth } from "firebase/auth";
+import { getAuth, EmailAuthProvider, reauthenticateWithCredential, updateEmail } from "firebase/auth";
 import { useFocusEffect } from "@react-navigation/native";
-import { useForm } from "react-hook-form";
-import { TextInput } from "react-native";
-import { Controller } from "react-hook-form";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  updateEmail,
-} from "firebase/auth";
-import { Alert } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { writeProfile, readProfile } from "../../components/Database";
+import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from "../../App";
 
 export default function ProfileScreen() {
   const [username, setUsername] = useState("");
@@ -32,8 +29,11 @@ export default function ProfileScreen() {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [original, setOriginal] = useState({});
+  const [imageModal, setImageModal] = useState(false);
+
   const auth = getAuth();
   const user = auth.currentUser;
+
   const {
     control,
     handleSubmit,
@@ -45,67 +45,52 @@ export default function ProfileScreen() {
       email: "",
       hpnumber: "",
       location: "",
-      username: "",
+      username: ""
     },
   });
 
-  const writeUserData = async (
-    userId,
-    hpnumber,
-    location,
-    imageUrl,
-    username
-  ) => {
-    const db = getDatabase();
-    const userRef = ref(db, "users/" + userId);
+  const writeUserData = async (hpnumber, location, imageUrl, username) => {
     try {
-      await set(userRef, {
-        hpnumber: hpnumber,
-        location: location,
-        imageUrl: imageUrl,
-        username: username,
-      });
+      const hpnumberSuccess = await writeProfile("hpnumber", hpnumber);
+      console.log(hpnumber);
+      if (!hpnumberSuccess) throw new Error("Failed to update hpnumber");
+  
+      const locationSuccess = await writeProfile("location", location);
+      if (!locationSuccess) throw new Error("Failed to update location");
+  
+      const imageUrlSuccess = await writeProfile("imageUrl", imageUrl);
+      if (!imageUrlSuccess) throw new Error("Failed to update imageUrl");
+  
+      const usernameSuccess = await writeProfile("username", username);
+      if (!usernameSuccess) throw new Error("Failed to update username");
+  
       return true;
     } catch (error) {
-      console.error("Error writing to database:", error);
+      console.error("Error updating profile:", error.message);
       return false;
     }
   };
+  
 
   useEffect(() => {
     if (user) {
       setValue("email", user.email);
     }
-    const fetchData = async (data, setData, fieldName) => {
-      if (user) {
-        const dbRef = ref(getDatabase());
-        try {
-          const snapshot = await get(child(dbRef, `users/${user.uid}/${data}`));
-          if (snapshot.exists()) {
-            setData(snapshot.val());
-            if (fieldName) {
-              setValue(fieldName, snapshot.val());
-            }
-          } else {
-            console.log("No data available");
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-    fetchData("username", setUsername, "username");
-    fetchData("hpnumber", setHpNumber, "hpnumber");
-    fetchData("location", setLocation, "location");
-    fetchData("imageUrl", setImageUrl, "imageUrl");
+    readProfile("username", setUsername);
+    readProfile("username", username => setValue('username', username));
+    readProfile("hpnumber", setHpNumber);
+    readProfile("hpnumber", username => setValue('hpnumber', username));
+    readProfile("location", setLocation);
+    readProfile("location", username => setValue('location', username));
+    readProfile("imageUrl", setImageUrl);
   }, [user, setValue]);
 
   useEffect(() => {
     setOriginal({
       email: watch("email"),
       username: watch("username"),
-      hpnumber: watch("hpnumber"),
-      location: watch("location"),
+      hpnumber: watch('hpnumber'),
+      location: watch('location'),
       imageUrl: watch("imageUrl"),
     });
   }, [watch]);
@@ -115,6 +100,7 @@ export default function ProfileScreen() {
       setEditable(false);
     }, [])
   );
+
   const reauthenticate = async () => {
     try {
       const credential = EmailAuthProvider.credential(
@@ -138,26 +124,30 @@ export default function ProfileScreen() {
     setEditable(false);
     const newEmail = data.email;
     const writeSuccessful = await writeUserData(
-      user.uid,
       hpnumber,
       location,
       imageUrl,
       watch("username")
     );
-    if (!writeSuccessful) {
-      Alert.alert("Error", "Failed to save user data. Please try again.");
-      return;
-    }
     if (newEmail !== user.email) {
       setShowPasswordModal(true);
+    } else {
+      if (!writeSuccessful) {
+        handleCancel();
+        Alert.alert("Error", "Failed to save user data. Please try again.");
+        return;
+      } else {
+        Alert.alert("Success", "Profile updated successfully", [{ text: "OK" }]);
+      }
     }
   };
+
   const handleCancel = () => {
     setEditable(false);
     setValue("email", original.email);
     setValue("username", username);
-    setHpNumber(original.hpnumber);
-    setLocation(original.location);
+    setValue("hpnumber", hpnumber);
+    setValue("location", location);
     setImageUrl(original.imageUrl);
   };
 
@@ -178,13 +168,126 @@ export default function ProfileScreen() {
         } else if (error.code === "auth/operation-not-allowed") {
           Alert.alert(
             "Operation Not Allowed",
-            "Please enable this operation in the Firebase console."
+            "Please inform us."
           );
         } else {
           Alert.alert("Error", "Failed to update email");
         }
       }
     }
+  };
+
+  const handlePasswordCancel = () => {
+    setValue("email", original.email);
+    setShowPasswordModal(false);
+  }
+
+  const onClose = () => {
+    setImageModal(false);
+  }
+
+  const uploadImage = async () => {
+    try {
+      const {status} = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Sorry, we need camera permissions to make this work!');
+        return;
+      }
+      let result = await ImagePicker.launchCameraAsync({
+        cameraType: ImagePicker.CameraType.front,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!result.canceled) {
+        const source = result.assets[0].uri;
+        try {
+          const response = await fetch(source);
+          const blob = await response.blob();
+          const storageRef = ref(storage, `images/${Date.now()}.jpg`);
+          await uploadBytes(storageRef, blob);
+          const downloadURL = await getDownloadURL(storageRef);
+          setImageUrl(downloadURL);
+          setImageModal(false);
+        } catch (error) {
+          console.error("Error reading file or uploading:", error);
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'error uploading image: ' + error.message);
+      setImageModal(false);
+    }
+  }
+
+  const removeImage = () => {
+    setImageUrl('');
+    writeProfile('imageUrl', '');
+    setImageModal(false);
+  };
+
+  const chooseFromGallery = async() => {
+    try {
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const source = result.assets[0].uri;
+        try {
+          const response = await fetch(source);
+          const blob = await response.blob();
+          const storageRef = ref(storage, `images/${Date.now()}.jpg`);
+    
+          await uploadBytes(storageRef, blob);
+          const downloadURL = await getDownloadURL(storageRef);
+          setImageUrl(downloadURL);
+          setImageModal(false);
+        } catch (error) {
+          console.error("Error reading file or uploading:", error);
+        }
+      }
+    } catch (error) {
+      Alert.alert('Error', 'error uploading image: ' + error.message);
+      console.warn(error.message);
+      setImageModal(false);
+    }
+  }
+
+  const ProfilePhotoModal = () => {
+    return (
+      <Modal
+        visible={imageModal}
+        transparent={true}
+        animationType="slide"
+      >
+        <View style={styles.imageModalContainer}>
+          <View style={styles.imageModalContent}>
+            <TouchableOpacity style={styles.imageCancelButton} onPress={onClose}>
+              <Icon name="close" size={20} color="#735DA5" />
+            </TouchableOpacity>
+            <Text style={styles.imageModalTitle}>Profile Photo</Text>
+            <View style={styles.imageOptionContainer}>
+              <TouchableOpacity style={styles.imageOption} onPress={() => uploadImage()}>
+                <Icon name="camera-alt" size={30} color="#D3C5E5" />
+                <Text style={styles.imageOptionText}>Camera</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageOption} onPress={() => chooseFromGallery()}>
+                <Icon name="photo" size={30} color="#D3C5E5" />
+                <Text style={styles.imageOptionText}>Gallery</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.imageOption} onPress={removeImage}>
+                <Icon name="delete" size={30} color="#D3C5E5" />
+                <Text style={styles.imageOptionText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
   };
 
   return (
@@ -199,10 +302,17 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: "https://via.placeholder.com/150" }}
+          {imageUrl == "" ? <Image
+            source={{ uri: "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg" }}
             style={styles.profileImage}
-          />
+          /> : <Image
+          source={{ uri: imageUrl }}
+          style={styles.profileImage}
+        />}
+          {editable && <TouchableOpacity onPress={() => setImageModal(true)}>
+                          <Image style={styles.changeButton} source={{ uri: 'https://cdn2.vectorstock.com/i/1000x1000/34/91/change-icon-simple-element-from-digital-vector-30023491.jpg' }} />
+                       </TouchableOpacity>}
+          <ProfilePhotoModal />
           <Controller
             control={control}
             name="username"
@@ -254,23 +364,41 @@ export default function ProfileScreen() {
         )}
         <View style={styles.inputContainer}>
           <Icon name="phone" size={20} color="grey" />
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            value={hpnumber}
-            editable={editable}
-            onChangeText={setHpNumber}
-            keyboardType="numeric"
+          <Controller
+            control={control}
+            name="hpnumber"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Phone Number"
+                value={value}
+                editable={editable}
+                onChangeText={(text) => {
+                  onChange(text);
+                }}
+                onBlur={onBlur}
+                keyboardType="phone-pad"
+              />
+            )}
           />
         </View>
         <View style={styles.inputContainer}>
           <Icon name="location-on" size={20} color="grey" />
-          <TextInput
-            style={styles.input}
-            placeholder="Location"
-            value={location}
-            editable={editable}
-            onChangeText={setLocation}
+          <Controller
+            control={control}
+            name="location"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <TextInput
+                style={styles.input}
+                placeholder="Location"
+                value={value}
+                editable={editable}
+                onChangeText={(text) => {
+                  onChange(text);
+                }}
+                onBlur={onBlur}
+              />
+            )}
           />
         </View>
         {editable && (
@@ -310,12 +438,18 @@ export default function ProfileScreen() {
               >
                 <Text style={styles.modalButtonText}>Submit</Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={handlePasswordCancel}
+              >
+                <Text style={styles.modalButtonText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </Modal>
       </View>
     </TouchableWithoutFeedback>
-  );
+)
 }
 
 const styles = StyleSheet.create({
@@ -352,6 +486,16 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     borderWidth: 3,
     borderColor: "white",
+  },
+  changeButton: {
+    position: 'absolute',
+    bottom: 100, 
+    left: 40,  
+    borderRadius: 20,
+    padding: 5,
+    color: 'blue',
+    width: 25,
+    height: 25
   },
   name: {
     fontSize: 22,
@@ -438,7 +582,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    alignItems: "center",
+    alignItems: "center"
   },
   modalTitle: {
     fontSize: 20,
@@ -458,8 +602,50 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
   },
+  modalCancelButton: {
+    backgroundColor: "#735DA5",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    marginTop: 20
+  },
   modalButtonText: {
     color: "white",
+    fontSize: 16,
+  },
+  imageModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  imageModalContent: {
+    width: 300,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  imageCancelButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  imageModalTitle: {
+    fontSize: 20,
+    marginBottom: 20,
+  },
+  imageOptionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+  },
+  imageOption: {
+    alignItems: 'center',
+  },
+  imageOptionText: {
+    marginTop: 5,
     fontSize: 16,
   },
 });

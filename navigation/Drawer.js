@@ -8,39 +8,22 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import SettingScreen from "../screens/MainApp/SettingScreen";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import { getDatabase, ref, child, get } from "firebase/database";
 import { useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
 import { useWindowDimensions } from "react-native";
+import { readProfile } from "../components/Database";
 
 const Drawers = createDrawerNavigator();
 
 const Drawer = () => {
   const [username, setUsername] = useState("");
-  const auth = getAuth();
-  const user = auth.currentUser;
   const dimensions = useWindowDimensions();
+  const fetchUsername = async () => {
+    await readProfile('username', setUsername);
+  }
   useEffect(() => {
-    if (user) {
-      const fetchUsername = async () => {
-        const dbRef = ref(getDatabase());
-        try {
-          const snapshot = await get(
-            child(dbRef, `users/${user.uid}/username`)
-          );
-          if (snapshot.exists()) {
-            setUsername(snapshot.val());
-          } else {
-            console.log("No data available");
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      fetchUsername();
-    }
-  }, [user]);
-
+    fetchUsername();
+  }, []);
+  
   return (
     <Drawers.Navigator
       drawerContent={(props) => <CustomDrawer {...props} username={username} />}
