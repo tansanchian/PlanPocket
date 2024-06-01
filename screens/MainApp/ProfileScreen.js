@@ -22,6 +22,8 @@ import {
   updateEmail,
 } from "firebase/auth";
 import { Alert } from "react-native";
+import { readProfile } from "../../components/Database";
+import writeProfile from "../../components/Database";
 
 export default function ProfileScreen() {
   const [username, setUsername] = useState("");
@@ -56,48 +58,20 @@ export default function ProfileScreen() {
     imageUrl,
     username
   ) => {
-    const db = getDatabase();
-    const userRef = ref(db, "users/" + userId);
-    try {
-      await set(userRef, {
-        hpnumber: hpnumber,
-        location: location,
-        imageUrl: imageUrl,
-        username: username,
-      });
-      return true;
-    } catch (error) {
-      console.error("Error writing to database:", error);
-      return false;
-    }
+    writeDatabase("hpnumber", hpnumber);
+    writeDatabase("location", location);
+    writeDatabase("imageUrl", imageUrl);
+    writeDatabase("username", username);
   };
 
   useEffect(() => {
     if (user) {
       setValue("email", user.email);
     }
-    const fetchData = async (data, setData, fieldName) => {
-      if (user) {
-        const dbRef = ref(getDatabase());
-        try {
-          const snapshot = await get(child(dbRef, `users/${user.uid}/${data}`));
-          if (snapshot.exists()) {
-            setData(snapshot.val());
-            if (fieldName) {
-              setValue(fieldName, snapshot.val());
-            }
-          } else {
-            console.log("No data available");
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-    fetchData("username", setUsername, "username");
-    fetchData("hpnumber", setHpNumber, "hpnumber");
-    fetchData("location", setLocation, "location");
-    fetchData("imageUrl", setImageUrl, "imageUrl");
+    readDatabase("username", setUsername);
+    readDatabase("hpnumber", setHpNumber);
+    readDatabase("location", setLocation);
+    readDatabase("imageUrl", setImageUrl);
   }, [user, setValue]);
 
   useEffect(() => {
