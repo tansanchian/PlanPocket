@@ -9,7 +9,6 @@ const AddScheduleScreen = () => {
   const navigation = useNavigation();
 
   const onAddSchedulePressed = () => {
-    console.log("onAddSchedulePressed");
     navigation.navigate("ScheduleForm");
   };
 
