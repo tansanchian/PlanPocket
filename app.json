@@ -16,7 +16,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "We need access to your camera to take photos.",
         "NSPhotoLibraryUsageDescription": "We need access to your photo library to choose photos."
-      }
+      },
+      "bundleIdentifier": "planpocket.expo.client"
     },
     "android": {
       "adaptiveIcon": {
@@ -39,6 +40,16 @@
     },
     "updates": {
       "url": "https://u.expo.dev/9e8859ec-b48b-47b0-8733-600112e4b700"
-    }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ]
   }
 }
