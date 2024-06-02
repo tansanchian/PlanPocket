@@ -1,4 +1,17 @@
 <h1>PlanPocket</h1>
+
+<h2>For Developers</h2>
+
+clone the repository here
+
+cd to the path where the repository is downloaded
+
+run <b>npm install</b>
+
+run <b>npm run</b>
+
+scan the QR code and test it out
+
 <h2>Motivation</h2>
 
 **Integrated Time and Budget Management**: Many people struggle to balance their schedules and financial budgets simultaneously. This app is created to integrate these aspects, while providing a solution that helps users plan their activities without overspending.
