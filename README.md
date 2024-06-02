@@ -16,9 +16,9 @@ run <b>npm install</b>
 
 run <b>npm run</b>
 
-for ios: scan the QR code using camera
+for ios: scan the generated QR code using camera
 
-for android: open expo go application and scan it there
+for android: open expo go application and scan the generated QR code there
 
 <h2>Motivation</h2>
 
