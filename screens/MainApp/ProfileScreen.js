@@ -9,7 +9,8 @@ import {
   TouchableWithoutFeedback,
   Modal,
   Alert,
-  TextInput
+  TextInput,
+  Pressable
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { getAuth, EmailAuthProvider, reauthenticateWithCredential, updateEmail } from "firebase/auth";
@@ -310,9 +311,9 @@ export default function ProfileScreen() {
           source={{ uri: imageUrl }}
           style={styles.profileImage}
         />}
-          {editable && <TouchableOpacity onPress={() => setImageModal(true)}>
+          {editable && <Pressable onPressIn={() => setImageModal(true)}>
                           <Image style={styles.changeButton} source={{ uri: 'https://cdn2.vectorstock.com/i/1000x1000/34/91/change-icon-simple-element-from-digital-vector-30023491.jpg' }} />
-                       </TouchableOpacity>}
+                       </Pressable>}
           <ProfilePhotoModal />
           <Controller
             control={control}
@@ -495,8 +496,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 5,
     color: 'blue',
-    width: 25,
-    height: 25
+    width: 30,
+    height: 30
   },
   name: {
     fontSize: 22,
