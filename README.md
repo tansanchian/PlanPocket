@@ -1,11 +1,10 @@
-Proposal for Orbital 24
-Team Name: Bing Bong
+**Team Name: Bing Bong
 
 Proposed Level of Achievement: Apollo 11 
 
-Application Name: PlanPocket
+Application Name: PlanPocket**
 
-Motivation: 
+**Motivation**
 Integrated Time and Budget Management: Many people struggle to balance their schedules and financial budgets simultaneously. This app is created to integrate these aspects, while providing a solution that helps users plan their activities without overspending.
 
 Simplification of Planning Process: Planning for various events and activities, especially when on a budget, can be complex and time-consuming. The app seeks to simplify this process by automating the generation of a feasible and budget-friendly timetable.
@@ -16,11 +15,11 @@ Stress Reduction: Managing deadlines, events, and financial constraints can be s
 
 Improving Quality of Life: Ultimately, the app seeks to enhance users' quality of life by enabling them to enjoy their preferred activities and events without the constant worry of financial overreach, thereby striking a balance between enjoyment and financial health.
 
-Aim 
+**Aim **
 
 To develop an app that allows users to input their upcoming events, activities, and budget constraints to generate a personalized timetable and event planner. The app will help users manage their time and finances effectively, ensuring they can balance their activities, such as travel, exams, deadlines, leisure activities, and dining, within their budget.
 
-
+**User Stories**
 
 As a student who wants to balance study time and leisure activities within a tight budget, I want to be able to input my class schedule, study sessions, leisure activities, and daily meal budget so the system can generate a weekly timetable that optimizes my time and expenses. 
 
