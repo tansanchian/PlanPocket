@@ -2,7 +2,13 @@
 
 <h2>For Developers</h2>
 
-clone the repository here
+make sure node.js is installed in your local device 
+
+download link: https://nodejs.org/en
+
+make sure you install expo go in your mobile device (available in appstore/google playstore)
+
+clone the repository here on your local device
 
 cd to the path where the repository is downloaded
 
@@ -10,7 +16,9 @@ run <b>npm install</b>
 
 run <b>npm run</b>
 
-scan the QR code and test it out
+for ios: scan the QR code using camera
+
+for android: open expo go application and scan it there
 
 <h2>Motivation</h2>
 
@@ -54,6 +62,8 @@ Profile Screen (allow user to change profile picture either from camera or galle
 Timetable/agenda screen
 
 Add schedule (purpose, budget, time, others linked to data base)
+
+Deploy an apk version of the application
 
 <h2>Tech Stack</h2>
 
