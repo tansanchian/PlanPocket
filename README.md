@@ -20,7 +20,7 @@ for ios: scan the generated QR code using camera
 
 for android: open expo go application and scan the generated QR code there
 
-OR
+OR download the apk file to your device
 
 For Android users: click the link below and install the apk
 
