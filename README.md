@@ -20,6 +20,28 @@ for ios: scan the generated QR code using camera
 
 for android: open expo go application and scan the generated QR code there
 
+OR
+
+For Android users: click the link below and install the apk
+
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a1bf6387-f181-4c2a-8a74-0ec8d2dd57b9
+
+For IOS users: since ios doesn't allow third party apk, you would need to run the app on the device emulator on your laptop.
+
+(Only use laptop when you are IOS user)
+
+For windows users: Click the link below and click the three dots, select Download Build.
+
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a1bf6387-f181-4c2a-8a74-0ec8d2dd57b9
+
+Install android studio (https://developer.android.com/studio) and launch the andorid emulator. Then, drag the apk file into the emulator.
+
+For macos users: Click the link below and download the zipped file. 
+
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/c81bc929-5566-44b7-9643-17d8ebda0bd6
+
+Then, install Xcode from mac app store then run the simulator. Next, extract the zip file and drag the .app file into the simulator
+
 <h2>Motivation</h2>
 
 **Integrated Time and Budget Management**: Many people struggle to balance their schedules and financial budgets simultaneously. This app is created to integrate these aspects, while providing a solution that helps users plan their activities without overspending.
