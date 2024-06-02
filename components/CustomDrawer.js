@@ -40,7 +40,7 @@ const CustomDrawer = (props) => {
         contentContainerStyle={styles.content}
       >
         <ImageBackground
-          source={require("../assets/menu.png")}
+          source={{uri: 'https://img.freepik.com/free-photo/abstract-splash-violet-paint_23-2147809147.jpg?t=st=1717315881~exp=1717316481~hmac=3c32c7ccc1a8e71fa22b60734bd08c836b28f810ffb77009a359458116f2fa13'}}
           style={styles.bgImage}
         >
           <Image

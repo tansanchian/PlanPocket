@@ -91,7 +91,7 @@ export default function ProfileScreen() {
       username: watch("username"),
       hpnumber: watch('hpnumber'),
       location: watch('location'),
-      imageUrl: watch("imageUrl"),
+      imageUrl: imageUrl,
     });
   }, [watch]);
 
@@ -149,6 +149,7 @@ export default function ProfileScreen() {
     setValue("hpnumber", hpnumber);
     setValue("location", location);
     setImageUrl(original.imageUrl);
+    console.log(original);
   };
 
   const handlePasswordSubmit = async () => {
