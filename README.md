@@ -29,6 +29,7 @@ As a fitness enthusiast who wants to maintain a healthy lifestyle on a budget, I
 
 <h3>UI + Framework for the application, Authentication, Simple Features</h3>
 <h4>May (Milestone 1)</h4>
+
 Sign in with google/facebook(work in progress)
 
 Sign Up with email
