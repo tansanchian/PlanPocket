@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { writeScheduleDatabase } from "../../components/Database";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { StatusBar } from "expo-status-bar";
 
 const ScheduleForm = () => {
   const navigation = useNavigation();
@@ -136,6 +137,7 @@ const ScheduleForm = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
+        <StatusBar style="auto" />
         <Text style={styles.title}>Add Schedule</Text>
         <Text style={styles.text}>Purpose</Text>
         <CustomInput

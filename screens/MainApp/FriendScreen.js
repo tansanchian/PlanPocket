@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Header from "../../components/Header";
+import { StatusBar } from "expo-status-bar";
 
 const FriendScreen = () => {
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       <Header title="Friends" />
       <View style={styles.internalContainer}>
         <Text style={styles.text}>Welcome to FriendScreen</Text>

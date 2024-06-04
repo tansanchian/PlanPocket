@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import Header from "../../components/Header";
+import { StatusBar } from "expo-status-bar";
 
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       <Header title="Home" />
       <View style={styles.internalContainer}>
         <Text style={styles.text}>Welcome to HomeScreen</Text>

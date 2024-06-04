@@ -18,12 +18,12 @@ const Drawer = () => {
   const [username, setUsername] = useState("");
   const dimensions = useWindowDimensions();
   const fetchUsername = async () => {
-    await readProfile('username', setUsername);
-  }
+    await readProfile("username", setUsername);
+  };
   useEffect(() => {
     fetchUsername();
   }, []);
-  
+
   return (
     <Drawers.Navigator
       drawerContent={(props) => <CustomDrawer {...props} username={username} />}

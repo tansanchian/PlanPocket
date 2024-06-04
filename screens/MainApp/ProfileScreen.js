@@ -25,6 +25,7 @@ import { writeProfile, readProfile } from "../../components/Database";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../App";
+import { StatusBar } from "expo-status-bar";
 
 export default function ProfileScreen() {
   const [username, setUsername] = useState("");
@@ -306,6 +307,7 @@ export default function ProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
+        <StatusBar style="auto" />
         <View style={styles.header}>
           <Text style={styles.headerText}>Profile</Text>
           <View style={styles.edit}>

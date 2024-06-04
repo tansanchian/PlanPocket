@@ -17,6 +17,7 @@ import { useState } from "react";
 import { ref, set } from "firebase/database";
 import { getDatabase } from "@firebase/database";
 import { globalStyles } from "../styles/global";
+import { StatusBar } from "expo-status-bar";
 
 export default function SignUpScreen() {
   const { height } = useWindowDimensions();
@@ -74,11 +75,13 @@ export default function SignUpScreen() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ minHeight: "100%" }}
+      contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
+      backgroundColor="#f3eef6"
     >
       <View style={globalStyles.globalContainer}>
         <View style={styles.container}>
+          <StatusBar style="auto" />
           <Image
             source={require("../assets/Logo.png")}
             style={[styles.img, { height: height * 0.3 }]}

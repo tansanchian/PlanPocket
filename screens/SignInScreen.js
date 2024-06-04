@@ -18,6 +18,7 @@ import { useForm } from "react-hook-form";
 import { auth } from "../App";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { AuthContext } from "../components/AuthContext";
+import { StatusBar } from "expo-status-bar";
 
 export default function SignInScreen() {
   const { height } = useWindowDimensions();
@@ -74,9 +75,11 @@ export default function SignInScreen() {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
+        backgroundColor="#f3eef6"
       >
         <View style={globalStyles.globalContainer}>
           <View style={styles.container}>
+            <StatusBar style="auto" />
             <Image
               source={require("../assets/Logo.png")}
               style={[styles.img, { height: height * 0.3 }]}

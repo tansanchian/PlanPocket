@@ -2,6 +2,7 @@ import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useState } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
 import Header from "../../components/Header";
+import { StatusBar } from "expo-status-bar";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -60,6 +61,7 @@ const TimeTableScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       <Header title="Timetable" />
       <Agenda
         items={items}

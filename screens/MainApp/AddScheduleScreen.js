@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../../components/Header";
-import { globalStyles } from "../../styles/global";
+import { StatusBar } from "expo-status-bar";
 
 const AddScheduleScreen = () => {
   const navigation = useNavigation();
@@ -14,6 +14,7 @@ const AddScheduleScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       <Header title="AddSchedule" />
       <View style={styles.internalContainer}>
         <Text style={styles.text}>No Current Event</Text>

@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../App";
+import { StatusBar } from "expo-status-bar";
 
 export default function FogotPassword() {
   const navigation = useNavigation();
@@ -34,10 +35,12 @@ export default function FogotPassword() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: "#f3eef6" }}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1 }}
+      style={styles.scrollContainer}
     >
-      <View style={styles.form}>
+      <View style={styles.container}>
+        <StatusBar style="auto" />
         <Text style={styles.title}>Reset your password</Text>
         <CustomInput
           name="email"
@@ -63,14 +66,20 @@ export default function FogotPassword() {
 }
 
 const styles = StyleSheet.create({
-  form: {
+  scrollContainer: {
+    backgroundColor: "#f3eef6",
+  },
+  container: {
     flex: 1,
     marginTop: 50,
+    justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
     backgroundColor: "#f3eef6",
   },
   title: {
+    alignItems: "center",
+    justifyContent: "center",
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",

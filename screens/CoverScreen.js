@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { globalStyles } from "../styles/global";
+import { StatusBar } from "expo-status-bar";
 
 const CoverScreen = () => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const CoverScreen = () => {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.container}>
+        <StatusBar style="auto" />
         <Image
           source={require("../assets/Logo.png")}
           style={{ resizeMode: "contain", height: 500 }}
