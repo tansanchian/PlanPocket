@@ -11,8 +11,12 @@
     "preview": {
       "distribution": "internal",
       "channel": "preview",
+      "android": {
+        "image": "latest"
+      },
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "image": "latest"
       }
     },
     "production": {
