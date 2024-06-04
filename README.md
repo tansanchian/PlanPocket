@@ -22,9 +22,11 @@ for android: open expo go application and scan the generated QR code there
 
 OR download the apk file to your device
 
+We did not publish the application to appstore/playstore so it is going to be an apk file. 
+
 For Android users: click the link below and install the apk
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a1bf6387-f181-4c2a-8a74-0ec8d2dd57b9
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d
 
 For IOS users: since ios doesn't allow third party apk, you would need to run the app on the device emulator on your laptop.
 
@@ -32,13 +34,13 @@ For IOS users: since ios doesn't allow third party apk, you would need to run th
 
 For windows users: Click the link below and click the three dots, select Download Build.
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a1bf6387-f181-4c2a-8a74-0ec8d2dd57b9
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d
 
 Install android studio (https://developer.android.com/studio) and launch the andorid emulator. Then, drag the apk file into the emulator.
 
 For macos users: Click the link below and download the zipped file. 
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/c81bc929-5566-44b7-9643-17d8ebda0bd6
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a8ed890d-3d15-4594-9eac-a6d0469cdbc1
 
 Then, install Xcode from mac app store then run the simulator. Next, extract the zip file and drag the .app file into the simulator
 
