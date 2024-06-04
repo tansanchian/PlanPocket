@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, useState } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  useState,
+  Alert,
+} from "react-native";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
@@ -12,10 +19,12 @@ export default function FogotPassword() {
   const onSendPressed = async () => {
     await sendPasswordResetEmail(auth, email)
       .then(() => alert("Password reset email sent!"))
-      .catch((error) => console.log(error.message));
+      .catch((error) => {
+        console.log(error.message);
+        Alert.alert("Error", "User not found");
+      });
   };
   const onSignInPressed = () => {
-    console.warn("onSignInPressed");
     navigation.navigate("SignIn");
   };
 
@@ -24,7 +33,10 @@ export default function FogotPassword() {
   const email = watch("email");
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={{ backgroundColor: "#f3eef6" }}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.form}>
         <Text style={styles.title}>Reset your password</Text>
         <CustomInput
@@ -52,9 +64,11 @@ export default function FogotPassword() {
 
 const styles = StyleSheet.create({
   form: {
+    flex: 1,
     marginTop: 50,
-    padding: 20,
     alignItems: "center",
+    paddingHorizontal: 20,
+    backgroundColor: "#f3eef6",
   },
   title: {
     fontSize: 24,

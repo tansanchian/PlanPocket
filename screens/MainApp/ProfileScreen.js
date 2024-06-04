@@ -10,15 +10,20 @@ import {
   Modal,
   Alert,
   TextInput,
-  Pressable
+  Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { getAuth, EmailAuthProvider, reauthenticateWithCredential, updateEmail } from "firebase/auth";
+import {
+  getAuth,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updateEmail,
+} from "firebase/auth";
 import { useFocusEffect } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import { writeProfile, readProfile } from "../../components/Database";
-import * as ImagePicker from 'expo-image-picker';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../App";
 
 export default function ProfileScreen() {
@@ -46,7 +51,7 @@ export default function ProfileScreen() {
       email: "",
       hpnumber: "",
       location: "",
-      username: ""
+      username: "",
     },
   });
 
@@ -55,34 +60,33 @@ export default function ProfileScreen() {
       const hpnumberSuccess = await writeProfile("hpnumber", hpnumber);
       console.log(hpnumber);
       if (!hpnumberSuccess) throw new Error("Failed to update hpnumber");
-  
+
       const locationSuccess = await writeProfile("location", location);
       if (!locationSuccess) throw new Error("Failed to update location");
-  
+
       const imageUrlSuccess = await writeProfile("imageUrl", imageUrl);
       if (!imageUrlSuccess) throw new Error("Failed to update imageUrl");
-  
+
       const usernameSuccess = await writeProfile("username", username);
       if (!usernameSuccess) throw new Error("Failed to update username");
-  
+
       return true;
     } catch (error) {
       console.error("Error updating profile:", error.message);
       return false;
     }
   };
-  
 
   useEffect(() => {
     if (user) {
       setValue("email", user.email);
     }
     readProfile("username", setUsername);
-    readProfile("username", username => setValue('username', username));
+    readProfile("username", (username) => setValue("username", username));
     readProfile("hpnumber", setHpNumber);
-    readProfile("hpnumber", username => setValue('hpnumber', username));
+    readProfile("hpnumber", (username) => setValue("hpnumber", username));
     readProfile("location", setLocation);
-    readProfile("location", username => setValue('location', username));
+    readProfile("location", (username) => setValue("location", username));
     readProfile("imageUrl", setImageUrl);
   }, [user, setValue]);
 
@@ -90,8 +94,8 @@ export default function ProfileScreen() {
     setOriginal({
       email: watch("email"),
       username: watch("username"),
-      hpnumber: watch('hpnumber'),
-      location: watch('location'),
+      hpnumber: watch("hpnumber"),
+      location: watch("location"),
       imageUrl: imageUrl,
     });
   }, [watch]);
@@ -138,7 +142,9 @@ export default function ProfileScreen() {
         Alert.alert("Error", "Failed to save user data. Please try again.");
         return;
       } else {
-        Alert.alert("Success", "Profile updated successfully", [{ text: "OK" }]);
+        Alert.alert("Success", "Profile updated successfully", [
+          { text: "OK" },
+        ]);
       }
     }
   };
@@ -168,10 +174,7 @@ export default function ProfileScreen() {
             "You have sent too many requests. Please try again later."
           );
         } else if (error.code === "auth/operation-not-allowed") {
-          Alert.alert(
-            "Operation Not Allowed",
-            "Please inform us."
-          );
+          Alert.alert("Operation Not Allowed", "Please inform us.");
         } else {
           Alert.alert("Error", "Failed to update email");
         }
@@ -182,17 +185,17 @@ export default function ProfileScreen() {
   const handlePasswordCancel = () => {
     setValue("email", original.email);
     setShowPasswordModal(false);
-  }
+  };
 
   const onClose = () => {
     setImageModal(false);
-  }
+  };
 
   const uploadImage = async () => {
     try {
-      const {status} = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Sorry, we need camera permissions to make this work!');
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera permissions to make this work!");
         return;
       }
       let result = await ImagePicker.launchCameraAsync({
@@ -216,18 +219,18 @@ export default function ProfileScreen() {
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'error uploading image: ' + error.message);
+      Alert.alert("Error", "error uploading image: " + error.message);
       setImageModal(false);
     }
-  }
+  };
 
   const removeImage = () => {
-    setImageUrl('');
-    writeProfile('imageUrl', '');
+    setImageUrl("");
+    writeProfile("imageUrl", "");
     setImageModal(false);
   };
 
-  const chooseFromGallery = async() => {
+  const chooseFromGallery = async () => {
     try {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -243,7 +246,7 @@ export default function ProfileScreen() {
           const response = await fetch(source);
           const blob = await response.blob();
           const storageRef = ref(storage, `images/${Date.now()}.jpg`);
-    
+
           await uploadBytes(storageRef, blob);
           const downloadURL = await getDownloadURL(storageRef);
           setImageUrl(downloadURL);
@@ -253,35 +256,43 @@ export default function ProfileScreen() {
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'error uploading image: ' + error.message);
+      Alert.alert("Error", "error uploading image: " + error.message);
       console.warn(error.message);
       setImageModal(false);
     }
-  }
+  };
 
   const ProfilePhotoModal = () => {
     return (
-      <Modal
-        visible={imageModal}
-        transparent={true}
-        animationType="slide"
-      >
+      <Modal visible={imageModal} transparent={true} animationType="slide">
         <View style={styles.imageModalContainer}>
           <View style={styles.imageModalContent}>
-            <TouchableOpacity style={styles.imageCancelButton} onPress={onClose}>
+            <TouchableOpacity
+              style={styles.imageCancelButton}
+              onPress={onClose}
+            >
               <Icon name="close" size={20} color="#735DA5" />
             </TouchableOpacity>
             <Text style={styles.imageModalTitle}>Profile Photo</Text>
             <View style={styles.imageOptionContainer}>
-              <TouchableOpacity style={styles.imageOption} onPress={() => uploadImage()}>
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={() => uploadImage()}
+              >
                 <Icon name="camera-alt" size={30} color="#D3C5E5" />
                 <Text style={styles.imageOptionText}>Camera</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.imageOption} onPress={() => chooseFromGallery()}>
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={() => chooseFromGallery()}
+              >
                 <Icon name="photo" size={30} color="#D3C5E5" />
                 <Text style={styles.imageOptionText}>Gallery</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.imageOption} onPress={removeImage}>
+              <TouchableOpacity
+                style={styles.imageOption}
+                onPress={removeImage}
+              >
                 <Icon name="delete" size={30} color="#D3C5E5" />
                 <Text style={styles.imageOptionText}>Remove</Text>
               </TouchableOpacity>
@@ -304,16 +315,26 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View style={styles.profileContainer}>
-          {imageUrl == "" ? <Image
-            source={{ uri: "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg" }}
-            style={styles.profileImage}
-          /> : <Image
-          source={{ uri: imageUrl }}
-          style={styles.profileImage}
-        />}
-          {editable && <Pressable onPressIn={() => setImageModal(true)}>
-                          <Image style={styles.changeButton} source={{ uri: 'https://cdn2.vectorstock.com/i/1000x1000/34/91/change-icon-simple-element-from-digital-vector-30023491.jpg' }} />
-                       </Pressable>}
+          {imageUrl == "" ? (
+            <Image
+              source={{
+                uri: "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg",
+              }}
+              style={styles.profileImage}
+            />
+          ) : (
+            <Image source={{ uri: imageUrl }} style={styles.profileImage} />
+          )}
+          {editable && (
+            <Pressable onPressIn={() => setImageModal(true)}>
+              <Image
+                style={styles.changeButton}
+                source={{
+                  uri: "https://cdn2.vectorstock.com/i/1000x1000/34/91/change-icon-simple-element-from-digital-vector-30023491.jpg",
+                }}
+              />
+            </Pressable>
+          )}
           <ProfilePhotoModal />
           <Controller
             control={control}
@@ -451,7 +472,7 @@ export default function ProfileScreen() {
         </Modal>
       </View>
     </TouchableWithoutFeedback>
-)
+  );
 }
 
 const styles = StyleSheet.create({
@@ -490,14 +511,14 @@ const styles = StyleSheet.create({
     borderColor: "white",
   },
   changeButton: {
-    position: 'absolute',
-    bottom: 100, 
-    left: 40,  
+    position: "absolute",
+    bottom: 100,
+    left: 40,
     borderRadius: 20,
     padding: 5,
-    color: 'blue',
+    color: "blue",
     width: 30,
-    height: 30
+    height: 30,
   },
   name: {
     fontSize: 22,
@@ -584,7 +605,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 20,
@@ -609,7 +630,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: "center",
-    marginTop: 20
+    marginTop: 20,
   },
   modalButtonText: {
     color: "white",
@@ -617,20 +638,20 @@ const styles = StyleSheet.create({
   },
   imageModalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   imageModalContent: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
-    position: 'relative',
+    alignItems: "center",
+    position: "relative",
   },
   imageCancelButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
@@ -639,12 +660,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   imageOptionContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "100%",
   },
   imageOption: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   imageOptionText: {
     marginTop: 5,

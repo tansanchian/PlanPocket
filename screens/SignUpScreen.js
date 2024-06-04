@@ -69,7 +69,6 @@ export default function SignUpScreen() {
     }
   };
   const onSignInPressed = () => {
-    console.warn("onSignInPressed");
     navigation.navigate("SignIn");
   };
 
@@ -79,114 +78,125 @@ export default function SignUpScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={globalStyles.globalContainer}>
-        <Image
-          source={require("../assets/Logo.png")}
-          style={(styles.img, { height: height * 0.3 })}
-          resizeMode="contain"
-        />
-        <Text style={styles.title}>Register</Text>
-        <Text
-          style={{
-            alignSelf: "flex-start",
-            fontSize: 15,
-            color: "grey",
-            textAlign: "left",
-            marginVertical: 5,
-          }}
-        >
-          Enter Your Personal Information
-        </Text>
-        <Text style={styles.text}>Username</Text>
-        <CustomInput
-          name="username"
-          placeholder="Enter your name"
-          control={control}
-          rules={{ required: "Username is required" }}
-        />
-        <Text style={styles.text}>Email</Text>
-        <CustomInput
-          name="email"
-          placeholder="Enter your email"
-          control={control}
-          rules={{
-            required: "Email is required",
-            pattern: {
-              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-              message: "Invalid email address",
-            },
-          }}
-        />
-        <Text style={styles.text}>Password</Text>
-        <CustomInput
-          name="password"
-          placeholder="Enter password"
-          control={control}
-          rules={{
-            required: "Password is required",
-            minLength: {
-              value: 6,
-              message: "Password should be at least 6 characters long",
-            },
-          }}
-          secureTextEntry={true}
-        />
-        <Text style={styles.text}>Confirm password</Text>
-        <CustomInput
-          name="password-repeat"
-          placeholder="Enter confirm Password"
-          control={control}
-          rules={{
-            validate: (value) =>
-              value === password ? true : "Password do not match",
-          }}
-          secureTextEntry={true}
-        />
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : (
-          <CustomButton
-            text="Register"
-            onPress={handleSubmit(onRegisterPressed)}
+        <View style={styles.container}>
+          <Image
+            source={require("../assets/Logo.png")}
+            style={[styles.img, { height: height * 0.3 }]}
+            resizeMode="contain"
           />
-        )}
-        <Text style={styles.policyText}>
-          By registering, you confirm that you accept our{" "}
-          <Text style={styles.link} onPress={onTermsOfUsePressed}>
-            Terms
-          </Text>{" "}
-          of Use and{" "}
-          <Text style={styles.link} onPress={onPrivacyPolicyPressed}>
-            Privacy Policy
+          <Text style={styles.title}>Register</Text>
+          <Text
+            style={{
+              alignSelf: "flex-start",
+              fontSize: 15,
+              color: "grey",
+              textAlign: "left",
+              marginVertical: 5,
+            }}
+          >
+            Enter Your Personal Information
           </Text>
-        </Text>
-        <CustomButton
-          text="Sign Up with Google"
-          onPress={onSignInGoogle}
-          bgColor="#FAE9EA"
-          fgColor="#DD4D44"
-        />
-        <CustomButton
-          text="Sign Up with Facebook"
-          onPress={onSignInFacebook}
-          bgColor="#FAE9EA"
-          fgColor="#DD4D44"
-        />
+          <Text style={styles.text}>Username</Text>
+          <CustomInput
+            name="username"
+            placeholder="Enter your name"
+            control={control}
+            rules={{ required: "Username is required" }}
+          />
+          <Text style={styles.text}>Email</Text>
+          <CustomInput
+            name="email"
+            placeholder="Enter your email"
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "Invalid email address",
+              },
+            }}
+          />
+          <Text style={styles.text}>Password</Text>
+          <CustomInput
+            name="password"
+            placeholder="Enter password"
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password should be at least 6 characters long",
+              },
+            }}
+            secureTextEntry={true}
+          />
+          <Text style={styles.text}>Confirm password</Text>
+          <CustomInput
+            name="password-repeat"
+            placeholder="Enter confirm Password"
+            control={control}
+            rules={{
+              validate: (value) =>
+                value === password ? true : "Password do not match",
+            }}
+            secureTextEntry={true}
+          />
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <CustomButton
+              text="Register"
+              onPress={handleSubmit(onRegisterPressed)}
+            />
+          )}
+          <Text style={styles.policyText}>
+            By registering, you confirm that you accept our{" "}
+            <Text style={styles.link} onPress={onTermsOfUsePressed}>
+              Terms
+            </Text>{" "}
+            of Use and{" "}
+            <Text style={styles.link} onPress={onPrivacyPolicyPressed}>
+              Privacy Policy
+            </Text>
+          </Text>
+          <CustomButton
+            text="Sign Up with Google"
+            onPress={onSignInGoogle}
+            bgColor="#FAE9EA"
+            fgColor="#DD4D44"
+          />
+          <CustomButton
+            text="Sign Up with Facebook"
+            onPress={onSignInFacebook}
+            bgColor="#FAE9EA"
+            fgColor="#DD4D44"
+          />
 
-        <CustomButton
-          text="Have an account? Sign in"
-          onPress={onSignInPressed}
-          type="TERTIARY"
-        />
+          <CustomButton
+            text="Have an account? Sign in"
+            onPress={onSignInPressed}
+            type="TERTIARY"
+          />
+        </View>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  form: {
-    marginTop: 50,
-    padding: 20,
+  container: {
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3eef6",
+    marginTop: 20,
+    padding: 20,
+  },
+  img: {
+    width: "100%",
+    height: 100,
+    maxWidth: 300,
+    maxHeight: 200,
   },
   title: {
     alignSelf: "flex-start",

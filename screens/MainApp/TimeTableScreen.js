@@ -47,9 +47,7 @@ const TimeTableScreen = () => {
             justifyContent: "space-between",
             alignItems: "center",
           }}
-        >
-          SANCHIAN HANDSOME
-        </Text>
+        ></Text>
       </TouchableOpacity>
     );
   };
@@ -79,7 +77,6 @@ export default TimeTableScreen;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
     flex: 1,
     backgroundColor: "white",
   },

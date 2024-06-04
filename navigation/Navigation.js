@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import ForgotPassword from "../screens/ForgotPassworScreen";
-import ResetPassword from "../screens/ResetPasswordScreen";
 import CoverScreen from "../screens/CoverScreen";
 import Drawer from "./Drawer";
 import { AuthContext } from "../components/AuthContext";
@@ -30,7 +29,6 @@ export default function Navigation() {
           <Stack.Screen name="SignIn" component={SignInScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-          <Stack.Screen name="ResetPassword" component={ResetPassword} />
         </Stack.Navigator>
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>

@@ -12,10 +12,7 @@ export const globalStyles = StyleSheet.create({
   },
   globalContainer: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f3eef6",
-    paddingHorizontal: 20,
+    backgroundColor: "#f3eef65",
   },
   input: {
     borderWidth: 1,

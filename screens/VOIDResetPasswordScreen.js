@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  useWindowDimensions,
-} from "react-native";
-import { useState } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import CustomButton from "../components/CustomButton";
 import CustomInput from "../components/CustomInput";
 import { useNavigation } from "@react-navigation/native";
@@ -53,9 +46,8 @@ export default function FogotPassword() {
 
 const styles = StyleSheet.create({
   form: {
-    marginTop: 50,
-    padding: 20,
     alignItems: "center",
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,

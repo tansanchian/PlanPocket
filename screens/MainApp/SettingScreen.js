@@ -1,10 +1,14 @@
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import React from "react";
+import Header from "../../components/Header";
 
 const SettingScreen = () => {
   return (
-    <View style={styles.form}>
-      <Text style={styles.text}>Welcome to SettingScreen</Text>
+    <View style={styles.container}>
+      <Header title="Setting" />
+      <View style={styles.internalContainer}>
+        <Text style={styles.text}>Welcome to SettingScreen</Text>
+      </View>
     </View>
   );
 };
@@ -12,16 +16,21 @@ const SettingScreen = () => {
 export default SettingScreen;
 
 const styles = StyleSheet.create({
-  form: {
+  container: {
     flex: 1,
-    backgroundColor: "pink",
-    padding: 20,
+    backgroundColor: "white",
+  },
+  internalContainer: {
+    flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f3eef6",
   },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
+    justifyContent: "center",
     margin: 10,
   },
 });

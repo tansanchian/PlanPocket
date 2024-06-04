@@ -25,7 +25,7 @@ const CoverScreen = () => {
       contentContainerStyle={{ minHeight: "100%" }}
       showsVerticalScrollIndicator={false}
     >
-      <View style={globalStyles.globalContainer}>
+      <View style={styles.container}>
         <Image
           source={require("../assets/Logo.png")}
           style={{ resizeMode: "contain", height: 500 }}

@@ -15,7 +15,7 @@ const AddScheduleScreen = () => {
   return (
     <View style={styles.container}>
       <Header title="AddSchedule" />
-      <View style={globalStyles.globalContainer}>
+      <View style={styles.internalContainer}>
         <Text style={styles.text}>No Current Event</Text>
         <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
       </View>
@@ -27,15 +27,21 @@ export default AddScheduleScreen;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
     flex: 1,
     backgroundColor: "white",
+  },
+  internalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f3eef6",
+    paddingHorizontal: 20,
   },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
+    justifyContent: "center",
     margin: 10,
-    textAlign: "center",
   },
 });
