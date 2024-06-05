@@ -70,10 +70,10 @@ export async function writeScheduleDatabase(
     const postSchedule = {
       purpose: purpose || "Unknown purpose",
       budget: budget !== "" ? budget : "N/A",
-      FromTime: time || "Unknown time",
-      FromDate: date || "Unknown date",
-      ToTime: toTime || "Unknown time",
-      ToDate: toDate || "Unknown date",
+      fromTime: time || "Unknown time",
+      fromDate: date || "Unknown date",
+      toTime: toTime || "Unknown time",
+      toDate: toDate || "Unknown date",
       others: others || "N/A",
     };
 

@@ -1,170 +1,147 @@
-import { Text, View, TouchableOpacity, StyleSheet, Button } from "react-native";
-import React, { useEffect, useState } from "react";
-import { Calendar, Agenda } from "react-native-calendars";
-import Header from "../../components/Header";
-import { StatusBar } from "expo-status-bar";
-import { readScheduleDatabase } from "../../components/Database";
-
-const timeToString = (time) => {
-  const date = new Date(time);
-  return date.toISOString().split("T")[0];
-};
-
-const calculateDateDifference = (date1, date2) => {
-  const parseDate = (dateString) => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month, day); 
-  };
-  const d1 = parseDate(date1);
-  const d2 = parseDate(date2);
-  const timeDifference = d1 - d2;
-  const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-  return Math.abs(dayDifference) + 1;
-};
-
-const TimeTableScreen = () => {
-  const [items, setItems] = useState({});
-
-  const addItemToSpecificDate = (dateString, item) => {
-    setItems((prevItems) => {
-      const updatedItems = { ...prevItems };
-      if (!updatedItems[dateString]) {
-        updatedItems[dateString] = [];
-      }
-      updatedItems[dateString].push(item);
-      return updatedItems;
-    });
-  };
-
-  const parseDate = (dateString) => {
-    const [year, month, day] = dateString.split('-').map(Number);
-    return new Date(year, month, day);
-  };
-  
-  const formatDate = (date) => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth()).padStart(2, '0');
-    const year = String(date.getFullYear()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const dataArray = await readScheduleDatabase();
-        const dateArray = dataArray.map(x => {
-          return [x.fromDate, x.toDate, x.purpose];
-        });
-        for (const item of dateArray) {
-          let dateString = item[0];
-          const purpose = item[2];
-          for (let i = 0; i < calculateDateDifference(item[0], item[1]); i++) {
-            const newItem = {
-              name: purpose,
-              height: 80,
-              day: dateString,
-            };
-            addItemToSpecificDate(dateString, newItem);
-            const d1 = parseDate(dateString);
-            d1.setDate(d1.getDate() + 1);
-            dateString = formatDate(d1);
-          }
-        }
-      } catch (error) {
-        console.error(error.message);
-      }
-    }
-    loadData();
-  }, []);
-
-  const loadItems = (day) => {
-    setTimeout(() => {
-      for (let i = -15; i < 85; i++) {
-        const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-        const strTime = timeToString(time);
-
-        if (!items[strTime]) {
-          items[strTime] = [];
-          items[strTime].push({
-            name: "",
-            height: 50,
-            day: strTime,
-          });
-        }
-      }
-      const newItems = {};
-      Object.keys(items).forEach((key) => {
-        newItems[key] = items[key];
-      });
-      setItems(newItems);
-    }, 1000);
-  };
-
-  const renderItem = (item) => {
-    return (
-      <TouchableOpacity>
-        <Text
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
-
-  const renderDay = (day) => {
-    if (day) {
-      return <Text style={styles.customDay}>{day.getDay()}</Text>;
-    }
-    return <View style={styles.dayItem} />;
-  };
-
-  return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Header title="Timetable" />
-      <Agenda
-        items={items}
-        loadItemsForMonth={loadItems}
-        selected={new Date()}
-        renderItem={renderItem}
-        theme={{ calendarBackground: "white", agendaKnobColor: "black" }}
-        showClosingKnob={true}
-      />
-    </View>
-  );
-};
-
-export default TimeTableScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  item: {
-    backgroundColor: "white",
-    flex: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginRight: 10,
-    marginTop: 17,
-  },
-  emptyDate: {
-    height: 15,
-    flex: 1,
-    paddingTop: 30,
-  },
-  customDay: {
-    margin: 10,
-    fontSize: 24,
-    color: "green",
-  },
-  dayItem: {
-    marginLeft: 34,
-  },
+import { 
+  Text, 
+  View, 
+  TouchableOpacity, 
+  StyleSheet, 
+  VirtualizedList, 
+} from "react-native"; 
+import React, { useEffect, useState, useCallback } from "react"; 
+import { Calendar, Agenda } from "react-native-calendars"; 
+import Header from "../../components/Header"; 
+import { StatusBar } from "expo-status-bar"; 
+import { readScheduleDatabase } from "../../components/Database"; 
+import { useFocusEffect } from "@react-navigation/native"; 
+ 
+const timeToString = (time) => { 
+  const date = new Date(time); 
+  return date.toISOString().split("T")[0]; 
+}; 
+ 
+const parseDate = (dateString) => { 
+  const [year, month, day] = dateString.split("-").map(Number); 
+  return new Date(year, month - 1, day + 1); // Month is 0-indexed 
+}; 
+ 
+const TimeTableScreen = () => { 
+  const [items, setItems] = useState({}); 
+ 
+  const loadItems = useCallback(async (day) => { 
+    try { 
+      const data = await readScheduleDatabase(); 
+      const dataLength = data ? data.length : 0; 
+      const newItems = {}; 
+      for (let i = -15; i < 70; i++) { 
+        const time = day.timestamp + i * 24 * 60 * 60 * 1000; 
+        const strTime = timeToString(time); 
+        if (!newItems[strTime]) { 
+          newItems[strTime] = []; 
+          if (dataLength != 0) { 
+            for (let i = 0; i < dataLength; i++) { 
+              if (data[i].fromDate === strTime) { 
+                let curr = parseDate(data[i].fromDate); 
+                const end = parseDate(data[i].toDate); 
+                while (curr <= end) { 
+                  const currStr = timeToString(curr.getTime()); 
+                  if (!newItems[currStr]) { 
+                    newItems[currStr] = []; 
+                  } 
+                  newItems[currStr].push({ 
+                    purpose: data[i].purpose, 
+                  }); 
+                  curr.setDate(curr.getDate() + 1); 
+                } 
+              } 
+            } 
+          } 
+        } 
+      } 
+      setItems(newItems); 
+    } catch (e) { 
+      console.error(e.message); 
+    } 
+  }, []); 
+ 
+  useFocusEffect( 
+    useCallback(() => { 
+      const today = new Date(); 
+      loadItems({ timestamp: today.getTime() }); 
+    }, [loadItems]) 
+  ); 
+ 
+  const renderItem = (item) => { 
+    return ( 
+      <TouchableOpacity> 
+        <View 
+          style={{ 
+            padding: 10, 
+            margin: 10, 
+            height: 100, 
+            backgroundColor: "#fff", 
+            borderRadius: 5, 
+            shadowColor: "#000", 
+            shadowOffset: { width: 0, height: 2 }, 
+            shadowOpacity: 0.1, 
+            shadowRadius: 5, 
+            elevation: 3, 
+          }} 
+        > 
+          <View 
+            style={{ 
+              justifyContent: "space-between", 
+              alignItems: "center", 
+              flexDirection: "row", 
+            }} 
+          > 
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}> 
+              {item.purpose} 
+            </Text> 
+          </View> 
+        </View> 
+      </TouchableOpacity> 
+    ); 
+  }; 
+ 
+  renderEmptyDate = () => { 
+    return ( 
+      <View style={styles.emptyDate}> 
+        <Text>This is empty date!</Text> 
+      </View> 
+    ); 
+  }; 
+ 
+  return ( 
+    <View style={styles.container}> 
+      <StatusBar style="auto" /> 
+      <Header title="Timetable" /> 
+      <Agenda 
+        items={items} 
+        showClosingKnob={true} 
+        loadItemsForMonth={loadItems} 
+        selected={new Date()} 
+        renderItem={renderItem} 
+        renderEmptyDate={renderEmptyDate} 
+        theme={{ 
+          calendarBackground: "white", 
+          agendaKnobColor: "#735DA5", 
+          agendaTodayColor: "#735DA5", 
+          selectedDayBackgroundColor: "#735DA5", 
+        }} 
+        list={(props) => <VirtualizedList {...props} />} 
+      /> 
+    </View> 
+  ); 
+}; 
+ 
+export default TimeTableScreen; 
+ 
+const styles = StyleSheet.create({ 
+  container: { 
+    flex: 1, 
+    backgroundColor: "white", 
+  }, 
+  emptyDate: { 
+    height: 15, 
+    flex: 1, 
+    paddingTop: 30, 
+  }, 
 });
