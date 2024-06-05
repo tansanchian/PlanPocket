@@ -36,6 +36,13 @@ const ScheduleForm = () => {
   const [showToTimePicker, setToShowTimePicker] = useState(false);
   const [highlightFromDate, setHighlightFromDate] = useState(false);
 
+  const stringifyDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [isAllDayEnabled, setIsAllDayEnabled] = useState(false);
   const toggleAllDaySwitch = () => {
     setIsAllDayEnabled((previousState) => !previousState);
@@ -102,14 +109,14 @@ const ScheduleForm = () => {
               minute: "2-digit",
             })
           : "12.00am",
-        date.toLocaleDateString("fr-FR"),
+        stringifyDate(date),
         !isAllDayEnabled
           ? toTime.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })
           : "11.59pm",
-        toDate.toLocaleDateString("fr-FR"),
+        stringifyDate(toDate),
         others
       );
       if (result) {

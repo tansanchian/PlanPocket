@@ -1,16 +1,81 @@
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
-import React, { useState } from "react";
+import { Text, View, TouchableOpacity, StyleSheet, Button } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
+import { readScheduleDatabase } from "../../components/Database";
 
 const timeToString = (time) => {
   const date = new Date(time);
   return date.toISOString().split("T")[0];
 };
 
+const calculateDateDifference = (date1, date2) => {
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month, day); 
+  };
+  const d1 = parseDate(date1);
+  const d2 = parseDate(date2);
+  const timeDifference = d1 - d2;
+  const dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+  return Math.abs(dayDifference) + 1;
+};
+
 const TimeTableScreen = () => {
   const [items, setItems] = useState({});
+
+  const addItemToSpecificDate = (dateString, item) => {
+    setItems((prevItems) => {
+      const updatedItems = { ...prevItems };
+      if (!updatedItems[dateString]) {
+        updatedItems[dateString] = [];
+      }
+      updatedItems[dateString].push(item);
+      return updatedItems;
+    });
+  };
+
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month, day);
+  };
+  
+  const formatDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth()).padStart(2, '0');
+    const year = String(date.getFullYear()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const dataArray = await readScheduleDatabase();
+        const dateArray = dataArray.map(x => {
+          return [x.fromDate, x.toDate, x.purpose];
+        });
+        for (const item of dateArray) {
+          let dateString = item[0];
+          const purpose = item[2];
+          for (let i = 0; i < calculateDateDifference(item[0], item[1]); i++) {
+            const newItem = {
+              name: purpose,
+              height: 80,
+              day: dateString,
+            };
+            addItemToSpecificDate(dateString, newItem);
+            const d1 = parseDate(dateString);
+            d1.setDate(d1.getDate() + 1);
+            dateString = formatDate(d1);
+          }
+        }
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+    loadData();
+  }, []);
 
   const loadItems = (day) => {
     setTimeout(() => {
@@ -20,15 +85,11 @@ const TimeTableScreen = () => {
 
         if (!items[strTime]) {
           items[strTime] = [];
-
-          const numItems = Math.floor(Math.random() * 3 + 1);
-          for (let j = 0; j < numItems; j++) {
-            items[strTime].push({
-              name: "Item for " + strTime + " #" + j,
-              height: Math.max(50, Math.floor(Math.random() * 150)),
-              day: strTime,
-            });
-          }
+          items[strTime].push({
+            name: "",
+            height: 50,
+            day: strTime,
+          });
         }
       }
       const newItems = {};
@@ -39,7 +100,7 @@ const TimeTableScreen = () => {
     }, 1000);
   };
 
-  const renderItem = (items) => {
+  const renderItem = (item) => {
     return (
       <TouchableOpacity>
         <Text
@@ -48,11 +109,14 @@ const TimeTableScreen = () => {
             justifyContent: "space-between",
             alignItems: "center",
           }}
-        ></Text>
+        >
+          {item.name}
+        </Text>
       </TouchableOpacity>
     );
   };
-  renderDay = (day) => {
+
+  const renderDay = (day) => {
     if (day) {
       return <Text style={styles.customDay}>{day.getDay()}</Text>;
     }

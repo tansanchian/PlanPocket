@@ -82,7 +82,7 @@ export async function writeScheduleDatabase(
       const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
 
       const lastIdSnapshot = await get(lastIdRef);
-      let newId = 1;
+      let newId = 0;
 
       if (lastIdSnapshot.exists()) {
         newId = lastIdSnapshot.val() + 1;
@@ -111,13 +111,8 @@ export async function readScheduleDatabase(filterItem) {
 
       if (snapshot.exists()) {
         const schedules = snapshot.val();
-        const filter = Object.values(schedules).map(
-          (schedule) => schedule[filterItem]
-        );
-        const filterJSON = JSON.stringify(filter);
-        const parseJSON = JSON.parse(filterJSON);
-        console.warn(parseJSON);
-        return parseJSON;
+        // console.warn(schedules);
+        return schedules;
       } else {
         console.log("No data available");
         return null;

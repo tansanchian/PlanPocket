@@ -79,27 +79,27 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    if (user) {
-      setValue("email", user.email);
+    const loadData = async () => {
+      if (user) {
+        setValue("email", user.email);
+      }
+      await readProfile("username", setUsername);
+      await readProfile("username", (username) => setValue("username", username));
+      await readProfile("hpnumber", setHpNumber);
+      await readProfile("hpnumber", (username) => setValue("hpnumber", username));
+      await readProfile("location", setLocation);
+      await readProfile("location", (username) => setValue("location", username));
+      await readProfile("imageUrl", setImageUrl);
     }
-    readProfile("username", setUsername);
-    readProfile("username", (username) => setValue("username", username));
-    readProfile("hpnumber", setHpNumber);
-    readProfile("hpnumber", (username) => setValue("hpnumber", username));
-    readProfile("location", setLocation);
-    readProfile("location", (username) => setValue("location", username));
-    readProfile("imageUrl", setImageUrl);
-  }, [user, setValue]);
-
-  useEffect(() => {
-    setOriginal({
+    loadData().then(setOriginal({
       email: watch("email"),
       username: watch("username"),
       hpnumber: watch("hpnumber"),
       location: watch("location"),
       imageUrl: imageUrl,
-    });
-  }, [watch]);
+    }));
+    console.log(original);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
