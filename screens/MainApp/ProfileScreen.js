@@ -86,20 +86,24 @@ export default function ProfileScreen() {
       await readProfile("username", setUsername);
       await readProfile("username", (username) => setValue("username", username));
       await readProfile("hpnumber", setHpNumber);
-      await readProfile("hpnumber", (username) => setValue("hpnumber", username));
+      await readProfile("hpnumber", (hpnumber) => setValue("hpnumber", hpnumber));
       await readProfile("location", setLocation);
-      await readProfile("location", (username) => setValue("location", username));
+      await readProfile("location", (location) => setValue("location", location));
       await readProfile("imageUrl", setImageUrl);
-    }
-    loadData().then(setOriginal({
+    };
+    loadData();
+  }, [user, setValue]);
+
+  useEffect(() => {
+    setOriginal({
       email: watch("email"),
       username: watch("username"),
       hpnumber: watch("hpnumber"),
       location: watch("location"),
       imageUrl: imageUrl,
-    }));
+    });
     console.log(original);
-  }, []);
+  }, [imageUrl, watch, setOriginal]);
 
   useFocusEffect(
     useCallback(() => {
