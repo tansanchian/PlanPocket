@@ -11,7 +11,7 @@ import { StatusBar } from "expo-status-bar";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 
-export default function DateScreen() {
+export default function WeekScreen() {
   const navigation = useNavigation();
   const onBackPressed = () => {
     navigation.navigate("ChooseDate");
@@ -19,18 +19,45 @@ export default function DateScreen() {
   const [meals, setMeals] = useState(2);
     const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
+  const laterDate = new Date();
+  laterDate.setDate(laterDate.getDate() + 7);
+  const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showToDatePicker, setToShowDatePicker] = useState(false);
     const [title, setTitle] = useState('');  
     const [meals2, setMeals2] = useState(true);  
     const [meals3, setMeals3] = useState(false);  
 
-  const onPressDatePicker = () => {
-    setShowDatePicker(true);
-  };
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
     setDate(currentDate);
+    const newToDate = new Date(currentDate);
+    newToDate.setDate(newToDate.getDate() + 7);
+    setToDate(newToDate);
+  };
+
+  const onPressDatePicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const onToDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || toDate;
+    setToShowDatePicker(false);
+    setToDate(currentDate);
+    const newFromDate = new Date(currentDate);
+    newFromDate.setDate(newFromDate.getDate() - 7);
+    setDate(newFromDate);
+  };
+
+  const onToPressDatePicker = () => {
+    setToShowDatePicker(true);
+  };
+
+  const getMinimumToDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 7);
+    return today;
   };
 
   return (
@@ -101,6 +128,23 @@ export default function DateScreen() {
               mode="date"
               onChange={onDateChange}
               minimumDate={new Date()}
+            />
+          )}
+        </View>
+      </View>
+      <View style={styles.datePicker}>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity onPress={onToPressDatePicker}>
+            <View pointerEvents="none">
+              <TextInput value={toDate.toDateString()} />
+            </View>
+          </TouchableOpacity>
+          {showToDatePicker && (
+            <DateTimePicker
+              value={toDate}
+              mode="date"
+              onChange={onToDateChange}
+              minimumDate={getMinimumToDate()}            
             />
           )}
         </View>

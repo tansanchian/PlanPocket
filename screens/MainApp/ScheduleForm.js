@@ -173,16 +173,7 @@ const ScheduleForm = () => {
           }}
         >
           <View style={{ flex: 1, alignItems: "flex-start" }}>
-            <Text style={styles.text}>All-day</Text>
-          </View>
-          <View style={{ alignItems: "flex-end" }}>
-            <Switch
-              trackColor={{ false: "#fff", true: "#fff" }}
-              thumbColor={isAllDayEnabled ? "#735DA5" : "#D3C5E5"}
-              ios_backgroundColor="#735DA5"
-              onValueChange={toggleAllDaySwitch}
-              value={isAllDayEnabled}
-            />
+            <Text style={styles.text}>Date</Text>
           </View>
         </View>
         <View
@@ -223,7 +214,7 @@ const ScheduleForm = () => {
                 />
               </View>
             </TouchableOpacity>
-            {showTimePicker && !isAllDayEnabled && (
+            {showTimePicker && (
               <DateTimePicker
                 value={time}
                 mode="time"

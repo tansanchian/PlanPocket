@@ -12,7 +12,10 @@ const ChooseDateScreen = () => {
     navigation.navigate("DateScreen");
   };
   const addOneWeek = () => {
-    navigation.navigate("ScheduleForm");
+    navigation.navigate("WeekScreen");
+  };
+  const addOneMonth = () => {
+    navigation.navigate("MonthScreen");
   };
 
   return (
@@ -22,6 +25,7 @@ const ChooseDateScreen = () => {
         <Text style={styles.text}>Choose your plan</Text>
         <CustomButton text="1 Day" onPress={addOneDay} />
         <CustomButton text="1 Week" onPress={addOneWeek} />
+        <CustomButton text="1 Month" onPress={addOneMonth} />
       </View>
     </View>
   );
