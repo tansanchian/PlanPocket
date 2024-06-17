@@ -9,7 +9,7 @@ const AddScheduleScreen = () => {
   const navigation = useNavigation();
 
   const onAddSchedulePressed = () => {
-    navigation.navigate("ScheduleForm");
+    navigation.navigate("ChooseDate");
   };
 
   return (
