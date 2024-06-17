@@ -162,62 +162,9 @@ const ScheduleForm = () => {
           Number="2"
           defaultOption={{ key: "3", value: "Nothing" }}
           search={false}
-          boxStyles={styles.allDayContainer}
+          boxStyles={styles.purpose}
           maxHeight="130"
         />
-
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: "bold",
-            textAlign: "centre",
-          }}
-        >
-          Budget Availablity
-        </Text>
-        <View style={{ flexDirection: "row" }}>
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={{
-                borderRadius: 25,
-                paddingVertical: 15,
-                alignItems: "center",
-                marginVertical: 10,
-                backgroundColor: available ? "#735DA5" : "#D3C5E5",
-              }}
-              onPress={onApplicablePressed}
-            >
-              <Text style={{ color: "white" }}>Budget available</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={{ flex: 0.05 }} />
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              style={{
-                borderRadius: 25,
-                paddingVertical: 15,
-                marginVertical: 10,
-                alignItems: "center",
-                backgroundColor: available ? "#D3C5E5" : "#735DA5",
-              }}
-              onPress={onNotApplicablePressed}
-            >
-              <Text style={{ color: "white", textAlign: "center" }}>
-                Budget Not available
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        {available && (
-          <>
-            <CustomInput
-              name="Budget"
-              placeholder="Budget"
-              control={control}
-              rules={{ required: "Budget is required" }}
-            />
-          </>
-        )}
         <View
           style={{
             flexDirection: "row",
@@ -329,11 +276,12 @@ const ScheduleForm = () => {
             )}
           </View>
         </View>
-        <Text style={styles.text}>Others</Text>
-        <View>
-          <Text>Location</Text>
-        </View>
-        <CustomInput name="Others" control={control} placeholder="Others" />
+        <Text style={styles.text}>Description</Text>
+        <CustomInput
+          name="Description"
+          control={control}
+          placeholder="Description"
+        />
         <CustomButton
           text="Add"
           onPress={
@@ -377,7 +325,6 @@ const styles = StyleSheet.create({
   container2: {
     backgroundColor: "white",
     width: "100%",
-
     borderColor: "#e8e8e8",
     borderWidth: 1,
     borderRadius: 5,
@@ -386,7 +333,20 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     borderRadius: 25,
   },
-  switch: {},
+  purpose: {
+    height: 40,
+    alignItems: "center",
+    flexDirection: "row",
+    backgroundColor: "white",
+    width: "100%",
+    borderColor: "#e8e8e8",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 5,
+    borderRadius: 25,
+  },
   allDayContainer: {
     flexDirection: "row",
     backgroundColor: "white",
