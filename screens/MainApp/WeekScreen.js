@@ -7,13 +7,24 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import CustomInput from "../../components/CustomInput";
+import { useForm } from "react-hook-form";
+import { createScheduleDatabase } from "../../components/Database";
 
 export default function WeekScreen() {
+  const stringifyDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const navigation = useNavigation();
   const onBackPressed = () => {
     navigation.navigate("ChooseDate");
@@ -26,7 +37,6 @@ export default function WeekScreen() {
   const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setToShowDatePicker] = useState(false);
-  const [title, setTitle] = useState("");
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
@@ -66,18 +76,51 @@ export default function WeekScreen() {
     Keyboard.dismiss();
   };
 
+  const { control, watch, handleSubmit } = useForm();
+  const budget = watch("Budget");
+  const title = watch("Title");
+
+  const onCreateSchedulePressed = async () => {
+    try {
+      const result = await createScheduleDatabase(
+        title,
+        budget,
+        meals,
+        stringifyDate(date),
+        stringifyDate(toDate)
+      );
+      if (result) {
+        Alert.alert("Success", "Schedule added successfully");
+      } else {
+        Alert.alert("Error", "Cannot overwrite current schedule");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to add schedule: " + error.message);
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
         <StatusBar style="auto" />
         <Text style={styles.label}>Title</Text>
-        <CustomInput name="Title" control={control} placeholder="Title" />
+        <CustomInput
+          name="Title"
+          control={control}
+          placeholder="Title"
+          rules={{
+            required: "Title is required",
+          }}
+        />
         <Text style={styles.label}>Budget</Text>
         <CustomInput
           name="Budget"
           control={control}
           placeholder="Budget"
           keyboard="numeric"
+          rules={{
+            required: "Budget is required",
+          }}
         />
         <Text style={styles.label}>How many meals a day?</Text>
         <View style={{ flexDirection: "row" }}>
@@ -170,8 +213,11 @@ export default function WeekScreen() {
             )}
           </View>
         </View>
-        <CustomButton text="Add" onPress={() => console.log(meals)} />
-        <CustomButton text="Back" onPress={onBackPressed} />
+        <CustomButton
+          text="Create"
+          onPress={handleSubmit(onCreateSchedulePressed)}
+        />
+        <CustomButton text="Back" onPress={onBackPressed} type="TERTIARY" />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -244,6 +290,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginVertical: 5,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   dateButton: {
     borderWidth: 1,

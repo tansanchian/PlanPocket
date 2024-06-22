@@ -19,11 +19,17 @@ const timeToString = (time) => {
 
 const parseDate = (dateString) => {
   const [year, month, day] = dateString.split("-").map(Number);
-  return new Date(year, month - 1, day + 1); // Month is 0-indexed
+  return new Date(year, month - 1, day + 1);
 };
 
-const TimeTableScreen = () => {
+const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
+
+  const [titleTT, setTitleTT] = useState("");
+  const [fromDateTT, setfromDateTT] = useState("");
+  const [toDateTT, setToDateTT] = useState("");
+  const [budgetTT, setBudgetTT] = useState("");
+  const [meallTT, setMealTT] = useState("");
 
   const loadItems = useCallback(async (day) => {
     try {
@@ -46,6 +52,12 @@ const TimeTableScreen = () => {
                     newItems[currStr] = [];
                   }
                   newItems[currStr].push({
+                    titleTT: data[i].title,
+                    fromDateTT: data[i].fromDate,
+                    setToDateTT: data[i].toDate,
+                    setBudgetTT: data[i].budget,
+                    setMealTT: data[i].meals,
+                    description: data[i].description,
                     purpose: data[i].purpose,
                   });
                   curr.setDate(curr.getDate() + 1);
@@ -69,8 +81,18 @@ const TimeTableScreen = () => {
   );
 
   const renderItem = (item) => {
+    const dataToSend = {
+      titleTT: item.titleTT,
+      fromDateTT: item.fromDateTT,
+      toDateTT: item.toDateTT,
+      budgetTT: item.budgetTT,
+      mealTT: item.meallTT,
+    };
+
     return (
-      <TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("ScheduleForm", dataToSend)}
+      >
         <View
           style={{
             padding: 10,
@@ -93,7 +115,9 @@ const TimeTableScreen = () => {
             }}
           >
             <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {item.purpose}
+              {item.titleTT}
+              {item.meals}
+              {item.description}
             </Text>
           </View>
         </View>

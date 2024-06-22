@@ -53,15 +53,7 @@ export const readProfile = async (data, setData) => {
   }
 };
 
-export async function writeScheduleDatabase(
-  purpose,
-  budget,
-  time,
-  date,
-  toTime,
-  toDate,
-  others
-) {
+export async function writeScheduleDatabase(purpose, description, fromDate) {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -69,29 +61,29 @@ export async function writeScheduleDatabase(
   if (userId) {
     const postSchedule = {
       purpose: purpose || "Unknown purpose",
-      budget: budget !== "" ? budget : "N/A",
-      fromTime: time || "Unknown time",
-      fromDate: date || "Unknown date",
-      toTime: toTime || "Unknown time",
-      toDate: toDate || "Unknown date",
-      others: others || "N/A",
+      description: description || "N/A",
     };
 
     try {
-      const userSchedulesRef = ref(db, `/users/${userId}/schedules`);
       const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
-
+      const dateRef = ref(db, `/users/${userId}/dateSet`);
       const lastIdSnapshot = await get(lastIdRef);
-      let newId = 0;
+      const dateSetSnapshot = await get(dateRef);
 
-      if (lastIdSnapshot.exists()) {
-        newId = lastIdSnapshot.val() + 1;
+      if (lastIdSnapshot.exists() && dateSetSnapshot.exists()) {
+        const dateSetObject = dateSetSnapshot.val();
+        const dateSet = new Map(Object.entries(dateSetObject));
+        if (dateSet.has(fromDate)) {
+          const id = dateSet.get(fromDate);
+          await update(
+            ref(db, `/users/${userId}/schedules/${id}/${fromDate}`),
+            postSchedule
+          );
+          return true;
+        }
+      } else {
+        return false;
       }
-      await set(ref(db, `/users/${userId}/schedules/${newId}`), postSchedule);
-
-      await set(lastIdRef, newId);
-
-      return true;
     } catch (error) {
       console.error("Error creating Schedule:", error);
       return false;
@@ -99,7 +91,13 @@ export async function writeScheduleDatabase(
   }
 }
 
-export async function createScheduleDatabase(title, budget, date, toDate) {
+export async function createScheduleDatabase(
+  title,
+  budget,
+  meals,
+  date,
+  toDate
+) {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -110,23 +108,59 @@ export async function createScheduleDatabase(title, budget, date, toDate) {
       budget: budget !== "" ? budget : "N/A",
       fromDate: date || "Unknown date",
       toDate: toDate || "Unknown date",
+      meals: meals || "Unknown meals",
     };
 
     try {
-      const userSchedulesRef = ref(db, `/users/${userId}/schedules`);
       const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
-
+      const dateSet = ref(db, `/users/${userId}/dateSet`);
       const lastIdSnapshot = await get(lastIdRef);
+      const dateSetSnapshot = await get(dateSet);
+      const parseDate = (dateString) => {
+        const [year, month, day] = dateString.split("-").map(Number);
+        return new Date(year, month - 1, day + 1);
+      };
+      const timeToString = (time) => {
+        const date = new Date(time);
+        return date.toISOString().split("T")[0];
+      };
+      let fail = false;
+
       let newId = 0;
+      let newSet = new Map();
+      let todate = parseDate(toDate);
+      let fromdate = parseDate(date);
 
       if (lastIdSnapshot.exists()) {
         newId = lastIdSnapshot.val() + 1;
       }
-      await set(ref(db, `/users/${userId}/schedules/${newId}`), postSchedule);
 
-      await set(lastIdRef, newId);
+      if (dateSetSnapshot.exists()) {
+        const dateSetObject = dateSetSnapshot.val();
+        newSet = new Map(Object.entries(dateSetObject));
+      }
 
-      return true;
+      while (fromdate <= todate) {
+        const stringFromDate = timeToString(fromdate);
+        if (newSet.has(stringFromDate)) {
+          fail = true;
+          break;
+        }
+        newSet.set(stringFromDate, newId);
+        fromdate.setDate(fromdate.getDate() + 1);
+      }
+
+      if (!fail) {
+        await set(ref(db, `/users/${userId}/schedules/${newId}`), postSchedule);
+
+        await set(dateSet, Object.fromEntries(newSet.entries()));
+
+        await set(lastIdRef, newId);
+
+        return true;
+      } else {
+        return false;
+      }
     } catch (error) {
       console.error("Error creating Schedule:", error);
       return false;

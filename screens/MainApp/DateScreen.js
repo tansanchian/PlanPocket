@@ -5,15 +5,17 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard,
   Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-import { createScheduleDatabase } from "../../components/Database";
 import CustomInput from "../../components/CustomInput";
 import { useForm } from "react-hook-form";
+import { createScheduleDatabase } from "../../components/Database";
 
 export default function DateScreen() {
   const stringifyDate = (date) => {
@@ -34,31 +36,36 @@ export default function DateScreen() {
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
-  const onPressDatePicker = () => {
-    setShowDatePicker(true);
-  };
+  const { control, watch, handleSubmit } = useForm();
+  const budget = watch("Budget");
+  const title = watch("Title");
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
     setDate(currentDate);
   };
 
-  const { control, watch, handleSubmit } = useForm();
-  const budget = watch("Budget");
-  const title = watch("Title");
+  const onPressDatePicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const dismiss = () => {
+    Keyboard.dismiss();
+  };
 
   const onCreateSchedulePressed = async () => {
     try {
       const result = await createScheduleDatabase(
         title,
         budget,
+        meals,
         stringifyDate(date),
         stringifyDate(date)
       );
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
       } else {
-        Alert.alert("Error", "Failed to add schedule");
+        Alert.alert("Error", "Cannot overwrite current schedule");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to add schedule: " + error.message);
@@ -66,107 +73,109 @@ export default function DateScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
-      <Text style={styles.label}>Title</Text>
-      <CustomInput
-        name="Title"
-        control={control}
-        placeholder="Title"
-        rules={{
-          required: "Title is required",
-        }}
-      />
-      <Text style={styles.label}>Budget</Text>
-      <CustomInput
-        name="Budget"
-        control={control}
-        placeholder="Budget"
-        keyboard="numeric"
-        rules={{
-          required: "Budget is required",
-        }}
-      />
-      <Text style={styles.label}>How many meals a day?</Text>
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity
-            style={meals2 ? styles.selectedButton : styles.button}
-            onPress={() => {
-              setMeals(2);
-              setOtherPressed(false);
-              setMeals3(false);
-              setMeals2(true);
-            }}
-          >
-            <Text style={styles.buttonText}>2</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ flex: 0.05 }} />
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity
-            style={meals3 ? styles.selectedButton : styles.button}
-            onPress={() => {
-              setMeals(3);
-              setOtherPressed(false);
-              setMeals2(false);
-              setMeals3(true);
-            }}
-          >
-            <Text style={styles.buttonText}>3</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={{ flex: 0.05 }} />
-        <View style={{ flex: 1 }}>
-          {otherPressed ? (
-            <View style={styles.selectedButton}>
-              <TextInput
-                style={{ textAlign: "center", color: "white" }}
-                placeholder="Enter"
-                placeholderTextColor={"white"}
-                keyboardType="numeric"
-                value={meals}
-                onChangeText={setMeals}
-              />
-            </View>
-          ) : (
+    <TouchableWithoutFeedback onPress={dismiss}>
+      <View style={styles.container}>
+        <StatusBar style="auto" />
+        <Text style={styles.label}>Title</Text>
+        <CustomInput
+          name="Title"
+          control={control}
+          placeholder="Title"
+          rules={{
+            required: "Title is required",
+          }}
+        />
+        <Text style={styles.label}>Budget</Text>
+        <CustomInput
+          name="Budget"
+          control={control}
+          placeholder="Budget"
+          keyboard="numeric"
+          rules={{
+            required: "Budget is required",
+          }}
+        />
+        <Text style={styles.label}>How many meals a day?</Text>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
-              style={styles.button}
+              style={meals2 ? styles.selectedButton : styles.button}
               onPress={() => {
-                setOtherPressed(true);
-                setMeals2(false);
+                setMeals(2);
+                setOtherPressed(false);
                 setMeals3(false);
+                setMeals2(true);
               }}
             >
-              <Text style={styles.buttonText}>Other</Text>
+              <Text style={styles.buttonText}>2</Text>
             </TouchableOpacity>
-          )}
+          </View>
+          <View style={{ flex: 0.05 }} />
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={meals3 ? styles.selectedButton : styles.button}
+              onPress={() => {
+                setMeals(3);
+                setOtherPressed(false);
+                setMeals2(false);
+                setMeals3(true);
+              }}
+            >
+              <Text style={styles.buttonText}>3</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 0.05 }} />
+          <View style={{ flex: 1 }}>
+            {otherPressed ? (
+              <View style={styles.selectedButton}>
+                <TextInput
+                  style={{ textAlign: "center", color: "white" }}
+                  placeholder="Enter"
+                  placeholderTextColor={"white"}
+                  keyboardType="numeric"
+                  value={meals}
+                  onChangeText={setMeals}
+                />
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => {
+                  setOtherPressed(true);
+                  setMeals2(false);
+                  setMeals3(false);
+                }}
+              >
+                <Text style={styles.buttonText}>Other</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-      <Text style={styles.label}>Date</Text>
-      <View style={styles.datePicker}>
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={onPressDatePicker}>
-            <View pointerEvents="none">
-              <TextInput value={date.toDateString()} />
-            </View>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={date}
-              mode="date"
-              onChange={onDateChange}
-              minimumDate={new Date()}
-            />
-          )}
+        <Text style={styles.label}>Date</Text>
+        <View style={styles.datePicker}>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onPressDatePicker}>
+              <View pointerEvents="none">
+                <TextInput value={date.toDateString()} />
+              </View>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                onChange={onDateChange}
+                minimumDate={new Date()}
+              />
+            )}
+          </View>
         </View>
+        <CustomButton
+          text="Add"
+          onPress={handleSubmit(onCreateSchedulePressed)}
+        />
+        <CustomButton text="Back" onPress={onBackPressed} />
       </View>
-      <CustomButton
-        text="Create"
-        onPress={handleSubmit(onCreateSchedulePressed)}
-      />
-      <CustomButton text="Back" onPress={onBackPressed} />
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 

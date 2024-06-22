@@ -47,11 +47,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     width: "100%",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   container_HALF: {
     paddingVertical: 15,
