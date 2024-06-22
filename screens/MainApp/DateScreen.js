@@ -5,24 +5,35 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
+import { createScheduleDatabase } from "../../components/Database";
+import CustomInput from "../../components/CustomInput";
+import { useForm } from "react-hook-form";
 
 export default function DateScreen() {
+  const stringifyDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const navigation = useNavigation();
   const onBackPressed = () => {
     navigation.navigate("ChooseDate");
   };
   const [meals, setMeals] = useState(2);
-    const [otherPressed, setOtherPressed] = useState(false);
+  const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-    const [title, setTitle] = useState('');  
-    const [meals2, setMeals2] = useState(true);  
-    const [meals3, setMeals3] = useState(false);  
+  const [title, setTitle] = useState("");
+  const [meals2, setMeals2] = useState(true);
+  const [meals3, setMeals3] = useState(false);
 
   const onPressDatePicker = () => {
     setShowDatePicker(true);
@@ -33,24 +44,50 @@ export default function DateScreen() {
     setDate(currentDate);
   };
 
+  const { control, watch } = useForm();
+  const budget = watch("Budget");
+
+  const onCreateSchedulePressed = async () => {
+    try {
+      const result = await createScheduleDatabase(
+        title,
+        budget,
+        stringifyDate(date),
+        stringifyDate(date)
+      );
+      if (result) {
+        Alert.alert("Success", "Schedule added successfully");
+      } else {
+        Alert.alert("Error", "Failed to add schedule");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to add schedule: " + error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
-         <StatusBar style="auto" />
-          <Text style={styles.label}>Title</Text>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          onChangeText={setTitle}
-          value={title}
-          editable={true}
-        />
-      </View>
+      <StatusBar style="auto" />
+      <Text style={styles.label}>Title</Text>
+      <CustomInput name="Title" control={control} placeholder="Title" />
+      <Text style={styles.label}>Budget</Text>
+      <CustomInput
+        name="Budget"
+        control={control}
+        placeholder="Budget"
+        keyboard="numeric"
+      />
       <Text style={styles.label}>How many meals a day?</Text>
       <View style={{ flexDirection: "row" }}>
         <View style={{ flex: 1 }}>
           <TouchableOpacity
             style={meals2 ? styles.selectedButton : styles.button}
-            onPress={() => { setMeals(2); setOtherPressed(false); setMeals3(false); setMeals2(true) }}
+            onPress={() => {
+              setMeals(2);
+              setOtherPressed(false);
+              setMeals3(false);
+              setMeals2(true);
+            }}
           >
             <Text style={styles.buttonText}>2</Text>
           </TouchableOpacity>
@@ -59,7 +96,12 @@ export default function DateScreen() {
         <View style={{ flex: 1 }}>
           <TouchableOpacity
             style={meals3 ? styles.selectedButton : styles.button}
-            onPress={() => { setMeals(3); setOtherPressed(false); setMeals2(false); setMeals3(true) }}
+            onPress={() => {
+              setMeals(3);
+              setOtherPressed(false);
+              setMeals2(false);
+              setMeals3(true);
+            }}
           >
             <Text style={styles.buttonText}>3</Text>
           </TouchableOpacity>
@@ -80,7 +122,11 @@ export default function DateScreen() {
           ) : (
             <TouchableOpacity
               style={styles.button}
-              onPress={() => {setOtherPressed(true); setMeals2(false); setMeals3(false)}}
+              onPress={() => {
+                setOtherPressed(true);
+                setMeals2(false);
+                setMeals3(false);
+              }}
             >
               <Text style={styles.buttonText}>Other</Text>
             </TouchableOpacity>
@@ -105,8 +151,8 @@ export default function DateScreen() {
           )}
         </View>
       </View>
-          <CustomButton text="Add" onPress={() => console.log(meals) } />
-          <CustomButton text="Back" onPress={onBackPressed} />
+      <CustomButton text="Create" onPress={onCreateSchedulePressed} />
+      <CustomButton text="Back" onPress={onBackPressed} />
     </View>
   );
 }
@@ -117,21 +163,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     padding: 20,
-    },
-    inputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        backgroundColor: "white",
-        borderRadius: 10,
-        padding: 10,
-        marginHorizontal: 0,
-        marginVertical: 15,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 5,
-    },
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    marginHorizontal: 0,
+    marginVertical: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
   label: {
     fontSize: 18,
     marginBottom: 10,

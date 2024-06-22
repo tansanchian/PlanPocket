@@ -99,6 +99,41 @@ export async function writeScheduleDatabase(
   }
 }
 
+export async function createScheduleDatabase(title, budget, date, toDate) {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+
+  if (userId) {
+    const postSchedule = {
+      title: title || "Unknown title",
+      budget: budget !== "" ? budget : "N/A",
+      fromDate: date || "Unknown date",
+      toDate: toDate || "Unknown date",
+    };
+
+    try {
+      const userSchedulesRef = ref(db, `/users/${userId}/schedules`);
+      const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
+
+      const lastIdSnapshot = await get(lastIdRef);
+      let newId = 0;
+
+      if (lastIdSnapshot.exists()) {
+        newId = lastIdSnapshot.val() + 1;
+      }
+      await set(ref(db, `/users/${userId}/schedules/${newId}`), postSchedule);
+
+      await set(lastIdRef, newId);
+
+      return true;
+    } catch (error) {
+      console.error("Error creating Schedule:", error);
+      return false;
+    }
+  }
+}
+
 export async function readScheduleDatabase(filterItem) {
   const auth = getAuth();
   const db = getDatabase();

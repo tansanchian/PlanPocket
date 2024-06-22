@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     width: "100%",
-
     borderColor: "#e8e8e8",
     borderWidth: 1,
     borderRadius: 5,
@@ -63,6 +62,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   containerHALF: {
     backgroundColor: "white",
