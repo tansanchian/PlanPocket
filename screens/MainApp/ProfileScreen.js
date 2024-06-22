@@ -84,11 +84,17 @@ export default function ProfileScreen() {
         setValue("email", user.email);
       }
       await readProfile("username", setUsername);
-      await readProfile("username", (username) => setValue("username", username));
+      await readProfile("username", (username) =>
+        setValue("username", username)
+      );
       await readProfile("hpnumber", setHpNumber);
-      await readProfile("hpnumber", (hpnumber) => setValue("hpnumber", hpnumber));
+      await readProfile("hpnumber", (hpnumber) =>
+        setValue("hpnumber", hpnumber)
+      );
       await readProfile("location", setLocation);
-      await readProfile("location", (location) => setValue("location", location));
+      await readProfile("location", (location) =>
+        setValue("location", location)
+      );
       await readProfile("imageUrl", setImageUrl);
     };
     loadData();

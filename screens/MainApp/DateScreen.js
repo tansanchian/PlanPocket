@@ -31,7 +31,6 @@ export default function DateScreen() {
   const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [title, setTitle] = useState("");
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
@@ -44,8 +43,9 @@ export default function DateScreen() {
     setDate(currentDate);
   };
 
-  const { control, watch } = useForm();
+  const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
+  const title = watch("Title");
 
   const onCreateSchedulePressed = async () => {
     try {
@@ -69,13 +69,23 @@ export default function DateScreen() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Text style={styles.label}>Title</Text>
-      <CustomInput name="Title" control={control} placeholder="Title" />
+      <CustomInput
+        name="Title"
+        control={control}
+        placeholder="Title"
+        rules={{
+          required: "Title is required",
+        }}
+      />
       <Text style={styles.label}>Budget</Text>
       <CustomInput
         name="Budget"
         control={control}
         placeholder="Budget"
         keyboard="numeric"
+        rules={{
+          required: "Budget is required",
+        }}
       />
       <Text style={styles.label}>How many meals a day?</Text>
       <View style={{ flexDirection: "row" }}>
@@ -151,7 +161,10 @@ export default function DateScreen() {
           )}
         </View>
       </View>
-      <CustomButton text="Create" onPress={onCreateSchedulePressed} />
+      <CustomButton
+        text="Create"
+        onPress={handleSubmit(onCreateSchedulePressed)}
+      />
       <CustomButton text="Back" onPress={onBackPressed} />
     </View>
   );
