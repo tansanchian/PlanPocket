@@ -5,34 +5,57 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import { Card, Avatar, IconButton } from "react-native-paper";
-import { readScheduleDatabase } from "../../components/Database";
+import { getDatabase, ref, onValue } from "firebase/database";
+import { deleteScheduleDatabase } from "../../components/Database";
 import { FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { getAuth } from "firebase/auth";
 
 const AddScheduleScreen = () => {
   const navigation = useNavigation();
-  const [schedules, setSchedules] = useState(null);
+  const [schedules, setSchedules] = useState([]);
+
   const onAddSchedulePressed = () => {
     navigation.navigate("ChooseDate");
   };
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        const data = await readScheduleDatabase();
-        setSchedules(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
-    fetchSchedules();
+  useEffect(() => {
+    const auth = getAuth();
+    const db = getDatabase();
+    const userId = auth.currentUser?.uid;
+
+    const schedulesRef = ref(db, `/users/${userId}/schedules`);
+    const unsubscribe = onValue(schedulesRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const schedulesArray = Object.values(data);
+        setSchedules(schedulesArray);
+      } else {
+        setSchedules([]);
+      }
+    });
+
+    // Clean up the listener when the component unmounts
+    return () => unsubscribe();
   }, []);
 
   const onCalendarPressed = () => {
     console.log("hi");
   };
-  const onDeletePressed = () => {};
+
+  const onDeletePressed = async (fromDate, toDate) => {
+    try {
+      await deleteScheduleDatabase(fromDate, toDate);
+      // The schedules state will automatically update due to the real-time listener
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const renderCards = ({ item }) => {
+    if (!item) {
+      return null;
+    }
     return (
       <Card style={styles.card}>
         <Card.Title
@@ -44,7 +67,11 @@ const AddScheduleScreen = () => {
             </TouchableOpacity>
           )}
           right={(props) => (
-            <IconButton {...props} icon="delete" onPress={onDeletePressed} />
+            <IconButton
+              {...props}
+              icon="delete"
+              onPress={() => onDeletePressed(item.fromDate, item.toDate)}
+            />
           )}
           titleStyle={styles.cardTitle}
           subtitleStyle={styles.cardSubtitle}
@@ -57,11 +84,12 @@ const AddScheduleScreen = () => {
       </Card>
     );
   };
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Header title="AddSchedule" />
-      {schedules == undefined ? (
+      {schedules.length === 0 ? (
         <View style={styles.internalContainer}>
           <Text style={styles.text}>No Current Schedule</Text>
           <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />

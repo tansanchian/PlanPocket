@@ -53,7 +53,12 @@ export const readProfile = async (data, setData) => {
   }
 };
 
-export async function writeScheduleDatabase(purpose, description, fromDate) {
+export async function writeScheduleDatabase(
+  purpose,
+  description,
+  fromDate,
+  costs
+) {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -62,6 +67,7 @@ export async function writeScheduleDatabase(purpose, description, fromDate) {
     const postSchedule = {
       purpose: purpose,
       description: description || "",
+      costs,
     };
 
     try {
@@ -87,6 +93,68 @@ export async function writeScheduleDatabase(purpose, description, fromDate) {
     } catch (error) {
       console.error("Error creating Schedule:", error);
       return false;
+    }
+  }
+}
+
+export async function deleteScheduleDatabase(fromDate, toDate) {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+
+  if (userId) {
+    try {
+      const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
+      const dateSetRef = ref(db, `/users/${userId}/dateSet`);
+      const schedulesRef = ref(db, `/users/${userId}/schedules`);
+
+      const parseDate = (dateString) => {
+        const [year, month, day] = dateString.split("-").map(Number);
+        return new Date(year, month - 1, day + 1);
+      };
+
+      const timeToString = (time) => {
+        return time.toISOString().split("T")[0];
+      };
+
+      const schedulesSnapShot = await get(schedulesRef);
+      const lastIdSnapshot = await get(lastIdRef);
+      const dateSetSnapshot = await get(dateSetRef);
+
+      if (!dateSetSnapshot.exists() || !schedulesSnapShot.exists()) {
+        console.error("No data found.");
+        return;
+      }
+
+      const dateSetObject = dateSetSnapshot.val();
+      const newSet = new Map(Object.entries(dateSetObject));
+      let id = newSet.get(fromDate);
+
+      if (lastIdSnapshot.exists() && lastIdSnapshot.val() === id) {
+        if (id == 0) {
+          await set(lastIdRef, null);
+        } else {
+          await set(lastIdRef, id - 1);
+        }
+      }
+
+      if (id !== undefined) {
+        await set(ref(db, `/users/${userId}/schedules/${id}`), null);
+      }
+
+      let currentDate = parseDate(fromDate);
+      const endDate = parseDate(toDate);
+
+      while (currentDate <= endDate) {
+        const currentDateString = timeToString(currentDate);
+        console.log(currentDateString);
+        newSet.delete(currentDateString);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      await set(dateSetRef, Object.fromEntries(newSet.entries()));
+    } catch (error) {
+      console.error("Error deleting Schedule:", error);
     }
   }
 }
@@ -180,6 +248,7 @@ export async function readScheduleDatabase() {
 
       if (snapshot.exists()) {
         const schedules = snapshot.val();
+        console.log(schedules);
         return schedules;
       } else {
         console.log("No data available");

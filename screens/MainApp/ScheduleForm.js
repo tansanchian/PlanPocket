@@ -1,4 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  TextInput,
+} from "react-native";
 import React, { useState } from "react";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
@@ -7,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { writeScheduleDatabase } from "../../components/Database";
 import { StatusBar } from "expo-status-bar";
 import { SelectList } from "react-native-dropdown-select-list";
+import TimeTableScreen from "./TimeTableScreen";
 
 export default function ScheduleForm({ route }) {
   const { titleTT, fromDateTT, toDateTT, budgetTT, mealTT } =
@@ -14,25 +22,32 @@ export default function ScheduleForm({ route }) {
 
   const [selected, setSelected] = useState("");
   const data = [
-    { key: "1", value: "Entertainment" },
-    { key: "2", value: "Movie" },
-    { key: "3", value: "Nothing" },
+    { key: "1", value: "Entertainment", cost: "10" },
+    { key: "2", value: "Movie", cost: "10" },
+    { key: "3", value: "Others", cost: "0" },
   ];
 
   const navigation = useNavigation();
 
   const { control, handleSubmit, watch } = useForm();
   const description = watch("Description");
+  const others = watch("Others");
+  const costs = watch("Costs");
 
   const onAddSchedulePressed = async () => {
+    let selectedValue = selected !== "Others" ? selected : others;
+    const selectedItem = data.find((item) => item.value === selected);
+
     try {
       const result = await writeScheduleDatabase(
-        selected,
+        selectedValue,
         description,
-        fromDateTT
+        fromDateTT,
+        selectedItem
       );
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
+        navigation.navigate("Timetable");
       } else {
         Alert.alert("Error", "Failed to add schedule");
       }
@@ -41,6 +56,9 @@ export default function ScheduleForm({ route }) {
     }
   };
 
+  const onUndoPressed = () => {
+    setSelected("");
+  };
   const onBackPressed = () => {
     navigation.navigate("Timetable");
   };
@@ -58,15 +76,45 @@ export default function ScheduleForm({ route }) {
           placeholder={fromDateTT}
         />
         <Text style={styles.text}>Purpose</Text>
-        <SelectList
-          setSelected={(val) => setSelected(val)}
-          data={data}
-          save="value"
-          search={false}
-          boxStyles={styles.boxStyles}
-          dropdownStyles={styles.dropdownStyles}
-          maxHeight="130"
-        />
+        {selected !== "Others" ? (
+          <SelectList
+            setSelected={(val) => setSelected(val)}
+            data={data}
+            save="value"
+            search={false}
+            boxStyles={styles.boxStyles}
+            dropdownStyles={styles.dropdownStyles}
+            maxHeight={130}
+          />
+        ) : (
+          <>
+            <View style={styles.allDayContainer}>
+              <View style={{ flex: 1 }}>
+                <CustomInput
+                  name="Others"
+                  control={control}
+                  placeholder="Others"
+                  rules={{
+                    required: "Purpose is required",
+                  }}
+                />
+              </View>
+              <View style={{ flex: 0.05 }}></View>
+              <View style={{ flex: 1 }}>
+                <CustomInput
+                  name="Costs"
+                  control={control}
+                  keyboard="numeric"
+                  placeholder="Costs"
+                  rules={{
+                    required: "Costs is required",
+                  }}
+                />
+              </View>
+            </View>
+            <CustomButton text="Undo" onPress={onUndoPressed} type="TERTIARY" />
+          </>
+        )}
         <Text style={styles.text}>Description</Text>
         <CustomInput
           name="Description"
@@ -82,21 +130,17 @@ export default function ScheduleForm({ route }) {
 
 const styles = StyleSheet.create({
   form: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 50,
     padding: 20,
-    alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
     margin: 10,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
   text: {
     alignSelf: "flex-start",
@@ -141,5 +185,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
+  },
+  allDayContainer: {
+    flexDirection: "row",
   },
 });
