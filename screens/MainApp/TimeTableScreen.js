@@ -25,11 +25,11 @@ const parseDate = (dateString) => {
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
 
-  const [titleTT, setTitleTT] = useState("");
-  const [fromDateTT, setfromDateTT] = useState("");
-  const [toDateTT, setToDateTT] = useState("");
-  const [budgetTT, setBudgetTT] = useState("");
-  const [meallTT, setMealTT] = useState("");
+  // const [titleTT, setTitleTT] = useState("");
+  // const [fromDateTT, setfromDateTT] = useState("");
+  // const [toDateTT, setToDateTT] = useState("");
+  // const [budgetTT, setBudgetTT] = useState("");
+  // const [meallTT, setMealTT] = useState("");
 
   const loadItems = useCallback(async (day) => {
     try {

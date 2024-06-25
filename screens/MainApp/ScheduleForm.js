@@ -46,7 +46,7 @@ export default function ScheduleForm({ route }) {
   };
 
   const onBackPressed = () => {
-    navigation.navigate("TimeTable");
+    navigation.navigate("Timetable");
   };
 
   return (

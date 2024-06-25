@@ -1,7 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import AddScheduleScreen from "../screens/MainApp/AddScheduleScreen";
-import ScheduleForm from "../screens/MainApp/ScheduleForm";
 import ChooseDateScreen from "../screens/MainApp/ChooseDateScreen";
 import DateScreen from "../screens/MainApp/DateScreen";
 import WeekScreen from "../screens/MainApp/WeekScreen";
@@ -17,7 +16,6 @@ const Schedule = () => {
       <Stack.Screen name="DateScreen" component={DateScreen} />
       <Stack.Screen name="WeekScreen" component={WeekScreen} />
       <Stack.Screen name="MonthScreen" component={MonthScreen} />
-      <Stack.Screen name="ScheduleForm" component={ScheduleForm} />
     </Stack.Navigator>
   );
 };

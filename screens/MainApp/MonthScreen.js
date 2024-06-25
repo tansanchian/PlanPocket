@@ -213,10 +213,10 @@ export default function MonthScreen() {
           </View>
         </View>
         <CustomButton
-          text="Add"
+          text="Create"
           onPress={handleSubmit(onCreateSchedulePressed)}
         />
-        <CustomButton text="Back" onPress={onBackPressed} />
+        <CustomButton text="Back" onPress={onBackPressed} type="TERTIARY" />
       </View>
     </TouchableWithoutFeedback>
   );

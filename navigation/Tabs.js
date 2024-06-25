@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/MainApp/HomeScreen";
 import FriendScreen from "../screens/MainApp/FriendScreen";
 import MessengerScreen from "../screens/MainApp/MessengerScreen";
-import TimeTableScreen from "../screens/MainApp/TimeTableScreen";
+import TimeTableNav from "./TimeTableNav";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AddScheduleScreen from "../screens/MainApp/AddScheduleScreen";
 import Schedule from "./Schedule";
@@ -43,7 +43,7 @@ const Tabs = () => {
       />
       <Tab.Screen
         name="TimeTable"
-        component={TimeTableScreen}
+        component={TimeTableNav}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
