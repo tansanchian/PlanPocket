@@ -53,12 +53,13 @@ const TimeTableScreen = ({ navigation }) => {
                   }
                   newItems[currStr].push({
                     titleTT: data[i].title,
+                    currDateTT: currStr,
                     fromDateTT: data[i].fromDate,
                     setToDateTT: data[i].toDate,
                     setBudgetTT: data[i].budget,
                     setMealTT: data[i].meals,
-                    description: data[i].description,
-                    purpose: data[i].purpose,
+                    descriptionTT: data[i][currStr]?.description,
+                    purposeTT: data[i][currStr]?.purpose,
                   });
                   curr.setDate(curr.getDate() + 1);
                 }
@@ -83,42 +84,28 @@ const TimeTableScreen = ({ navigation }) => {
   const renderItem = (item) => {
     const dataToSend = {
       titleTT: item.titleTT,
-      fromDateTT: item.fromDateTT,
+      fromDateTT: item.currDateTT,
       toDateTT: item.toDateTT,
       budgetTT: item.budgetTT,
       mealTT: item.meallTT,
     };
 
+    const onPressHandler = () => {
+      navigation.navigate("ScheduleForm", dataToSend);
+    };
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate("ScheduleForm", dataToSend)}
-      >
-        <View
-          style={{
-            padding: 10,
-            margin: 10,
-            height: 100,
-            backgroundColor: "#fff",
-            borderRadius: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 5,
-            elevation: 3,
-          }}
-        >
-          <View
-            style={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexDirection: "row",
-            }}
-          >
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-              {item.titleTT}
-              {item.meals}
-              {item.description}
-            </Text>
+      <TouchableOpacity onPress={onPressHandler}>
+        <View style={styles.card}>
+          <View style={styles.innerCard}>
+            <View>
+              <Text style={styles.title}>{item.titleTT}</Text>
+              {item.purposeTT && (
+                <Text style={styles.purpose}>{item.purposeTT}</Text>
+              )}
+              {item.descriptionTT && (
+                <Text style={styles.description}>{item.descriptionTT}</Text>
+              )}
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -163,9 +150,40 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
   },
+  card: {
+    padding: 10,
+    margin: 10,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    flexShrink: 1,
+  },
+  innerCard: {
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+  },
   emptyDate: {
     height: 15,
     flex: 1,
     paddingTop: 30,
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  purpose: {
+    fontSize: 14,
+    fontWeight: "normal",
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 12,
+    fontWeight: "normal",
   },
 });

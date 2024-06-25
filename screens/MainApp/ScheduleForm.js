@@ -12,10 +12,6 @@ export default function ScheduleForm({ route }) {
   const { titleTT, fromDateTT, toDateTT, budgetTT, mealTT } =
     route.params || {};
 
-  console.log(fromDateTT);
-  console.log(toDateTT);
-  console.log(toDateTT);
-
   const [selected, setSelected] = useState("");
   const data = [
     { key: "1", value: "Entertainment" },
@@ -66,10 +62,9 @@ export default function ScheduleForm({ route }) {
           setSelected={(val) => setSelected(val)}
           data={data}
           save="value"
-          Number="2"
-          defaultOption={{ key: "3", value: "Nothing" }}
           search={false}
-          boxStyles={styles.purpose}
+          boxStyles={styles.boxStyles}
+          dropdownStyles={styles.dropdownStyles}
           maxHeight="130"
         />
         <Text style={styles.text}>Description</Text>
@@ -109,18 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "left",
   },
-  container2: {
-    backgroundColor: "white",
-    width: "100%",
-    borderColor: "#e8e8e8",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginVertical: 5,
-    borderRadius: 25,
-  },
-  purpose: {
+  boxStyles: {
     height: 40,
     alignItems: "center",
     flexDirection: "row",
@@ -133,8 +117,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  allDayContainer: {
+  dropdownStyles: {
+    height: 130,
+    alignItems: "center",
     flexDirection: "row",
     backgroundColor: "white",
     width: "100%",
@@ -145,5 +136,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginVertical: 5,
     borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
 });

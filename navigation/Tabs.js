@@ -5,7 +5,6 @@ import FriendScreen from "../screens/MainApp/FriendScreen";
 import MessengerScreen from "../screens/MainApp/MessengerScreen";
 import TimeTableNav from "./TimeTableNav";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import AddScheduleScreen from "../screens/MainApp/AddScheduleScreen";
 import Schedule from "./Schedule";
 import { Platform, View } from "react-native";
 

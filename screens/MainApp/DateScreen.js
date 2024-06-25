@@ -76,7 +76,8 @@ export default function DateScreen() {
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
         <StatusBar style="auto" />
-        <Text style={styles.label}>Title</Text>
+        <Text style={styles.mainTitle}> 1 Day Plan</Text>
+        <Text style={styles.firstTitle}>Title</Text>
         <CustomInput
           name="Title"
           control={control}
@@ -200,7 +201,22 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
+  mainTitle: {
+    textAlign: "center",
+    fontSize: 35,
+    fontWeight: "bold",
+    color: "#051C60",
+    margin: 10,
+  },
+  firstTitle: {
+    marginTop: 10,
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: "bold",
+    color: "#40376e",
+  },
   label: {
+    marginTop: 10,
     fontSize: 18,
     marginBottom: 10,
     fontWeight: "bold",
@@ -246,6 +262,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     marginVertical: 5,
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
   },
   dateButton: {
     borderWidth: 1,

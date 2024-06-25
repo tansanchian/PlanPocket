@@ -60,8 +60,8 @@ export async function writeScheduleDatabase(purpose, description, fromDate) {
 
   if (userId) {
     const postSchedule = {
-      purpose: purpose || "Unknown purpose",
-      description: description || "N/A",
+      purpose: purpose,
+      description: description || "",
     };
 
     try {
@@ -168,7 +168,7 @@ export async function createScheduleDatabase(
   }
 }
 
-export async function readScheduleDatabase(filterItem) {
+export async function readScheduleDatabase() {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -180,7 +180,6 @@ export async function readScheduleDatabase(filterItem) {
 
       if (snapshot.exists()) {
         const schedules = snapshot.val();
-        // console.warn(schedules);
         return schedules;
       } else {
         console.log("No data available");
