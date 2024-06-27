@@ -43,6 +43,9 @@ const TimeTableScreen = ({ navigation }) => {
           newItems[strTime] = [];
           if (dataLength != 0) {
             for (let i = 0; i < dataLength; i++) {
+              if (data[i] == undefined) {
+                continue;
+              }
               if (data[i].fromDate === strTime) {
                 let curr = parseDate(data[i].fromDate);
                 const end = parseDate(data[i].toDate);

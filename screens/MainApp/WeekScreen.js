@@ -91,6 +91,7 @@ export default function WeekScreen() {
       );
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
+        navigation.navigate("AddSchedule");
       } else {
         Alert.alert("Error", "Cannot overwrite current schedule");
       }

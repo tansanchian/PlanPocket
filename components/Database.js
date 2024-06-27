@@ -248,6 +248,13 @@ export async function readScheduleDatabase() {
 
       if (snapshot.exists()) {
         const schedules = snapshot.val();
+        if (!Array.isArray(schedules)) {
+          const temp = Object.keys(schedules).map((key) => ({
+            ...schedules[key],
+          }));
+          console.log(temp);
+          return temp;
+        }
         console.log(schedules);
         return schedules;
       } else {

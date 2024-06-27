@@ -10,7 +10,10 @@ const Stack = createNativeStackNavigator();
 
 const Schedule = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="AddSchedule" component={AddScheduleScreen} />
       <Stack.Screen name="ChooseDate" component={ChooseDateScreen} />
       <Stack.Screen name="DateScreen" component={DateScreen} />

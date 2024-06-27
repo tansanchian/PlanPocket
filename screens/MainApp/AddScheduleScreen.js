@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../../components/Header";
@@ -35,24 +35,22 @@ const AddScheduleScreen = () => {
       }
     });
 
-    // Clean up the listener when the component unmounts
     return () => unsubscribe();
   }, []);
 
   const onCalendarPressed = () => {
-    console.log("hi");
+    navigation.navigate("Timetable");
   };
 
   const onDeletePressed = async (fromDate, toDate) => {
     try {
       await deleteScheduleDatabase(fromDate, toDate);
-      // The schedules state will automatically update due to the real-time listener
     } catch (error) {
       console.error(error);
     }
   };
 
-  const renderCards = ({ item }) => {
+  const renderComponentOne = ({ item }) => {
     if (!item) {
       return null;
     }
@@ -85,6 +83,30 @@ const AddScheduleScreen = () => {
     );
   };
 
+  const renderComponentTwo = () => (
+    <View>
+      <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
+    </View>
+  );
+
+  const latestDate = useMemo(() => {
+    if (schedules.length === 0) return null;
+    return schedules.reduce((latest, item) => {
+      const itemDate = new Date(item.toDate);
+      return itemDate > latest ? latest : itemDate;
+    }, new Date(schedules[0].toDate));
+  }, [schedules]);
+
+  const renderItem = ({ item }) => {
+    const itemDate = new Date(item.toDate);
+    const isLatestDate = itemDate.getTime() === latestDate.getTime();
+    return (
+      <View>
+        {isLatestDate && renderComponentTwo()}
+        {renderComponentOne({ item })}
+      </View>
+    );
+  };
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -95,19 +117,15 @@ const AddScheduleScreen = () => {
           <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
         </View>
       ) : (
-        <View style={styles.internalContainer}>
-          <View style={styles.flatList}>
-            <FlatList
-              data={schedules}
-              renderItem={renderCards}
-              keyExtractor={(item, index) => index.toString()}
-              contentContainerStyle={styles.flatListContent}
-            />
-          </View>
-          <View style={styles.button}>
-            <CustomButton text="Add Schedule" onPress={onAddSchedulePressed} />
-          </View>
-        </View>
+        <>
+          <FlatList
+            style={styles.flatContainer}
+            data={schedules}
+            renderItem={renderItem}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={styles.flatListContent}
+          />
+        </>
       )}
     </View>
   );
@@ -127,6 +145,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3eef6",
     paddingHorizontal: 20,
   },
+  flatContainer: { flex: 1, backgroundColor: "#f3eef6" },
   text: {
     fontSize: 24,
     fontWeight: "bold",
@@ -134,14 +153,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     margin: 10,
   },
-  flatList: {
-    flex: 1.5,
-  },
   card: {
     marginVertical: 10,
-    borderRadius: 30,
+    borderRadius: 50,
     elevation: 2,
-    width: 350,
+    width: 400,
   },
   cardTitle: {
     fontSize: 18,
@@ -157,11 +173,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   flatListContent: {
-    paddingVertical: 20,
-    marginHorizontal: 20,
-  },
-  button: {
-    flex: 1,
-    width: "100%",
+    flexGrow: 1,
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
