@@ -97,6 +97,16 @@ export default function DateScreen() {
             required: "Budget is required",
           }}
         />
+        <Text style={styles.label}>How much you spend a meal</Text>
+        <CustomInput
+          name="meal"
+          control={control}
+          placeholder="$"
+          keyboard="numeric"
+          rules={{
+            required: "Meal cost is required",
+          }}
+        />
         <Text style={styles.label}>How many meals a day?</Text>
         <View style={{ flexDirection: "row" }}>
           <View style={{ flex: 1 }}>

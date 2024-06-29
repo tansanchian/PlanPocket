@@ -57,17 +57,29 @@ export async function writeScheduleDatabase(
   purpose,
   description,
   fromDate,
-  costs
+  costs,
+  fromTime,
+  toTime
 ) {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
 
+  const fromTimeString = fromTime.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const toTimeString = toTime.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
   if (userId) {
     const postSchedule = {
       purpose: purpose,
       description: description || "",
       costs,
+      fromTimeString,
+      toTimeString,
     };
 
     try {
@@ -81,10 +93,33 @@ export async function writeScheduleDatabase(
         const dateSet = new Map(Object.entries(dateSetObject));
         if (dateSet.has(fromDate)) {
           const id = dateSet.get(fromDate);
-          await update(
-            ref(db, `/users/${userId}/schedules/${id}/${fromDate}`),
-            postSchedule
+          const purposeRef = ref(
+            db,
+            `/users/${userId}/schedules/${id}/Purpose/${fromDate}`
           );
+          const purposeLastIdRef = ref(
+            db,
+            `/users/${userId}/schedules/${id}/Purpose/${fromDate}/lastPurposeId`
+          );
+          const purposeSnapshot = await get(purposeRef);
+          const purposeLastIdSnapshot = await get(purposeLastIdRef);
+          if (purposeSnapshot.exists()) {
+            const newId = purposeLastIdSnapshot.val() + 1;
+            await set(purposeLastIdRef, newId);
+            await set(
+              ref(
+                db,
+                `/users/${userId}/schedules/${id}/Purpose/${fromDate}/${newId}`
+              ),
+              postSchedule
+            );
+          } else {
+            await set(purposeLastIdRef, 0);
+            await set(
+              ref(db, `/users/${userId}/schedules/${id}/Purpose/${fromDate}/0`),
+              postSchedule
+            );
+          }
           return true;
         }
       } else {

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   VirtualizedList,
+  FlatList,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
@@ -22,14 +23,23 @@ const parseDate = (dateString) => {
   return new Date(year, month - 1, day + 1);
 };
 
+const months = [
+  { key: 1, label: "January" },
+  { key: 2, label: "February" },
+  { key: 3, label: "March" },
+  { key: 4, label: "April" },
+  { key: 5, label: "May" },
+  { key: 6, label: "June" },
+  { key: 7, label: "July" },
+  { key: 8, label: "August" },
+  { key: 9, label: "September" },
+  { key: 10, label: "October" },
+  { key: 11, label: "November" },
+  { key: 12, label: "December" },
+];
+
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
-
-  // const [titleTT, setTitleTT] = useState("");
-  // const [fromDateTT, setfromDateTT] = useState("");
-  // const [toDateTT, setToDateTT] = useState("");
-  // const [budgetTT, setBudgetTT] = useState("");
-  // const [meallTT, setMealTT] = useState("");
 
   const loadItems = useCallback(async (day) => {
     try {
@@ -46,7 +56,7 @@ const TimeTableScreen = ({ navigation }) => {
               if (data[i] == undefined) {
                 continue;
               }
-              if (data[i].fromDate === strTime) {
+              if (data[i] && data[i].fromDate === strTime) {
                 let curr = parseDate(data[i].fromDate);
                 const end = parseDate(data[i].toDate);
                 while (curr <= end) {
@@ -63,6 +73,7 @@ const TimeTableScreen = ({ navigation }) => {
                     setMealTT: data[i].meals,
                     descriptionTT: data[i][currStr]?.description,
                     purposeTT: data[i][currStr]?.purpose,
+                    itemz: data[i],
                   });
                   curr.setDate(curr.getDate() + 1);
                 }
@@ -83,6 +94,12 @@ const TimeTableScreen = ({ navigation }) => {
       loadItems({ timestamp: today.getTime() });
     }, [loadItems])
   );
+  const ref = React.useRef(null);
+  const [activeTab, setActiveTab] = React.useState(0);
+  const [index, setIndex] = useState(0);
+  // React.useEffect(() => {
+  //   ref.current?.scrollToIndex({ index, animated: true });
+  // }, [index]);
 
   const renderItem = (item) => {
     const dataToSend = {
@@ -96,20 +113,60 @@ const TimeTableScreen = ({ navigation }) => {
     const onPressHandler = () => {
       navigation.navigate("ScheduleForm", dataToSend);
     };
+
+    let transformedData = null;
+    const currentDate = item.currDateTT;
+    const datas =
+      item.itemz.Purpose == undefined ? [] : [item.itemz.Purpose[currentDate]];
+    const originalObject = datas[0];
+
+    if (originalObject != undefined) {
+      transformedData = Object.keys(originalObject)
+        .filter((key) => key !== "lastPurposeId")
+        .map((key) => ({
+          id: key,
+          ...originalObject[key],
+        }));
+    }
+
     return (
       <TouchableOpacity onPress={onPressHandler}>
         <View style={styles.card}>
-          <View style={styles.innerCard}>
-            <View>
-              <Text style={styles.title}>{item.titleTT}</Text>
-              {item.purposeTT && (
-                <Text style={styles.purpose}>{item.purposeTT}</Text>
-              )}
-              {item.descriptionTT && (
-                <Text style={styles.description}>{item.descriptionTT}</Text>
-              )}
-            </View>
-          </View>
+          <Text style={styles.title}>{item.titleTT}</Text>
+          <FlatList
+            style={{ flexGrow: 0 }}
+            data={transformedData}
+            ref={ref}
+            keyExtractor={(items) => items.key}
+            contentContainerStyle={{ paddingLeft: 10 }}
+            vertical
+            renderItem={({ item, index: fIndex }) => {
+              return (
+                <TouchableOpacity onPress={onPressHandler}>
+                  <View
+                    style={{
+                      marginRight: 10,
+                      padding: 10,
+                      borderWidth: 2,
+                      borderRadius: 12,
+                      borderColor: "#abc",
+                    }}
+                  >
+                    <Text>{item.description}</Text>
+                    <Text>{item.purpose}</Text>
+                    {/* {items.purpose && (
+                      <Text style={styles.purpose}>{items.purpose}</Text>
+                    )}
+                    {items.description && (
+                      <Text style={styles.description}>
+                        {items.description}
+                      </Text>
+                    )} */}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+          />
         </View>
       </TouchableOpacity>
     );

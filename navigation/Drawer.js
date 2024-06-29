@@ -31,7 +31,7 @@ const Drawer = () => {
         drawerStyle: {
           width: dimensions.width * 0.7,
         },
-        swipeEdgeWidth: dimensions.width,
+        swipeEdgeWidth: dimensions.width * 0.5,
         headerShown: false,
         drawerLabelStyle: { marginLeft: -25 },
         drawerActiveBackgroundColor: "#D3C5E5",

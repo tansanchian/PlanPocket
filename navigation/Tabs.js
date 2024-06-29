@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/MainApp/HomeScreen";
+import HomeScreenNav from "./HomeScreenNav";
 import FriendScreen from "../screens/MainApp/FriendScreen";
 import MessengerScreen from "../screens/MainApp/MessengerScreen";
 import TimeTableNav from "./TimeTableNav";
@@ -31,7 +31,7 @@ const Tabs = () => {
     <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeScreenNav}
         options={{
           tabBarIcon: ({ color, size }) => {
             return (
