@@ -39,6 +39,7 @@ export default function DateScreen() {
   const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
   const title = watch("Title");
+  const mealBudget = watch('meal');
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
@@ -60,13 +61,18 @@ export default function DateScreen() {
         budget,
         meals,
         stringifyDate(date),
-        stringifyDate(date)
+        stringifyDate(date),
+        mealBudget
       );
-      if (result) {
+      if (result == true) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("AddSchedule");
+      } else if (result == '402') {
+        Alert.alert("Error", "Cannot overwrite current schedule!");
+      } else if (result == '404') {
+        Alert.alert("Error", "Insufficient budget for current meal plan!")
       } else {
-        Alert.alert("Error", "Cannot overwrite current schedule");
+        Alert.alert("Error", "Please Try Again!");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to add schedule: " + error.message);

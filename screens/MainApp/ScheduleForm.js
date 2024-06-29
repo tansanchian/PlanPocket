@@ -38,6 +38,14 @@ export default function ScheduleForm({ route }) {
   const [toTime, setToTime] = useState(() => {
     const currentTime = new Date();
     currentTime.setHours(currentTime.getHours() + 1);
+
+    const maxTime = new Date();
+    maxTime.setHours(23, 59, 0, 0);
+
+    if (currentTime > maxTime) {
+      return maxTime;
+    }
+
     return currentTime;
   });
   const [showFromTimePicker, setShowFromTimePicker] = useState(false);
@@ -284,7 +292,7 @@ export default function ScheduleForm({ route }) {
           text="Add"
           onPress={
             highlightFromDate
-              ? () => Alert.alert("Error", "From date cannot be after to date")
+              ? () => Alert.alert("The end time must be after the start time")
               : selected == ""
               ? () => Alert.alert("Error", "Select an option")
               : handleSubmit(onAddSchedulePressed)

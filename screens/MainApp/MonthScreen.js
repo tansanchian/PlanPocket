@@ -43,6 +43,7 @@ export default function MonthScreen() {
 
   const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
+  const mealBudget = watch('meal');
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
@@ -86,13 +87,18 @@ export default function MonthScreen() {
         budget,
         meals,
         stringifyDate(date),
-        stringifyDate(toDate)
+        stringifyDate(toDate),
+        mealBudget
       );
-      if (result) {
+      if (result == true) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("AddSchedule");
+      } else if (result == '402') {
+        Alert.alert("Error", "Cannot overwrite current schedule!");
+      } else if (result == '404') {
+        Alert.alert("Error", "Insufficient budget for current meal plan!")
       } else {
-        Alert.alert("Error", "Cannot overwrite current schedule");
+        Alert.alert("Error", "Please Try Again!");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to add schedule: " + error.message);
@@ -121,6 +127,16 @@ export default function MonthScreen() {
           keyboard="numeric"
           rules={{
             required: "Budget is required",
+          }}
+        />
+        <Text style={styles.label}>How much you spend a meal</Text>
+        <CustomInput
+          name="meal"
+          control={control}
+          placeholder="$"
+          keyboard="numeric"
+          rules={{
+            required: "Meal cost is required",
           }}
         />
         <Text style={styles.label}>How many meals a day?</Text>
