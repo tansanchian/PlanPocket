@@ -122,7 +122,7 @@ const TimeTableScreen = ({ navigation }) => {
 
     if (originalObject != undefined) {
       transformedData = Object.keys(originalObject)
-        .filter((key) => key !== "lastPurposeId")
+        .filter((key) => key !== "lastPurposeId" && key !== "intervals")
         .map((key) => ({
           id: key,
           ...originalObject[key],
