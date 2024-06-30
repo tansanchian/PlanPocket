@@ -34,6 +34,7 @@ export default function WeekScreen() {
   const [date, setDate] = useState(new Date());
   const laterDate = new Date();
   laterDate.setDate(laterDate.getDate() + 6);
+  laterDate.setDate(laterDate.getDate() + 6);
   const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setToShowDatePicker] = useState(false);
@@ -79,7 +80,6 @@ export default function WeekScreen() {
   const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
   const title = watch("Title");
-  const mealBudget = watch("meal");
 
   const onCreateSchedulePressed = async () => {
     try {
@@ -94,10 +94,6 @@ export default function WeekScreen() {
       if (result == true) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("AddSchedule");
-      } else if (result == "402") {
-        Alert.alert("Error", "Cannot overwrite current schedule!");
-      } else if (result == "404") {
-        Alert.alert("Error", "Insufficient budget for current meal plan!");
       } else {
         Alert.alert("Error", "Please Try Again!");
       }
