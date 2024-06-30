@@ -292,10 +292,8 @@ export async function createScheduleDatabase(
         newSet = new Map(Object.entries(dateSetObject));
       }
 
-      // Calculate the number of days between the two dates
       const timeDiff = todate.getTime() - fromdate.getTime();
       const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      // Calculate the budget left
       const budgetLeft = budget - (daysDiff + 1) * mealBudget * meals;
 
       if (budgetLeft < 0) {
@@ -380,6 +378,7 @@ export async function readScheduleDatabase() {
 // }
 
 export async function readCurrentDateDatabase() {
+  await new Promise((resolve) => setTimeout(resolve, 500));
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
