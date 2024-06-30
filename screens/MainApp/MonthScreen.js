@@ -93,6 +93,10 @@ export default function MonthScreen() {
       if (result == true) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("AddSchedule");
+      } else if (result == "402") {
+        Alert.alert("Error", "Cannot overwrite current schedule!");
+      } else if (result == "404") {
+        Alert.alert("Error", "Insufficient budget for current meal plan!");
       } else {
         Alert.alert("Error", "Please Try Again!");
       }
