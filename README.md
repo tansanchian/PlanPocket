@@ -116,7 +116,7 @@ The profile screen is designed with a modern and clean UI, providing a seamless 
 
 <h3>June (Milestone 2)</h3>
 
-<u><b>Advanced UX/UI and Overall Layout Improvement</b></u>
+<u><b>Advanced UX/UI and Overall Layout Improvement [Completed]</b></u>
 
 <b>Color Scheme Update:</b> 
 Implemented a modern, accessible color palette to improve visual appeal and readability.
@@ -130,24 +130,24 @@ Updated the application to be more compatible with various devices and screen si
 <b>Cohesion and Design Improvements:</b>
 Ensured all elements of the application follow a cohesive design language, improving the overall aesthetic and functional quality.
 
-<b>Timetable Management Feature [Completed]</b>
+<p style={text-decoration: underline}><b>Timetable Management Feature [Completed]</b></p>
 
-Calendar and Agenda Integration
-Utilizes react-native-calendars to provide a combined calendar and agenda view.
-Users can view their schedules in a daily, weekly, or monthly format.
-Dynamic Data Loading
-Schedules are dynamically loaded based on the current date and user interaction.
-Efficiently handles large data sets and ensures smooth scrolling and data rendering.
-Interactive Schedule Management
-Users can tap on a schedule item to navigate to a detailed view, allowing for edits and updates.
-Empty dates are displayed with a placeholder message, enhancing user experience.
-Custom Styling and Theming
-The calendar and agenda components are styled to match the application's design language.
-Custom themes ensure visual consistency and improve user interface aesthetics.
-Data Persistence
-Schedule data is read from and written to a database using custom functions like readScheduleDatabase.
-Ensures data integrity and reliability with proper error handling during data operations.
+<b>Calendar and Agenda Integration:</b>
+<img width="240" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/ecb61f21-e20c-4ba3-8802-b473c1fe8a93">
 
+Utilizes react-native-calendars to provide a combined calendar and agenda view. Users can view their schedules in a daily, weekly, or monthly format.
+
+<b>Dynamic Data Loading:</b>
+Schedules are dynamically loaded based on the current date and user interaction. Efficiently handles large data sets and ensures smooth scrolling and data rendering.
+
+<b>Interactive Schedule Management:</b>
+Users can tap on a schedule item to navigate to a detailed view, allowing for edits and updates. Empty dates are displayed with a placeholder message, enhancing user experience.
+
+<b>Custom Styling and Theming:</b>
+The calendar and agenda components are styled to match the application's design language. Custom themes ensure visual consistency and improve user interface aesthetics.
+
+<b>Data Persistence</b>
+Schedule data is read from and written to a database using custom functions like readScheduleDatabase. Ensures data integrity and reliability with proper error handling during data operations.
 
 <h2>Tech Stack</h2>
 
