@@ -72,22 +72,67 @@ As a fitness enthusiast who wants to maintain a healthy lifestyle on a budget, I
 
 <h2>Project Scope</h2>
 
-<h3>UI + Framework for the application, Authentication, Simple Features</h3>
 <h4>May (Milestone 1)</h4>
 
-Sign in with google/facebook(work in progress)
+<b><u>User Account Authentication [Completed]</u><b>
 
-Sign Up with email
+<b>Login via email and password:</b>
 
-Sign In with email 
+Based on user input, the application will invoke Firebase authentication. For instance, when registering with an email and password, the onRegisterPressed method will be called. Any FirebaseAuthException that arises will be handled within a try-catch block, along with react-hook-form, to ensure that the user does not enter invalid data. For example, the password must be at least six characters long, the confirmation password must match the original password, and the email address must conform to the standard email format.
 
-Profile Screen (allow user to change profile picture either from camera or gallery, edit username, location and store profile data in data base)
+Only then upon successful creation of the account will the user be auto routed to the login page to login to access our home screen.
 
-Timetable/agenda screen
+React-native navigation stack is used to ensure smooth user experience.
+
+<b>Implementation side features:</b>
+
+The application includes a feature to verify if the user is currently logged in. When the user first opens the application, it checks the user's login status. If the user is logged in, the application directs them to the home page. Otherwise, it prompts the user to log in.
+<img width="643" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/f7a991e4-5b17-4100-b756-49c225baba3b">
+
+<b>Implementation challenges:</b>
+
+Some challenges we face include routing users to the appropriate pages while ensuring a smooth user experience. For instance, after registering, the user should be directed to the correct page. Additionally, after clicking the register button, the user should be redirected to the login page.
+Firebase auth database
+
+<img width="638" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/095c4325-b7e9-49a8-be75-431e37f95a39">
+<img width="639" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/c0433165-0696-4bd8-b71a-ed05accaded2">
+
+<u><b>Profile Feature [Completed]</u></b>
+
+<img width="190" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/4c8db542-a397-4c38-8e6b-684d4b7d3477">
+
+User Information Management:
+Users can update their username, phone number, location, and email address. Data validation ensures that inputs such as email and phone number are correctly formatted and required fields are not left empty.
+
+Profile Image Management:
+Users can upload a profile picture using their camera or choose from their photo gallery. Images are uploaded to Firebase Storage and the URL is stored in the user's profile. Users can remove their profile picture if they choose to do so.
+
+Security and Authentication:
+Reauthentication is required for sensitive operations such as changing the email address. Utilizes Firebase authentication for secure user management. Error handling for re authentication ensures users are informed of any issues with their password.
+
+Data Persistence:
+Profile data is read from and written to a database using custom writeProfile and readProfile functions. Ensures data consistency and reliability with proper error handling during read/write operations. 
+
+UX/UI design:
+The profile screen is designed with a modern and clean UI, providing a seamless user experience. Editable fields are clearly distinguished from non-editable ones, and users are given visual feedback during the editing process. A modal interface is used for profile image options and password reauthentication, enhancing the usability and aesthetic appeal of the application.
+
+<u><b>Database initialization and linking</u></b>
 
 Add schedule (purpose, budget, time, others linked to data base)
 
-Deploy an apk version of the application
+<h4>June (Milestone 2)</h4>
+
+<u><b>Advanced UX/UI</b></u>
+
+Color Scheme Update: Implemented a modern, accessible color palette to improve visual appeal and readability.
+
+Layout Restructuring: Redesigned the application’s layout to enhance user navigation and interaction, ensuring a more intuitive and seamless user experience.
+
+Compatibility Enhancements: Updated the application to be more compatible with various devices and screen sizes, ensuring a consistent experience across platforms.
+
+Cohesion and Design Improvements: Ensured all elements of the application follow a cohesive design language, improving the overall aesthetic and functional quality.
+
+<u><b>Database Utilization (BackEnd)</u></b>
 
 <h2>Tech Stack</h2>
 
