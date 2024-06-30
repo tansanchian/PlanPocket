@@ -33,7 +33,7 @@ export default function WeekScreen() {
   const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
   const laterDate = new Date();
-  laterDate.setDate(laterDate.getDate() + 7);
+  laterDate.setDate(laterDate.getDate() + 6);
   const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setToShowDatePicker] = useState(false);
@@ -45,7 +45,7 @@ export default function WeekScreen() {
     setShowDatePicker(false);
     setDate(currentDate);
     const newToDate = new Date(currentDate);
-    newToDate.setDate(newToDate.getDate() + 7);
+    newToDate.setDate(newToDate.getDate() + 6);
     setToDate(newToDate);
   };
 
@@ -58,7 +58,7 @@ export default function WeekScreen() {
     setToShowDatePicker(false);
     setToDate(currentDate);
     const newFromDate = new Date(currentDate);
-    newFromDate.setDate(newFromDate.getDate() - 7);
+    newFromDate.setDate(newFromDate.getDate() - 6);
     setDate(newFromDate);
   };
 
@@ -68,7 +68,7 @@ export default function WeekScreen() {
 
   const getMinimumToDate = () => {
     const today = new Date();
-    today.setDate(today.getDate() + 7);
+    today.setDate(today.getDate() + 6);
     return today;
   };
 
@@ -79,6 +79,7 @@ export default function WeekScreen() {
   const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
   const title = watch("Title");
+  const mealBudget = watch("meal");
 
   const onCreateSchedulePressed = async () => {
     try {
@@ -87,13 +88,18 @@ export default function WeekScreen() {
         budget,
         meals,
         stringifyDate(date),
-        stringifyDate(toDate)
+        stringifyDate(toDate),
+        mealBudget
       );
-      if (result) {
+      if (result == true) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("AddSchedule");
+      } else if (result == "402") {
+        Alert.alert("Error", "Cannot overwrite current schedule!");
+      } else if (result == "404") {
+        Alert.alert("Error", "Insufficient budget for current meal plan!");
       } else {
-        Alert.alert("Error", "Cannot overwrite current schedule");
+        Alert.alert("Error", "Please Try Again!");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to add schedule: " + error.message);
@@ -122,6 +128,16 @@ export default function WeekScreen() {
           keyboard="numeric"
           rules={{
             required: "Budget is required",
+          }}
+        />
+        <Text style={styles.label}>How much you spend a meal</Text>
+        <CustomInput
+          name="meal"
+          control={control}
+          placeholder="$"
+          keyboard="numeric"
+          rules={{
+            required: "Meal cost is required",
           }}
         />
         <Text style={styles.label}>How many meals a day?</Text>

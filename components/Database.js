@@ -8,6 +8,7 @@ import {
   set,
 } from "firebase/database";
 import { getAuth } from "firebase/auth";
+import { parse } from "react-native-svg";
 
 export async function writeProfile(dataPath, data) {
   const auth = getAuth();
@@ -73,6 +74,25 @@ export async function writeScheduleDatabase(
     hour: "2-digit",
     minute: "2-digit",
   });
+  function convertTimeStringToDate(timeString) {
+    const [time, modifier] = timeString.split(" ");
+    let [hours, minutes] = time.split(":");
+
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
+
+    if (modifier === "PM" && hours !== 12) {
+      hours += 12;
+    }
+    if (modifier === "AM" && hours === 12) {
+      hours = 0;
+    }
+
+    const date = new Date();
+    date.setHours(hours, minutes, 0, 0);
+
+    return date;
+  }
   if (userId) {
     const postSchedule = {
       purpose: purpose,
@@ -87,7 +107,6 @@ export async function writeScheduleDatabase(
       const dateRef = ref(db, `/users/${userId}/dateSet`);
       const lastIdSnapshot = await get(lastIdRef);
       const dateSetSnapshot = await get(dateRef);
-
       if (lastIdSnapshot.exists() && dateSetSnapshot.exists()) {
         const dateSetObject = dateSetSnapshot.val();
         const dateSet = new Map(Object.entries(dateSetObject));
@@ -97,12 +116,39 @@ export async function writeScheduleDatabase(
             db,
             `/users/${userId}/schedules/${id}/Purpose/${fromDate}`
           );
+          const intervalsRef = ref(
+            db,
+            `/users/${userId}/schedules/${id}/Purpose/${fromDate}/intervals`
+          );
           const purposeLastIdRef = ref(
             db,
             `/users/${userId}/schedules/${id}/Purpose/${fromDate}/lastPurposeId`
           );
           const purposeSnapshot = await get(purposeRef);
           const purposeLastIdSnapshot = await get(purposeLastIdRef);
+          const intervalsSnapshot = await get(intervalsRef);
+
+          let array = new Array();
+          if (intervalsSnapshot.exists()) {
+            array = intervalsSnapshot.val();
+            for (let i = 0; i < array.length; i++) {
+              const left = convertTimeStringToDate(array[i][0]);
+              const right = convertTimeStringToDate(array[i][1]);
+              console.log(array[i][0]);
+              console.log(array[i][1]);
+              console.log(
+                convertTimeStringToDate("10:47 PM") < right &&
+                  convertTimeStringToDate("11:47 PM") > left
+              );
+              if (
+                convertTimeStringToDate(fromTimeString) < right &&
+                convertTimeStringToDate(toTimeString) > left
+              ) {
+                return false;
+              }
+            }
+          }
+          array.push([fromTimeString, toTimeString]);
           if (purposeSnapshot.exists()) {
             const newId = purposeLastIdSnapshot.val() + 1;
             await set(purposeLastIdRef, newId);
@@ -120,6 +166,7 @@ export async function writeScheduleDatabase(
               postSchedule
             );
           }
+          await set(intervalsRef, array);
           return true;
         }
       } else {
@@ -199,7 +246,8 @@ export async function createScheduleDatabase(
   budget,
   meals,
   date,
-  toDate
+  toDate,
+  mealBudget
 ) {
   const auth = getAuth();
   const db = getDatabase();
@@ -212,6 +260,7 @@ export async function createScheduleDatabase(
       fromDate: date || "Unknown date",
       toDate: toDate || "Unknown date",
       meals: meals || "Unknown meals",
+      mealBudget: mealBudget || "Unknown budget",
     };
 
     try {
@@ -242,6 +291,15 @@ export async function createScheduleDatabase(
         const dateSetObject = dateSetSnapshot.val();
         newSet = new Map(Object.entries(dateSetObject));
       }
+      const timeDiff = todate.getTime() - fromdate.getTime();
+      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+      const budgetLeft = budget - (daysDiff + 1) * mealBudget * meals;
+
+      if (budgetLeft < 0) {
+        return "404";
+      }
+
+      postSchedule["budgetLeft"] = budgetLeft;
 
       while (fromdate <= todate) {
         const stringFromDate = timeToString(fromdate);
@@ -262,7 +320,7 @@ export async function createScheduleDatabase(
 
         return true;
       } else {
-        return false;
+        return "402";
       }
     } catch (error) {
       console.error("Error creating Schedule:", error);
@@ -287,11 +345,111 @@ export async function readScheduleDatabase() {
           const temp = Object.keys(schedules).map((key) => ({
             ...schedules[key],
           }));
-          console.log(temp);
           return temp;
         }
-        console.log(schedules);
         return schedules;
+      } else {
+        console.log("No data available");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error reading Schedule:", error);
+      return null;
+    }
+  } else {
+    console.error("User is not authenticated");
+    return null;
+  }
+}
+
+// export async function budgetCalculator() {
+//   const auth = getAuth();
+//   const db = getDatabase();
+//   const userId = auth.currentUser?.uid;
+//   if (userId) {
+//     try {
+//       const schedulesRef = ref(db, `/users/${userId}/schedules`);
+//       const snapshot = await get(schedulesRef);
+//     }
+//   }
+// }
+
+export async function readCurrentDateDatabase() {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
+  if (userId) {
+    try {
+      const schedulesRef = ref(db, `/users/${userId}/schedules`);
+      const dateSetRef = ref(db, `/users/${userId}/dateSet`);
+      const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
+      const snapshot = await get(schedulesRef);
+      const lastIdSnapshot = await get(lastIdRef);
+      const dateSetSnapshot = await get(dateSetRef);
+
+      if (lastIdSnapshot.exists() && snapshot.exists()) {
+        const schedules = snapshot.val();
+        const lastId = lastIdSnapshot.val() + 1;
+        const dateSet = dateSetSnapshot.val();
+        const dates = Object.keys(dateSet);
+
+        for (let i = 0; i < lastId; i++) {
+          if (schedules != undefined) {
+            if (schedules[i] != undefined) {
+              let temp = schedules[i];
+              const dateLen = dates.length;
+              for (let i = 0; i < dateLen; i++) {
+                const purpose = temp.Purpose[dates[i]];
+
+                if (purpose != undefined) {
+                  const lastPurposeId = purpose.lastPurposeId + 1;
+                  for (let y = 0; y < lastPurposeId; y++) {
+                    const fromTimeString = purpose[y].fromTimeString;
+                    const toTimeString = purpose[y].toTimeString;
+                    let timeParts = fromTimeString.split(":");
+                    let hours = parseInt(timeParts[0], 10);
+                    let minutes = parseInt(timeParts[1].split(" ")[0], 10);
+                    if (fromTimeString.includes("PM") && hours !== 12) {
+                      hours += 12;
+                    }
+                    let formattedTime =
+                      hours.toString().padStart(2, "0") +
+                      ":" +
+                      minutes.toString().padStart(2, "0");
+                    let specificDateTime = new Date(
+                      currentDate.getFullYear(),
+                      currentDate.getMonth(),
+                      currentDate.getDate(),
+                      parseInt(formattedTime.split(":")[0]),
+                      parseInt(formattedTime.split(":")[1])
+                    );
+
+                    if (specificDateTime > currentDate) {
+                      console.log(
+                        "The specific time is in the future compared to current time."
+                      );
+                      let dateObject = new Date(formattedDate);
+                      let eventDate = dateObject.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      });
+                      return (
+                        eventDate +
+                        " - " +
+                        fromTimeString +
+                        " to " +
+                        toTimeString
+                      );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       } else {
         console.log("No data available");
         return null;

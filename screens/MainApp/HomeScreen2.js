@@ -1,17 +1,40 @@
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
+import React, { useState, useCallback } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { Avatar } from "react-native-paper";
+import { FontAwesome5 } from "@expo/vector-icons";
+import CustomButton from "../../components/CustomButton";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { todayString } from "react-native-calendars/src/expandableCalendar/commons";
-import CustomButton from "../../components/CustomButton";
-import { useNavigation } from "@react-navigation/native";
+import { readCurrentDateDatabase } from "../../components/Database";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
+  const [currentEvent, setCurrentEvent] = useState(null);
+
+  const loadItems = useCallback(async () => {
+    try {
+      const data = await readCurrentDateDatabase();
+      setCurrentEvent(data);
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+      setCurrentEvent(null);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadItems();
+    }, [loadItems])
+  );
   const onNextPressed = () => {
     navigation.navigate("HomeScreen");
   };
+
+  const onCalendarPressed = () => {
+    navigation.navigate("Timetable");
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -20,11 +43,31 @@ const HomeScreen2 = () => {
         <View style={styles.budget}>
           <Text style={styles.title}>Title</Text>
         </View>
-        <View style={styles.date}>
-          <Text style={styles.dateText}>
-            {new Date().toJSON().slice(0, 10).replace(/-/g, "/")}
-          </Text>
-        </View>
+        {!currentEvent ? (
+          <View style={styles.date}>
+            <View style={{ padding: 20 }}>
+              <TouchableOpacity onPress={onCalendarPressed}>
+                <Avatar.Icon icon="calendar" size={40} />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <Text style={styles.dateText}>Your have no event</Text>
+              <Text style={styles.dateText}>{currentEvent}</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.date}>
+            <View style={{ padding: 20 }}>
+              <TouchableOpacity onPress={onCalendarPressed}>
+                <Avatar.Icon icon="calendar" size={40} />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <Text style={styles.dateText}>Your next event is on</Text>
+              <Text style={styles.dateText}>{currentEvent}</Text>
+            </View>
+          </View>
+        )}
         <CustomButton text="Next" onPress={onNextPressed} />
         <View style={styles.main}>
           <View style={styles.card}>
@@ -93,13 +136,13 @@ const styles = StyleSheet.create({
   },
   date: {
     flex: 0.1,
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "flex-start",
     alignItems: "center",
     backgroundColor: "#6a1b9a",
-    marginHorizontal: -100,
   },
   dateText: {
-    fontSize: 20,
+    fontSize: 17,
     color: "white",
   },
   main: {

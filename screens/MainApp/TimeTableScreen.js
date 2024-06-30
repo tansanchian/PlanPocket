@@ -122,7 +122,7 @@ const TimeTableScreen = ({ navigation }) => {
 
     if (originalObject != undefined) {
       transformedData = Object.keys(originalObject)
-        .filter((key) => key !== "lastPurposeId")
+        .filter((key) => key !== "lastPurposeId" && key !== "intervals")
         .map((key) => ({
           id: key,
           ...originalObject[key],
@@ -152,16 +152,14 @@ const TimeTableScreen = ({ navigation }) => {
                       borderColor: "#abc",
                     }}
                   >
-                    <Text>{item.description}</Text>
-                    <Text>{item.purpose}</Text>
-                    {/* {items.purpose && (
-                      <Text style={styles.purpose}>{items.purpose}</Text>
+                    {item.purpose && (
+                      <Text style={styles.purpose}>{item.purpose}</Text>
                     )}
-                    {items.description && (
-                      <Text style={styles.description}>
-                        {items.description}
-                      </Text>
-                    )} */}
+                    {item.description && (
+                      <Text style={styles.description}>{item.description}</Text>
+                    )}
+                    <Text>{item.fromTimeString}</Text>
+                    <Text>{item.toTimeString}</Text>
                   </View>
                 </TouchableOpacity>
               );
