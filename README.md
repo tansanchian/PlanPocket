@@ -195,6 +195,7 @@ Schedules are stored and retrieved from Firebase using custom functions like wri
 
 <b>Data Accuracy:</b> 
 An array of current time used is stored in the database for future checking of duplicates. 
+
 <img width="270" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/e848863d-e17c-41a2-b0ec-bc3afb8d29f0">
 
 <b>Budget Dashboard [Partially Completed]</b>
