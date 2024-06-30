@@ -130,7 +130,7 @@ Updated the application to be more compatible with various devices and screen si
 <b>Cohesion and Design Improvements:</b>
 Ensured all elements of the application follow a cohesive design language, improving the overall aesthetic and functional quality.
 
-<p style={text-decoration: underline}><b>Timetable Management Feature [Completed]</b></p>
+<b>Timetable Management Feature [Completed]</b>
 
 <b>Calendar and Agenda Integration:</b>
 <img width="240" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/ecb61f21-e20c-4ba3-8802-b473c1fe8a93">
@@ -146,8 +146,71 @@ Users can tap on a schedule item to navigate to a detailed view, allowing for ed
 <b>Custom Styling and Theming:</b>
 The calendar and agenda components are styled to match the application's design language. Custom themes ensure visual consistency and improve user interface aesthetics.
 
-<b>Data Persistence</b>
+<b>Data Persistence:</b>
 Schedule data is read from and written to a database using custom functions like readScheduleDatabase. Ensures data integrity and reliability with proper error handling during data operations.
+
+<b>Add Schedule Management Feature [Completed]</b>
+
+<img width="253" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/dc8ad787-da6d-42bd-a649-26c4177a711b">
+
+<b>Real-Time Data Sync:</b>
+Utilizes Firebase Realtime Database to keep schedules updated in real time. Ensures that any changes to the schedule are instantly reflected in the app.
+
+<img width="201" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/6cc952e1-a4fa-475f-bfea-6963bedfb86b">
+<img width="575" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/7fd24daa-3605-4f90-b60d-5e6099af19e4">
+
+<b>Interactive Schedule Management:</b>
+Users can add new schedules by navigating to a date selection screen. Existing schedules are displayed in a list with options to view details or delete them.
+
+<b>Custom Components:</b>
+CustomButton component is used for consistent styling and functionality across the app. Header component provides a consistent title and navigation controls.
+
+<b>Efficient Data Handling:</b>
+Schedules are stored and retrieved from Firebase using efficient database queries. Proper error handling ensures smooth user experience even in case of failures.
+<img width="227" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/70c13fb2-c9e9-45d5-a4ce-992e70c40c42">
+
+<b>User-Friendly Design:</b>
+The interface is designed with user experience in mind, featuring clear calls to action and intuitive navigation. Cards are used to display schedule details in a visually appealing manner.
+
+<b>Data Accuracy:</b> 
+A hashmap with the schedule’s date and schedule id as key-value pair has been stored in the database for convenient accessing in the future and checking for duplicates. 
+
+<img width="225" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/c71b957e-cc12-4b94-912f-05f2a795fb73">
+
+<b>Purpose Creation Feature [Partially Completed]</b>
+![image](https://github.com/tansanchian/PlanPocket/assets/142957529/be11fd09-0852-4f6a-a69f-fb725b839657)
+
+<b>Form Input Management:</b>
+Users can input details such as purpose, description, costs, and time for their schedules. Utilizes react-hook-form for efficient form state management and validation.
+
+<b>Date and Time Picker Integration:</b>
+Integrates DateTimePicker for selecting start and end times for schedules. Includes an "All-day" switch to set events that span the entire day. More purposes will be added in the future.
+
+<b>Dropdown Selection:</b>
+Utilizes react-native-dropdown-select-list for purpose selection, allowing users to choose predefined categories or input custom ones.
+
+<b>Real-Time Data Handling:</b>
+Schedules are stored and retrieved from Firebase using custom functions like writeScheduleDatabase and readScheduleDatabase. Ensures data integrity and reliability with proper error handling during data operations.
+<img width="485" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/4e52a467-5ca0-4451-ae85-eee4c13c0bb9">
+
+<b>Data Accuracy:</b> 
+An array of current time used is stored in the database for future checking of duplicates. 
+<img width="270" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/e848863d-e17c-41a2-b0ec-bc3afb8d29f0">
+
+<b>Budget Dashboard [Partially Completed]</b>
+
+<b>Incoming events:</b>
+Showing the latest event that is happening soon in the home dashboard.
+
+<b>Current Budget Left:</b>
+(Potentially) showing budget left for current period.
+
+<b>More Features... (Not done yet)</b>
+
+<h2>System diagaram</h2>
+
+<img width="622" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/7ddde169-6b99-4af5-9c7b-8bdc048140da">
+
 
 <h2>Tech Stack</h2>
 
