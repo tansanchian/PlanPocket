@@ -178,7 +178,9 @@ A hashmap with the schedule’s date and schedule id as key-value pair has been 
 <img width="225" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/c71b957e-cc12-4b94-912f-05f2a795fb73">
 
 <b>Purpose Creation Feature [Partially Completed]</b>
-![image](https://github.com/tansanchian/PlanPocket/assets/142957529/be11fd09-0852-4f6a-a69f-fb725b839657)
+
+<img width="221" alt="image" src="https://github.com/tansanchian/PlanPocket/assets/142957529/560f93fd-e34b-4ab4-8458-f42bd589acfe">
+
 
 <b>Form Input Management:</b>
 Users can input details such as purpose, description, costs, and time for their schedules. Utilizes react-hook-form for efficient form state management and validation.
