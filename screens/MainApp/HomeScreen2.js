@@ -6,14 +6,19 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import CustomButton from "../../components/CustomButton";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
-import { readCurrentDateDatabase } from "../../components/Database";
+import {
+  readCurrentDateDatabase,
+  readProfile,
+} from "../../components/Database";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
   const [currentEvent, setCurrentEvent] = useState(null);
+  const [username, setUsername] = useState("");
 
   const loadItems = useCallback(async () => {
     try {
+      await readProfile("username", setUsername);
       const data = await readCurrentDateDatabase();
       setCurrentEvent(data);
     } catch (error) {
@@ -24,9 +29,14 @@ const HomeScreen2 = () => {
 
   useFocusEffect(
     useCallback(() => {
-      loadItems();
+      const timer = setTimeout(() => {
+        loadItems();
+      }, 1000);
+
+      return () => clearTimeout(timer);
     }, [loadItems])
   );
+
   const onNextPressed = () => {
     navigation.navigate("HomeScreen");
   };
@@ -40,24 +50,23 @@ const HomeScreen2 = () => {
       <StatusBar style="auto" />
       <Header title="Home" />
       <View style={styles.dashboard}>
-        <View style={styles.budget}>
-          <Text style={styles.title}>Title</Text>
+        <View style={styles.name}>
+          <Text style={styles.nameText}>Good Day {username}</Text>
         </View>
         {!currentEvent ? (
           <View style={styles.date}>
-            <View style={{ padding: 20 }}>
+            <View style={{ paddingRight: 20 }}>
               <TouchableOpacity onPress={onCalendarPressed}>
                 <Avatar.Icon icon="calendar" size={40} />
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.dateText}>Your have no event</Text>
-              <Text style={styles.dateText}>{currentEvent}</Text>
+              <Text style={styles.dateText}>You have no current event</Text>
             </View>
           </View>
         ) : (
           <View style={styles.date}>
-            <View style={{ padding: 20 }}>
+            <View style={{ paddingRight: 20 }}>
               <TouchableOpacity onPress={onCalendarPressed}>
                 <Avatar.Icon icon="calendar" size={40} />
               </TouchableOpacity>
@@ -68,7 +77,6 @@ const HomeScreen2 = () => {
             </View>
           </View>
         )}
-        <CustomButton text="Next" onPress={onNextPressed} />
         <View style={styles.main}>
           <View style={styles.card}>
             <View
@@ -77,7 +85,7 @@ const HomeScreen2 = () => {
               <FontAwesome5 name="wallet" size={24} color="orange" />
             </View>
             <Text style={styles.cardText}>Current Spend</Text>
-            <Text style={styles.amount}>$3463</Text>
+            <Text style={styles.amount}>???</Text>
           </View>
           <View style={styles.card}>
             <View
@@ -86,7 +94,7 @@ const HomeScreen2 = () => {
               <FontAwesome5 name="rocket" size={24} color="skyblue" />
             </View>
             <Text style={styles.cardText}>Spend to goals</Text>
-            <Text style={styles.amount}>$5463</Text>
+            <Text style={styles.amount}>???</Text>
           </View>
           <View style={styles.card}>
             <View
@@ -95,7 +103,7 @@ const HomeScreen2 = () => {
               <FontAwesome5 name="handshake" size={24} color="pink" />
             </View>
             <Text style={styles.cardText}>Consult Spend</Text>
-            <Text style={styles.amount}>$1252</Text>
+            <Text style={styles.amount}>???</Text>
           </View>
           <View style={[styles.card, { marginBottom: 0 }]}>
             <View
@@ -104,7 +112,7 @@ const HomeScreen2 = () => {
               <FontAwesome5 name="tags" size={24} color="lightgreen" />
             </View>
             <Text style={styles.cardText}>If Category</Text>
-            <Text style={styles.amount}>$1463</Text>
+            <Text style={styles.amount}>???</Text>
           </View>
         </View>
       </View>
@@ -123,7 +131,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     backgroundColor: "#F0F0F5",
-    padding: 20,
   },
   budget: {
     flex: 0.1,
@@ -135,14 +142,29 @@ const styles = StyleSheet.create({
     color: "#6a1b9a",
   },
   date: {
-    flex: 0.1,
+    flex: 1,
+    maxHeight: 65,
+    padding: 20,
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#6a1b9a",
+    backgroundColor: "#735DA5",
+  },
+  name: {
+    flex: 1,
+    maxHeight: 60,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#735DA5",
   },
   dateText: {
-    fontSize: 17,
+    fontSize: 20,
+    color: "white",
+  },
+  nameText: {
+    fontSize: 20,
     color: "white",
   },
   main: {

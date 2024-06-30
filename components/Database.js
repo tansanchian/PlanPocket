@@ -378,7 +378,7 @@ export async function readScheduleDatabase() {
 // }
 
 export async function readCurrentDateDatabase() {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
