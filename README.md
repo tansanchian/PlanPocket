@@ -202,7 +202,7 @@ An array of current time used is stored in the database for future checking of d
 
 <b>Budget Dashboard [Partially Completed]</b>
 
-<b>Incoming events:</b>
+<b>Ongoing events:</b>
 Showing the latest event that is happening soon in the home dashboard.
 
 <b>Current Budget Left:</b>
