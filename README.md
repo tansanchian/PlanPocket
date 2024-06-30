@@ -72,7 +72,7 @@ As a fitness enthusiast who wants to maintain a healthy lifestyle on a budget, I
 
 <h2>Project Scope</h2>
 
-<h4>May (Milestone 1)</h4>
+<h3>May (Milestone 1)</h3>
 
 <b><u>User Account Authentication [Completed]</u></b>
 
@@ -114,7 +114,7 @@ Profile data is read from and written to a database using custom writeProfile an
 <b>UX/UI design:</b>
 The profile screen is designed with a modern and clean UI, providing a seamless user experience. Editable fields are clearly distinguished from non-editable ones, and users are given visual feedback during the editing process. A modal interface is used for profile image options and password reauthentication, enhancing the usability and aesthetic appeal of the application.
 
-<h4>June (Milestone 2)</h4>
+<h3>June (Milestone 2)</h3>
 
 <u><b>Advanced UX/UI and Overall Layout Improvement</b></u>
 
