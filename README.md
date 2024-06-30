@@ -74,7 +74,7 @@ As a fitness enthusiast who wants to maintain a healthy lifestyle on a budget, I
 
 <h4>May (Milestone 1)</h4>
 
-<b><u>User Account Authentication [Completed]</u><b>
+<b><u>User Account Authentication [Completed]</u></b>
 
 <b>Login via email and password:</b>
 
