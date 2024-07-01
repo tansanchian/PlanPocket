@@ -40,7 +40,7 @@ Install android studio (https://developer.android.com/studio) and launch the and
 
 For macos users: Click the link below and download the zipped file. 
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a8ed890d-3d15-4594-9eac-a6d0469cdbc1
+[https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a8ed890d-3d15-4594-9eac-a6d0469cdbc1](https://expo.dev/accounts/tansanchian/projects/planpocket/builds/7327b9fb-2ddd-4aa0-af42-6c788ffebdd1)
 
 Then, install Xcode from mac app store then run the simulator. Next, extract the zip file and drag the .app file into the simulator
 
