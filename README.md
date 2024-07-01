@@ -26,7 +26,7 @@ We did not publish the application to appstore/playstore so it is going to be an
 
 For Android users: click the link below and install the apk
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/54a5f47b-b6ad-4460-9586-b383f746909a
 
 For IOS users: since ios doesn't allow third party apk, you would need to run the app on the device emulator on your laptop.
 
@@ -34,13 +34,13 @@ For IOS users: since ios doesn't allow third party apk, you would need to run th
 
 For windows users: Click the link below and click the three dots, select Download Build.
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d
+https://expo.dev/accounts/tansanchian/projects/planpocket/builds/54a5f47b-b6ad-4460-9586-b383f746909a
 
 Install android studio (https://developer.android.com/studio) and launch the andorid emulator. Then, drag the apk file into the emulator.
 
 For macos users: Click the link below and download the zipped file. 
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a8ed890d-3d15-4594-9eac-a6d0469cdbc1
+[https://expo.dev/accounts/tansanchian/projects/planpocket/builds/a8ed890d-3d15-4594-9eac-a6d0469cdbc1](https://expo.dev/accounts/tansanchian/projects/planpocket/builds/7327b9fb-2ddd-4aa0-af42-6c788ffebdd1)
 
 Then, install Xcode from mac app store then run the simulator. Next, extract the zip file and drag the .app file into the simulator
 
