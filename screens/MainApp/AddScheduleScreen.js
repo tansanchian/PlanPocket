@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
-    padding: 20,
+    paddingBottom: Platform.OS === "ios" ? 90 : 60,
     justifyContent: "center",
     alignItems: "center",
   },

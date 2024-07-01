@@ -37,13 +37,13 @@ export default function MonthScreen() {
   const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setToShowDatePicker] = useState(false);
-  const [title, setTitle] = useState("");
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
   const { control, watch, handleSubmit } = useForm();
   const budget = watch("Budget");
   const mealBudget = watch("meal");
+  const title = watch("Title");
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
@@ -82,6 +82,9 @@ export default function MonthScreen() {
 
   const onCreateSchedulePressed = async () => {
     try {
+      if (otherPressed && meals == 2) {
+        return Alert.alert("Please enter the number of meals");
+      }
       const result = await createScheduleDatabase(
         title,
         budget,

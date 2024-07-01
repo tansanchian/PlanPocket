@@ -1,5 +1,11 @@
-import React, { useState, useCallback } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useCallback, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -14,6 +20,7 @@ const HomeScreen2 = () => {
   const navigation = useNavigation();
   const [currentEvent, setCurrentEvent] = useState(null);
   const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const loadItems = useCallback(async () => {
     try {
@@ -23,6 +30,8 @@ const HomeScreen2 = () => {
     } catch (error) {
       console.error("Error fetching data:", error.message);
       setCurrentEvent(null);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -36,6 +45,10 @@ const HomeScreen2 = () => {
     }, [loadItems])
   );
 
+  useEffect(() => {
+    return () => setIsLoading(true);
+  }, []);
+
   const onNextPressed = () => {
     navigation.navigate("HomeScreen");
   };
@@ -43,6 +56,19 @@ const HomeScreen2 = () => {
   const onCalendarPressed = () => {
     navigation.navigate("Timetable");
   };
+
+  if (isLoading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator size="large" color="#735DA5" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

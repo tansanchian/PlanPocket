@@ -83,6 +83,9 @@ export default function WeekScreen() {
 
   const onCreateSchedulePressed = async () => {
     try {
+      if (otherPressed && meals == 2) {
+        return Alert.alert("Please enter the number of meals");
+      }
       const result = await createScheduleDatabase(
         title,
         budget,

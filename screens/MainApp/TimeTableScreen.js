@@ -6,6 +6,7 @@ import {
   VirtualizedList,
   FlatList,
   Alert,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
@@ -39,6 +40,8 @@ const months = [
   { key: 11, label: "November" },
   { key: 12, label: "December" },
 ];
+
+const height = Platform.OS === "ios" ? 90 : 60;
 
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
@@ -227,6 +230,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    paddingBottom: Platform.OS === "ios" ? 90 : 60,
   },
   card: {
     padding: 10,
