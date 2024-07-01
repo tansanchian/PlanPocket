@@ -346,10 +346,8 @@ export async function readScheduleDatabase() {
           const temp = Object.keys(schedules).map((key) => ({
             ...schedules[key],
           }));
-          console.log(temp);
           return temp;
         }
-        console.log(schedules);
         return schedules;
       } else {
         console.log("No data available");
@@ -378,7 +376,6 @@ export async function readScheduleDatabase() {
 // }
 
 export async function readCurrentDateDatabase() {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -430,7 +427,8 @@ export async function readCurrentDateDatabase() {
                       parseInt(formattedTime.split(":")[0]),
                       parseInt(formattedTime.split(":")[1])
                     );
-
+                    console.log(specificDateTime);
+                    console.log(currentDate);
                     if (specificDateTime > currentDate) {
                       console.log(
                         "The specific time is in the future compared to current time."

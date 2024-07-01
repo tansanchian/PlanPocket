@@ -72,7 +72,7 @@ const Tabs = () => {
                   borderColor: "white",
                 }}
               >
-                <MaterialCommunityIcons name="home" color="white" size={size} />
+                <MaterialCommunityIcons name="plus" color="white" size={size} />
               </View>
             );
           },

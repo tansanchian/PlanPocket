@@ -132,7 +132,7 @@ const TimeTableScreen = ({ navigation }) => {
     return (
       <TouchableOpacity onPress={onPressHandler}>
         <View style={styles.card}>
-          <Text style={styles.title}>{item.titleTT}</Text>
+          <Text style={styles.title}>Title: {item.titleTT}</Text>
           <FlatList
             style={{ flexGrow: 0 }}
             data={transformedData}
