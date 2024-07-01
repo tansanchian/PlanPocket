@@ -5,6 +5,7 @@ import {
   StyleSheet,
   VirtualizedList,
   FlatList,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
@@ -12,6 +13,7 @@ import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import { readScheduleDatabase } from "../../components/Database";
 import { useFocusEffect } from "@react-navigation/native";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -130,43 +132,61 @@ const TimeTableScreen = ({ navigation }) => {
     }
 
     return (
-      <TouchableOpacity onPress={onPressHandler}>
-        <View style={styles.card}>
+      <View style={styles.card}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Text style={styles.title}>Title: {item.titleTT}</Text>
-          <FlatList
-            style={{ flexGrow: 0 }}
-            data={transformedData}
-            ref={ref}
-            keyExtractor={(items) => items.key}
-            contentContainerStyle={{ paddingLeft: 10 }}
-            vertical
-            renderItem={({ item, index: fIndex }) => {
-              return (
-                <TouchableOpacity onPress={onPressHandler}>
-                  <View
-                    style={{
-                      marginRight: 10,
-                      padding: 10,
-                      borderWidth: 2,
-                      borderRadius: 12,
-                      borderColor: "#abc",
-                    }}
-                  >
-                    {item.purpose && (
-                      <Text style={styles.purpose}>{item.purpose}</Text>
-                    )}
-                    {item.description && (
-                      <Text style={styles.description}>{item.description}</Text>
-                    )}
-                    <Text>{item.fromTimeString}</Text>
-                    <Text>{item.toTimeString}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
+          <View style={{ alignSelf: "center" }}>
+            <TouchableOpacity onPress={onPressHandler}>
+              <FontAwesome name="plus" size={20} color="#735DA5" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </TouchableOpacity>
+        <FlatList
+          style={{ flexGrow: 0 }}
+          data={transformedData}
+          ref={ref}
+          keyExtractor={(items) => items.key}
+          contentContainerStyle={{ paddingLeft: 10 }}
+          vertical
+          renderItem={({ item, index: fIndex }) => {
+            return (
+              <TouchableOpacity
+                style={{ paddingBottom: 10 }}
+                onPress={() => Alert.alert("To be implemented")}
+              >
+                <View
+                  style={{
+                    marginRight: 10,
+                    padding: 10,
+                    borderWidth: 1,
+                    borderRadius: 20,
+                    borderColor: "#f3eef6",
+                    backgroundColor: "#f3eef6",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 5,
+                    elevation: 3,
+                    flexShrink: 1,
+                  }}
+                >
+                  {item.purpose && (
+                    <Text style={styles.purpose}>Purpose: {item.purpose}</Text>
+                  )}
+                  {item.description && (
+                    <Text style={styles.description}>
+                      Description: {item.description}
+                    </Text>
+                  )}
+                  <Text style={styles.description}>
+                    Time: {item.fromTimeString} to {item.toTimeString}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+        />
+      </View>
     );
   };
 
@@ -212,7 +232,7 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     backgroundColor: "#fff",
-    borderRadius: 5,
+    borderRadius: 25,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -231,17 +251,21 @@ const styles = StyleSheet.create({
     paddingTop: 30,
   },
   title: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "#735DA5",
   },
   purpose: {
     fontSize: 14,
     fontWeight: "normal",
     marginBottom: 5,
+    color: "black",
   },
   description: {
     fontSize: 12,
     fontWeight: "normal",
+    color: "black",
   },
 });

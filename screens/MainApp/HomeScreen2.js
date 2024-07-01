@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
-import CustomButton from "../../components/CustomButton";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import {
