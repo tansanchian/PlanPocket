@@ -25,9 +25,12 @@ export default function ScheduleForm({ route }) {
 
   const [selected, setSelected] = useState("");
   const data = [
-    { key: "1", value: "Entertainment", cost: "10" },
-    { key: "2", value: "Movie", cost: "10" },
-    { key: "3", value: "Others", cost: "0" },
+    { key: "1", value: "Entertainment & Leisure" },
+    { key: "2", value: "Trnsportation" },
+    { key: "3", value: "Bill, Utilities & Taxes" },
+    { key: "4", value: "Dining" },
+    { key: "5", value: "Shopping" },
+    { key: "6", value: "Uncategorized" },
   ];
 
   const navigation = useNavigation();
@@ -101,19 +104,17 @@ export default function ScheduleForm({ route }) {
 
   const { control, handleSubmit, watch } = useForm();
   const description = watch("Description");
-  const others = watch("Others");
+  const purpose = watch("Purpose");
   const costs = watch("Costs");
 
   const onAddSchedulePressed = async () => {
-    let selectedValue = selected !== "Others" ? selected : others;
-    const selectedItem = data.find((item) => item.value === selected);
-
     try {
       const result = await writeScheduleDatabase(
-        selectedValue,
+        selected,
+        purpose,
         description,
         fromDateTT,
-        costs || selectedItem.cost,
+        costs,
         fromTime,
         toTime
       );
@@ -242,7 +243,7 @@ export default function ScheduleForm({ route }) {
           </View>
         </View>
         <Text style={styles.text}>Purpose</Text>
-        {selected !== "Others" ? (
+        {selected == "" ? (
           <SelectList
             setSelected={(val) => setSelected(val)}
             data={data}
@@ -254,10 +255,21 @@ export default function ScheduleForm({ route }) {
           />
         ) : (
           <>
+            <SelectList
+              setSelected={(val) => setSelected(val)}
+              defaultOption={selected}
+              placeholder={selected}
+              data={data}
+              save="value"
+              search={false}
+              boxStyles={styles.boxStyles}
+              dropdownStyles={styles.dropdownStyles}
+              maxHeight={130}
+            />
             <View style={styles.purposeContainer}>
               <View style={{ flex: 1 }}>
                 <CustomInput
-                  name="Others"
+                  name="Purpose"
                   control={control}
                   placeholder="Others"
                   rules={{

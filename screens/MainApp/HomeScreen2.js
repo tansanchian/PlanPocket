@@ -14,6 +14,7 @@ import { StatusBar } from "expo-status-bar";
 import {
   readCurrentDateDatabase,
   readProfile,
+  readScheduleExpenses,
 } from "../../components/Database";
 
 const HomeScreen2 = () => {
@@ -26,6 +27,7 @@ const HomeScreen2 = () => {
     try {
       await readProfile("username", setUsername);
       const data = await readCurrentDateDatabase();
+      const expenses = await readScheduleExpenses();
       setCurrentEvent(data);
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -104,39 +106,45 @@ const HomeScreen2 = () => {
         )}
         <View style={styles.main}>
           <View style={styles.card}>
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#FFEFE3" }]}
-            >
-              <FontAwesome5 name="wallet" size={24} color="orange" />
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="wallet" size={24} color="#41afaa" />
             </View>
-            <Text style={styles.cardText}>Current Spend</Text>
+            <Text style={styles.cardText}>Entertainment & Leisure Movie</Text>
             <Text style={styles.amount}>???</Text>
           </View>
           <View style={styles.card}>
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#E3F7FF" }]}
-            >
-              <FontAwesome5 name="rocket" size={24} color="skyblue" />
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="rocket" size={24} color="#466eb4" />
             </View>
-            <Text style={styles.cardText}>Spend to goals</Text>
+            <Text style={styles.cardText}>Trnsportation</Text>
             <Text style={styles.amount}>???</Text>
           </View>
           <View style={styles.card}>
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#FDE3FF" }]}
-            >
-              <FontAwesome5 name="handshake" size={24} color="pink" />
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
             </View>
-            <Text style={styles.cardText}>Consult Spend</Text>
+            <Text style={styles.cardText}>Dining</Text>
             <Text style={styles.amount}>???</Text>
           </View>
           <View style={[styles.card, { marginBottom: 0 }]}>
-            <View
-              style={[styles.iconContainer, { backgroundColor: "#E3FFE3" }]}
-            >
-              <FontAwesome5 name="tags" size={24} color="lightgreen" />
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="shopping-cart" size={24} color="#e6a532" />
             </View>
-            <Text style={styles.cardText}>If Category</Text>
+            <Text style={styles.cardText}>Shopping</Text>
+            <Text style={styles.amount}>???</Text>
+          </View>
+          <View style={styles.card}>
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="handshake" size={24} color="#d7642c" />
+            </View>
+            <Text style={styles.cardText}>Bill, Utilities & Taxe</Text>
+            <Text style={styles.amount}>???</Text>
+          </View>
+          <View style={[styles.card, { marginBottom: 0 }]}>
+            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+              <FontAwesome5 name="tags" size={24} color="#af4b91" />
+            </View>
+            <Text style={styles.cardText}>Uncategorized</Text>
             <Text style={styles.amount}>???</Text>
           </View>
         </View>
@@ -226,6 +234,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
+    textAlign: "center",
   },
   amount: {
     fontSize: 18,
