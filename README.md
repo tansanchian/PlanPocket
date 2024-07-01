@@ -26,7 +26,7 @@ We did not publish the application to appstore/playstore so it is going to be an
 
 For Android users: click the link below and install the apk
 
-https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d
+[https://expo.dev/accounts/tansanchian/projects/planpocket/builds/271e3398-d213-45c4-b107-7d8d8797dd2d](https://expo.dev/accounts/tansanchian/projects/planpocket/builds/272182db-c478-4c0c-858c-3147f8ba46a3)
 
 For IOS users: since ios doesn't allow third party apk, you would need to run the app on the device emulator on your laptop.
 
