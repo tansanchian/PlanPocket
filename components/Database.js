@@ -55,6 +55,7 @@ export const readProfile = async (data, setData) => {
 };
 
 export async function writeScheduleDatabase(
+  category,
   purpose,
   description,
   fromDate,
@@ -95,6 +96,7 @@ export async function writeScheduleDatabase(
   }
   if (userId) {
     const postSchedule = {
+      category: category,
       purpose: purpose,
       description: description || "",
       costs,
@@ -252,6 +254,16 @@ export async function createScheduleDatabase(
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day + 1);
+  };
+
+  let todate = parseDate(toDate);
+  let fromdate = parseDate(date);
+  const timeDiff = todate.getTime() - fromdate.getTime();
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  const mealExpenses = (daysDiff + 1) * mealBudget * meals;
 
   if (userId) {
     const postSchedule = {
@@ -261,6 +273,7 @@ export async function createScheduleDatabase(
       toDate: toDate || "Unknown date",
       meals: meals || "Unknown meals",
       mealBudget: mealBudget || "Unknown budget",
+      mealExpenses: mealExpenses || "Unknown budget",
     };
 
     try {
@@ -268,20 +281,13 @@ export async function createScheduleDatabase(
       const dateSet = ref(db, `/users/${userId}/dateSet`);
       const lastIdSnapshot = await get(lastIdRef);
       const dateSetSnapshot = await get(dateSet);
-      const parseDate = (dateString) => {
-        const [year, month, day] = dateString.split("-").map(Number);
-        return new Date(year, month - 1, day + 1);
-      };
       const timeToString = (time) => {
         const date = new Date(time);
         return date.toISOString().split("T")[0];
       };
       let fail = false;
-
       let newId = 0;
       let newSet = new Map();
-      let todate = parseDate(toDate);
-      let fromdate = parseDate(date);
 
       if (lastIdSnapshot.exists()) {
         newId = lastIdSnapshot.val() + 1;
@@ -291,10 +297,7 @@ export async function createScheduleDatabase(
         const dateSetObject = dateSetSnapshot.val();
         newSet = new Map(Object.entries(dateSetObject));
       }
-
-      const timeDiff = todate.getTime() - fromdate.getTime();
-      const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-      const budgetLeft = budget - (daysDiff + 1) * mealBudget * meals;
+      const budgetLeft = budget - mealExpenses;
 
       if (budgetLeft < 0) {
         return "404";
@@ -445,6 +448,70 @@ export async function readCurrentDateDatabase() {
                         " to " +
                         toTimeString
                       );
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        console.log("No data available");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error reading Schedule:", error);
+      return null;
+    }
+  } else {
+    console.error("User is not authenticated");
+    return null;
+  }
+}
+
+export async function readScheduleExpenses() {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split("T")[0];
+
+  if (userId) {
+    try {
+      const schedulesRef = ref(db, `/users/${userId}/schedules`);
+      const dateSetRef = ref(db, `/users/${userId}/dateSet`);
+      const lastIdRef = ref(db, `/users/${userId}/lastScheduleId`);
+      const snapshot = await get(schedulesRef);
+      const lastIdSnapshot = await get(lastIdRef);
+      const dateSetSnapshot = await get(dateSetRef);
+
+      if (lastIdSnapshot.exists() && snapshot.exists()) {
+        const schedules = snapshot.val();
+        const lastId = lastIdSnapshot.val() + 1;
+        const dateSet = dateSetSnapshot.val();
+        const dates = Object.keys(dateSet);
+
+        for (let i = 0; i < lastId; i++) {
+          if (schedules != undefined) {
+            if (schedules[i] != undefined) {
+              let temp = schedules[i];
+              const dateLen = dates.length;
+              if (temp.Purpose == undefined) {
+                console.log(temp.mealExpenses);
+              } else {
+                for (let i = 0; i < dateLen; i++) {
+                  const purpose = temp.Purpose[dates[i]];
+                  if (purpose != undefined) {
+                    const lastPurposeId = purpose.lastPurposeId + 1;
+                    for (let y = 0; y < lastPurposeId; y++) {
+                      console.log(
+                        purpose[y].category +
+                          " " +
+                          purpose[y].purpose +
+                          " " +
+                          purpose[y].costs
+                      );
+                      console.log(temp.mealExpenses);
                     }
                   }
                 }
