@@ -26,6 +26,8 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../App";
 import { StatusBar } from "expo-status-bar";
+import { database } from "../../App";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function ProfileScreen() {
   const [username, setUsername] = useState("");
@@ -41,6 +43,7 @@ export default function ProfileScreen() {
   const auth = getAuth();
   const user = auth.currentUser;
 
+  console.log(user);
   const {
     control,
     handleSubmit,

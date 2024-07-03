@@ -1,7 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import React from "react";
 import MessengerScreen from "../screens/MainApp/Messenger/MessengerScreen";
-import UserList from "../screens/MainApp/Messenger/UserList";
+import ChatList from "../screens/MainApp/Messenger/ChatList";
+import ChatItem from "../screens/MainApp/Messenger/ChatItem";
 
 const Stack = createNativeStackNavigator();
 
@@ -9,10 +10,11 @@ const MessengerNav = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="UserList"
+      initialRouteName="ChatList"
     >
-      <Stack.Screen name="UserList" component={UserList} />
+      <Stack.Screen name="ChatList" component={ChatList} />
       <Stack.Screen name="Messenger" component={MessengerScreen} />
+      <Stack.Screen name="ChatItem" component={ChatItem} />
     </Stack.Navigator>
   );
 };

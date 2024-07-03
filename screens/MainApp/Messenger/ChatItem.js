@@ -1,21 +1,41 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import React from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { useNavigation } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 
-export default function ChatItem({ item, noBorder }) {
+export default function ChatItem({ item, noBorder, currentUser }) {
+  const navigation = useNavigation();
+
+  const handleUserPress = () => {
+    const id = currentUser[0].username + "-" + item.username;
+    const username = item.username;
+    const dataToSend = {
+      chatId: id,
+      username: username,
+    };
+    console.log("Data to send:", dataToSend);
+    navigation.navigate("Messenger", {
+      data: [dataToSend],
+    });
+  };
+
   return (
-    <TouchableOpacity style={styles.container}>
+    <TouchableOpacity
+      onPress={handleUserPress}
+      style={[styles.container, noBorder && { borderBottomWidth: 0 }]}
+    >
       <Image
         source={require("../../../assets/icon.png")}
         style={[styles.image, { height: hp(6), width: hp(6) }]}
       />
-
       <View style={styles.textContainer}>
         <View style={styles.header}>
-          <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>Nomi</Text>
+          <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
+            {item.username}
+          </Text>
           <Text style={[styles.lastMessagetime, { fontSize: hp(1.6) }]}>
             Time
           </Text>

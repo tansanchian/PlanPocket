@@ -400,14 +400,13 @@ export async function readCurrentDateDatabase() {
         const dateSet = dateSetSnapshot.val();
         const dates = Object.keys(dateSet);
 
-        for (let i = 0; i < lastId; i++) {
-          if (schedules != undefined) {
-            if (schedules[i] != undefined) {
-              let temp = schedules[i];
-              const dateLen = dates.length;
+        for (let id = 0; id < lastId; id++) {
+          if (schedules && schedules[id]) {
+            let temp = schedules[id];
+            const dateLen = dates.length;
+            if (temp.Purpose !== undefined) {
               for (let i = 0; i < dateLen; i++) {
                 const purpose = temp.Purpose[dates[i]];
-
                 if (purpose != undefined) {
                   const lastPurposeId = purpose.lastPurposeId + 1;
                   for (let y = 0; y < lastPurposeId; y++) {

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
 import React, {
   useEffect,
   useCallback,
@@ -17,24 +17,26 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { database } from "../../../App";
-import Header from "../../../components/Header";
 import { useNavigation } from "@react-navigation/native";
+import ChatRoomHeader from "./ChatRoomHeader";
 
 const MessengerScreen = ({ route }) => {
-  const { user } = route.params;
-  const { name } = user;
+  const { data } = route.params;
+  const username = data[0].username;
+  const chatId = data[0].chatId;
+
   const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
-  const [username, setUsername] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [lastMessage, setLastMessage] = useState(undefined);
   const auth = getAuth();
 
   useLayoutEffect(() => {
-    const collectionRef = collection(database, "chats-" + name);
+    const collectionRef = collection(database, "chats" + chatId);
     const q = query(collectionRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      console.log("snapshot");
+      let allMessages = snapshot.docs.map((doc) => doc.data());
       setMessages(
         snapshot.docs.map((doc) => ({
           _id: doc.id,
@@ -43,7 +45,9 @@ const MessengerScreen = ({ route }) => {
           user: doc.data().user,
         }))
       );
+      setLastMessage(allMessages[0] ? allMessages[0] : null);
     });
+    console.log(lastMessage);
     return () => unsubscribe();
   }, []);
 
@@ -53,7 +57,7 @@ const MessengerScreen = ({ route }) => {
     );
 
     const { _id, createdAt, text, user } = messages[0];
-    addDoc(collection(database, "chats-" + name), {
+    addDoc(collection(database, "chats" + chatId), {
       _id,
       createdAt,
       text,
@@ -64,6 +68,7 @@ const MessengerScreen = ({ route }) => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
+      <ChatRoomHeader name={username} />
       <View style={styles.internalContainer}>
         <GiftedChat
           messages={messages}
@@ -71,7 +76,7 @@ const MessengerScreen = ({ route }) => {
           onSend={(messages) => onSend(messages)}
           user={{
             _id: auth?.currentUser?.email,
-            name: username,
+            name: "abc",
             avatar: imageUrl,
           }}
           messagesContainerStyle={{
@@ -92,7 +97,7 @@ const styles = StyleSheet.create({
   },
   internalContainer: {
     flex: 1,
-    paddingBottom: 200,
+    paddingBottom: Platform.OS === "ios" ? 90 : 60,
   },
   text: {
     fontSize: 24,

@@ -1,28 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useState, useEffect } from "react";
-import { getAuth } from "firebase/auth";
-import { database } from "../App";
-import { doc, getDoc } from "firebase/firestore";
 
 export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [userToken, setUserToken] = useState(null);
-
-  const updateUserData = async (userId) => {
-    const docRef = doc(database, "users", userId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      let data = docSnap.data();
-      setUser({
-        ...userId,
-        username: data.username,
-        profileUrl: data.profileUrl,
-        userId: data.userId,
-      });
-    }
-  };
 
   const login = async (customToken) => {
     setIsLoading(true);

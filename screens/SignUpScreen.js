@@ -58,8 +58,7 @@ export default function SignUpScreen() {
       );
 
       await setDoc(doc(database, "users", response?.user?.uid), {
-        username,
-        profileUrl,
+        username: username,
         userId: response?.user?.uid,
       });
 
