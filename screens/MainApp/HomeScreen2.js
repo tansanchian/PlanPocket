@@ -10,6 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -111,15 +112,10 @@ const HomeScreen2 = () => {
         )}
         <View style={styles.main}>
           <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="wallet" size={24} color="#41afaa" />
-            </View>
-            <Text style={styles.cardText}>Entertainment & Leisure Movie</Text>
-            <Text style={styles.amount}>???</Text>
-          </View>
-          <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="rocket" size={24} color="#466eb4" />
+            <View
+              style={[styles.iconContainer, { backgroundColor: "#FFEFE3" }]}
+            >
+              <FontAwesome5 name="wallet" size={24} color="orange" />
             </View>
             <Text style={styles.cardText}>Transportation</Text>
             <Text style={styles.amount}>???</Text>
@@ -210,7 +206,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     flexWrap: "wrap",
     flexDirection: "row",
-    paddingVertical: 50,
+    paddingVertical: 10,
   },
   card: {
     backgroundColor: "white",
@@ -236,7 +232,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cardText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "bold",
     marginBottom: 5,
     textAlign: "center",

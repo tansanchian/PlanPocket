@@ -28,7 +28,6 @@ export default function ScheduleForm({ route }) {
     { key: "1", value: "Entertainment & Leisure" },
     { key: "2", value: "Transportation" },
     { key: "3", value: "Bill, Utilities & Taxes" },
-    { key: "4", value: "Dining" },
     { key: "5", value: "Shopping" },
     { key: "6", value: "Uncategorized" },
   ];
