@@ -60,6 +60,7 @@ export default function SignUpScreen() {
       await setDoc(doc(database, "users", response?.user?.uid), {
         username: username,
         userId: response?.user?.uid,
+        friends: [],
       });
 
       if (response.user) {

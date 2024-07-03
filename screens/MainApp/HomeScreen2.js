@@ -117,7 +117,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Entertainment & Leisure</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["Entertainment & Leisure"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
           <View style={styles.card}>
@@ -126,7 +126,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Transportation</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["Transportation"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
           <View style={styles.card}>
@@ -135,7 +135,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Dining</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["mealBudget"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
           <View style={[styles.card, { marginBottom: 0 }]}>
@@ -144,7 +144,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Shopping</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["Shopping"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
           <View style={styles.card}>
@@ -153,7 +153,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
           <View style={[styles.card, { marginBottom: 0 }]}>
@@ -162,7 +162,7 @@ const HomeScreen2 = () => {
             </View>
             <Text style={styles.cardText}>Uncategorized</Text>
             <Text style={styles.amount}>
-              {`$${expenses?.["Uncategorized"]?.["costs"] ?? "N/A"}`}
+              {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
             </Text>
           </View>
         </View>

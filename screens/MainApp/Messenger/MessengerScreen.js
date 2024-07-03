@@ -28,7 +28,6 @@ const MessengerScreen = ({ route }) => {
   const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
-  const [lastMessage, setLastMessage] = useState(undefined);
   const auth = getAuth();
 
   useLayoutEffect(() => {
@@ -36,7 +35,6 @@ const MessengerScreen = ({ route }) => {
     const q = query(collectionRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      let allMessages = snapshot.docs.map((doc) => doc.data());
       setMessages(
         snapshot.docs.map((doc) => ({
           _id: doc.id,
@@ -45,9 +43,7 @@ const MessengerScreen = ({ route }) => {
           user: doc.data().user,
         }))
       );
-      setLastMessage(allMessages[0] ? allMessages[0] : null);
     });
-    console.log(lastMessage);
     return () => unsubscribe();
   }, []);
 
@@ -75,7 +71,7 @@ const MessengerScreen = ({ route }) => {
           showAvatarForEveryMessage={true}
           onSend={(messages) => onSend(messages)}
           user={{
-            _id: auth?.currentUser?.email,
+            _id: auth?.currentUser?.uid,
             name: "abc",
             avatar: imageUrl,
           }}
