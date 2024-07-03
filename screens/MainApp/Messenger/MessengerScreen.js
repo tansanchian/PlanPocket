@@ -72,7 +72,7 @@ const MessengerScreen = ({ route }) => {
           onSend={(messages) => onSend(messages)}
           user={{
             _id: auth?.currentUser?.uid,
-            name: "abc",
+            name: username,
             avatar: imageUrl,
           }}
           messagesContainerStyle={{

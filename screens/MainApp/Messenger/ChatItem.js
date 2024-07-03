@@ -44,14 +44,17 @@ export default function ChatItem({ item, noBorder, currentUser }) {
 
   const renderLastMessage = () => {
     if (!lastMessage) return "Say Hi 👋";
-    const isCurrentUser = currentUser?._id === lastMessage?._id;
+    const isCurrentUser = currentUser[0].userId === lastMessage?.user?._id;
     console.log(lastMessage);
     return isCurrentUser ? `You: ${lastMessage.text}` : lastMessage.text;
   };
 
   const formatDate = (date) => {
-    var day = date.getDate();
-    var monthNames = [
+    const now = new Date();
+    const diff = now - date;
+    const oneDay = 24 * 60 * 60 * 1000;
+    const oneWeek = 7 * oneDay;
+    const monthNames = [
       "Jan",
       "Feb",
       "Mar",
@@ -65,10 +68,31 @@ export default function ChatItem({ item, noBorder, currentUser }) {
       "Nov",
       "Dec",
     ];
-    var month = monthNames[date.getMonth()];
+    const shortDaysOfWeek = [
+      "Sun",
+      "Mon",
+      "Tues",
+      "Wed",
+      "Thurs",
+      "Fri",
+      "Sat",
+    ];
 
-    var formattedDate = day + " " + month;
-    return formattedDate;
+    if (diff < oneDay) {
+      const hours = date.getHours() % 12 || 12;
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const ampm = date.getHours() >= 12 ? "PM" : "AM";
+      return `${hours}:${minutes} ${ampm}`;
+    }
+    if (diff < 2 * oneDay && now.getDate() !== date.getDate())
+      return "Yesterday";
+    if (diff < oneWeek) return shortDaysOfWeek[date.getDay()];
+    if (diff < 30 * oneDay)
+      return `${date.getDate()} ${monthNames[date.getMonth()]}`;
+
+    return `${date.getDate()} ${
+      monthNames[date.getMonth()]
+    } ${date.getFullYear()}`;
   };
 
   const renderLastTime = () => {
