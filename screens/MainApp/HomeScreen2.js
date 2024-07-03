@@ -1,4 +1,9 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import {
   View,
   Text,
@@ -116,7 +121,7 @@ const HomeScreen2 = () => {
             <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
               <FontAwesome5 name="rocket" size={24} color="#466eb4" />
             </View>
-            <Text style={styles.cardText}>Trnsportation</Text>
+            <Text style={styles.cardText}>Transportation</Text>
             <Text style={styles.amount}>???</Text>
           </View>
           <View style={styles.card}>
@@ -137,7 +142,7 @@ const HomeScreen2 = () => {
             <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
               <FontAwesome5 name="handshake" size={24} color="#d7642c" />
             </View>
-            <Text style={styles.cardText}>Bill, Utilities & Taxe</Text>
+            <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
             <Text style={styles.amount}>???</Text>
           </View>
           <View style={[styles.card, { marginBottom: 0 }]}>

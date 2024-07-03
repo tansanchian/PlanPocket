@@ -26,7 +26,7 @@ export default function ScheduleForm({ route }) {
   const [selected, setSelected] = useState("");
   const data = [
     { key: "1", value: "Entertainment & Leisure" },
-    { key: "2", value: "Trnsportation" },
+    { key: "2", value: "Transportation" },
     { key: "3", value: "Bill, Utilities & Taxes" },
     { key: "4", value: "Dining" },
     { key: "5", value: "Shopping" },

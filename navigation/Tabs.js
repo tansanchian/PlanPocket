@@ -2,11 +2,11 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreenNav from "./HomeScreenNav";
 import FriendScreen from "../screens/MainApp/FriendScreen";
-import MessengerScreen from "../screens/MainApp/MessengerScreen";
 import TimeTableNav from "./TimeTableNav";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Schedule from "./Schedule";
 import { Platform, View } from "react-native";
+import MessengerNav from "./MessengerNav";
 
 const Tab = createBottomTabNavigator();
 
@@ -79,7 +79,7 @@ const Tabs = () => {
       />
       <Tab.Screen
         name="Inbox"
-        component={MessengerScreen}
+        component={MessengerNav}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="message" color={color} size={size} />
