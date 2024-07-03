@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import ChatItem from "./ChatItem";
 
 const users = [
   { id: "1", name: "User 1" },
@@ -16,7 +17,6 @@ const users = [
 
 const UserList = () => {
   const navigation = useNavigation();
-
   const handleUserPress = (user) => {
     navigation.navigate("Messenger", { user });
   };
@@ -25,14 +25,11 @@ const UserList = () => {
     <View style={styles.container}>
       <FlatList
         data={users}
+        contentContainerStyle={{ flex: 1, paddingVertical: 25 }}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleUserPress(item)}
-            style={styles.userItem}
-          >
-            <Text style={styles.userName}>{item.name}</Text>
-          </TouchableOpacity>
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item, index }) => (
+          <ChatItem noBoarder={index + 1 == users.length} item={item} />
         )}
       />
     </View>

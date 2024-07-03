@@ -18,6 +18,8 @@ import { ref, set } from "firebase/database";
 import { getDatabase } from "@firebase/database";
 import { globalStyles } from "../styles/global";
 import { StatusBar } from "expo-status-bar";
+import { database } from "../App";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function SignUpScreen() {
   const { height } = useWindowDimensions();
@@ -54,6 +56,12 @@ export default function SignUpScreen() {
         email,
         password
       );
+
+      await setDoc(doc(database, "users", response?.user?.uid), {
+        username,
+        profileUrl,
+        userId: response?.user?.uid,
+      });
 
       if (response.user) {
         await createProfile(response);
