@@ -9,7 +9,8 @@ import {
 } from "firebase/database";
 import { getAuth } from "firebase/auth";
 import { parse } from "react-native-svg";
-
+import { database } from "../App";
+import { updateDoc, doc } from "firebase/firestore";
 export async function writeProfile(dataPath, data) {
   const auth = getAuth();
   const user = auth.currentUser;
@@ -53,6 +54,15 @@ export const readProfile = async (data, setData) => {
     }
   }
 };
+
+export async function writeUsernameFireStore(username) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  await updateDoc(doc(database, "users", user.uid), {
+    username: username,
+  });
+  return true;
+}
 
 export async function writeScheduleDatabase(
   category,

@@ -21,7 +21,11 @@ import {
 } from "firebase/auth";
 import { useFocusEffect } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
-import { writeProfile, readProfile } from "../../components/Database";
+import {
+  writeProfile,
+  readProfile,
+  writeUsernameFireStore,
+} from "../../components/Database";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../App";
@@ -72,7 +76,12 @@ export default function ProfileScreen() {
       if (!imageUrlSuccess) throw new Error("Failed to update imageUrl");
 
       const usernameSuccess = await writeProfile("username", username);
+
+      const usernameFirestoreSuccess = await writeUsernameFireStore(username);
+
       if (!usernameSuccess) throw new Error("Failed to update username");
+      if (!usernameFirestoreSuccess)
+        throw new Error("Failed to update username");
 
       return true;
     } catch (error) {

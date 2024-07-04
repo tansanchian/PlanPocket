@@ -1,12 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreenNav from "./HomeScreenNav";
-import FriendScreen from "../screens/MainApp/FriendScreen";
 import TimeTableNav from "./TimeTableNav";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import Schedule from "./Schedule";
 import { Platform, View } from "react-native";
 import MessengerNav from "./MessengerNav";
+import FriendScreen from "../screens/MainApp/Friend/FriendScreen";
 
 const Tab = createBottomTabNavigator();
 

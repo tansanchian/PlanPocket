@@ -14,24 +14,21 @@ export default function ChatItem({ item, noBorder, currentUser }) {
   const [id, setId] = useState("");
 
   const handleUserPress = () => {
-    const sortedUsernames = [currentUser[0].username, item.username].sort();
-    const id = sortedUsernames.join("-");
-    setId(id);
-    const username = item.username;
+    const chatId = item.id;
+    const username = item.friend.username;
     const dataToSend = {
-      chatId: id,
+      chatId: chatId,
       username: username,
     };
-    console.log("Data to send:", dataToSend);
     navigation.navigate("Messenger", {
       data: [dataToSend],
     });
   };
 
-  useEffect(() => {
-    if (!id) return;
+  useLayoutEffect(() => {
+    if (!item.id) return;
 
-    const collectionRef = collection(database, "chats" + id);
+    const collectionRef = collection(database, item.id);
     const q = query(collectionRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -40,12 +37,11 @@ export default function ChatItem({ item, noBorder, currentUser }) {
     });
 
     return () => unsubscribe();
-  }, [id]);
+  }, [item.id]);
 
   const renderLastMessage = () => {
     if (!lastMessage) return "Say Hi 👋";
-    const isCurrentUser = currentUser[0].userId === lastMessage?.user?._id;
-    console.log(lastMessage);
+    const isCurrentUser = currentUser.userId === lastMessage?.user?._id;
     return isCurrentUser ? `You: ${lastMessage.text}` : lastMessage.text;
   };
 
@@ -68,15 +64,7 @@ export default function ChatItem({ item, noBorder, currentUser }) {
       "Nov",
       "Dec",
     ];
-    const shortDaysOfWeek = [
-      "Sun",
-      "Mon",
-      "Tues",
-      "Wed",
-      "Thurs",
-      "Fri",
-      "Sat",
-    ];
+    const shortDaysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     if (diff < oneDay) {
       const hours = date.getHours() % 12 || 12;
@@ -114,7 +102,7 @@ export default function ChatItem({ item, noBorder, currentUser }) {
       <View style={styles.textContainer}>
         <View style={styles.header}>
           <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
-            {item.username}
+            {item.friend.username}
           </Text>
           <Text style={[styles.lastMessagetime, { fontSize: hp(1.6) }]}>
             {renderLastTime()}

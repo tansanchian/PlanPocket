@@ -25,13 +25,14 @@ const MessengerScreen = ({ route }) => {
   const username = data[0].username;
   const chatId = data[0].chatId;
 
+  console.log(data);
   const navigation = useNavigation();
   const [messages, setMessages] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
   const auth = getAuth();
 
   useLayoutEffect(() => {
-    const collectionRef = collection(database, "chats" + chatId);
+    const collectionRef = collection(database, chatId);
     const q = query(collectionRef, orderBy("createdAt", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -53,7 +54,7 @@ const MessengerScreen = ({ route }) => {
     );
 
     const { _id, createdAt, text, user } = messages[0];
-    addDoc(collection(database, "chats" + chatId), {
+    addDoc(collection(database, chatId), {
       _id,
       createdAt,
       text,
