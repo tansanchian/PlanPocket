@@ -8,9 +8,8 @@ import { useNavigation } from "@react-navigation/native";
 export default function ChatItem({ item, noBorder, currentUser }) {
   const navigation = useNavigation();
   const handleUserPress = () => {
-    const sortedUsernames = [currentUser[0].username, item.username].sort();
+    const sortedUsernames = [currentUser.userId, item.userId].sort();
     const id = sortedUsernames.join("-");
-
     const username = item.username;
     const dataToSend = {
       chatId: id,

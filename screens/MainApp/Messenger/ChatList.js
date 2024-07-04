@@ -12,12 +12,23 @@ export default function ChatList() {
   const [currentUser, setCurrentUser] = useState({});
   const currentUserId = auth.currentUser.uid;
 
-  useEffect(() => {
-    if (currentUserId) {
-      const unsubscribe = getFriends();
-      return unsubscribe;
-    }
-  }, [currentUserId]);
+  const filterExistingChatIds = (friends) => {
+    let validChatIds = [];
+    friends.forEach((friend) => {
+      const sortedUsernames = [currentUserId, friend.userId].sort();
+      const id = sortedUsernames.join("-");
+      const collectionRef = collection(database, id);
+      const q = query(collectionRef);
+      onSnapshot(q, (snapshot) => {
+        if (!snapshot.empty) {
+          validChatIds.push({ id, friend });
+        } else {
+          validChatIds = validChatIds.filter((chat) => chat.id !== id);
+        }
+        setUsers([...validChatIds]);
+      });
+    });
+  };
 
   const getFriends = () => {
     const userRef = collection(database, "users");
@@ -34,7 +45,7 @@ export default function ChatList() {
         let friendData = [];
         currData[0].friends.forEach((friendId) => {
           const getFriendQ = query(userRef, where("userId", "==", friendId));
-          const unsubscribe = onSnapshot(getFriendQ, (friendSnapshot) => {
+          onSnapshot(getFriendQ, (friendSnapshot) => {
             friendSnapshot.forEach((doc) => {
               friendData.push({ ...doc.data() });
             });
@@ -43,30 +54,19 @@ export default function ChatList() {
             setUsers(chatIdData);
           });
         });
-        return () => friendData.forEach(unsubscribe);
+        return friendData;
       } else {
         setUsers([]);
       }
     });
   };
 
-  const filterExistingChatIds = (friends) => {
-    let validChatIds = [];
-    friends.forEach((friend) => {
-      const sortedUsernames = [currentUserId, friend.userId].sort();
-      const id = sortedUsernames.join("-");
-      const collectionRef = collection(database, id);
-      const q = query(collectionRef);
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        if (!snapshot.empty) {
-          validChatIds.push({ id, friend });
-        } else {
-          validChatIds = validChatIds.filter((chat) => chat.id !== id);
-        }
-        setUsers([...validChatIds]);
-      });
-    });
-  };
+  useEffect(() => {
+    if (currentUserId) {
+      const unsubscribe = getFriends();
+      return unsubscribe;
+    }
+  }, [currentUserId]);
 
   return (
     <View style={styles.container}>
