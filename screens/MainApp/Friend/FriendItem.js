@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { getDatabase, ref, child, get } from "firebase/database";
 
 const FriendItem = ({ friend }) => {
-  const [imageUri, setImageUri] = useState("");
+  const [imageUri, setImageUri] = useState(
+    "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+  );
 
   useEffect(() => {
     const fetchImage = async () => {
@@ -12,18 +14,11 @@ const FriendItem = ({ friend }) => {
         const snapshot = await get(
           child(dbRef, `users/${friend.userId}/Profile/imageUrl`)
         );
-        if (snapshot.exists()) {
+        if (snapshot.exists() && snapshot.val() !== "") {
           setImageUri(snapshot.val());
-        } else {
-          setImageUri(
-            "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
-          );
         }
       } catch (error) {
         console.error(error);
-        setImageUri(
-          "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
-        );
       }
     };
 

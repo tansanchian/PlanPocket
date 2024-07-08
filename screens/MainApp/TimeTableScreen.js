@@ -26,31 +26,38 @@ const parseDate = (dateString) => {
   return new Date(year, month - 1, day + 1);
 };
 
-const months = [
-  { key: 1, label: "January" },
-  { key: 2, label: "February" },
-  { key: 3, label: "March" },
-  { key: 4, label: "April" },
-  { key: 5, label: "May" },
-  { key: 6, label: "June" },
-  { key: 7, label: "July" },
-  { key: 8, label: "August" },
-  { key: 9, label: "September" },
-  { key: 10, label: "October" },
-  { key: 11, label: "November" },
-  { key: 12, label: "December" },
-];
+const parseTime = (x) => {
+  function convertTo12HourFormat(timeString) {
+    const [hours, minutes] = timeString.split(":");
 
-const height = Platform.OS === "ios" ? 90 : 60;
+    const dateObj = new Date();
+    dateObj.setHours(hours);
+    dateObj.setMinutes(minutes);
+
+    const formattedTime = dateObj.toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    });
+
+    return formattedTime;
+  }
+
+  return convertTo12HourFormat(x.split("T")[1].substring(0, 5));
+};
 
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
 
   const loadItems = useCallback(async (day) => {
     try {
-      const data = await readScheduleDatabase();
-      const dataLength = data ? data.length : 0;
+      const data = (await readScheduleDatabase()) || {};
+      const dataArray = Object.entries(data) || [];
+      const dataLength = dataArray.length;
       const newItems = {};
+      if (dataArray.length == 0) {
+        return;
+      }
       for (let i = -15; i < 70; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
@@ -58,27 +65,24 @@ const TimeTableScreen = ({ navigation }) => {
           newItems[strTime] = [];
           if (dataLength != 0) {
             for (let i = 0; i < dataLength; i++) {
-              if (data[i] == undefined) {
-                continue;
-              }
-              if (data[i] && data[i].fromDate === strTime) {
-                let curr = parseDate(data[i].fromDate);
-                const end = parseDate(data[i].toDate);
+              if (!dataArray[i][1]) continue;
+              if (dataArray[i][1].fromDate === strTime) {
+                let curr = parseDate(dataArray[i][1].fromDate);
+                const end = parseDate(dataArray[i][1].toDate);
                 while (curr <= end) {
                   const currStr = timeToString(curr.getTime());
                   if (!newItems[currStr]) {
                     newItems[currStr] = [];
                   }
                   newItems[currStr].push({
-                    titleTT: data[i].title,
                     currDateTT: currStr,
-                    fromDateTT: data[i].fromDate,
-                    setToDateTT: data[i].toDate,
-                    setBudgetTT: data[i].budget,
-                    setMealTT: data[i].meals,
-                    descriptionTT: data[i][currStr]?.description,
-                    purposeTT: data[i][currStr]?.purpose,
-                    itemz: data[i],
+                    fromDateTT: dataArray[i][1].fromDate,
+                    setToDateTT: dataArray[i][1].toDate,
+                    setBudgetTT: dataArray[i][1].budget,
+                    setMealTT: dataArray[i][1].meals,
+                    descriptionTT: dataArray[i][1][currStr]?.description,
+                    purposeTT: dataArray[i][1][currStr]?.purpose,
+                    data: dataArray[i],
                   });
                   curr.setDate(curr.getDate() + 1);
                 }
@@ -99,45 +103,24 @@ const TimeTableScreen = ({ navigation }) => {
       loadItems({ timestamp: today.getTime() });
     }, [loadItems])
   );
+
   const ref = React.useRef(null);
   const [activeTab, setActiveTab] = React.useState(0);
   const [index, setIndex] = useState(0);
-  // React.useEffect(() => {
-  //   ref.current?.scrollToIndex({ index, animated: true });
-  // }, [index]);
 
   const renderItem = (item) => {
     const dataToSend = {
-      titleTT: item.titleTT,
-      fromDateTT: item.currDateTT,
-      toDateTT: item.toDateTT,
-      budgetTT: item.budgetTT,
-      mealTT: item.meallTT,
+      dataTT: item.data,
     };
-
     const onPressHandler = () => {
       navigation.navigate("ScheduleForm", dataToSend);
     };
-
-    let transformedData = null;
-    const currentDate = item.currDateTT;
-    const datas =
-      item.itemz.Purpose == undefined ? [] : [item.itemz.Purpose[currentDate]];
-    const originalObject = datas[0];
-
-    if (originalObject != undefined) {
-      transformedData = Object.keys(originalObject)
-        .filter((key) => key !== "lastPurposeId" && key !== "intervals")
-        .map((key) => ({
-          id: key,
-          ...originalObject[key],
-        }));
-    }
-
+    const datas = item.data[1].purpose;
+    const dataArray = Object.entries(datas);
     return (
       <View style={styles.card}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.title}>Title: {item.titleTT}</Text>
+          <Text style={styles.title}>Title: {item.data[1].title}</Text>
           <View style={{ alignSelf: "center" }}>
             <TouchableOpacity onPress={onPressHandler}>
               <FontAwesome name="plus" size={20} color="#735DA5" />
@@ -146,7 +129,7 @@ const TimeTableScreen = ({ navigation }) => {
         </View>
         <FlatList
           style={{ flexGrow: 0 }}
-          data={transformedData}
+          data={dataArray}
           ref={ref}
           keyExtractor={(items) => items.key}
           contentContainerStyle={{ paddingLeft: 10 }}
@@ -173,16 +156,19 @@ const TimeTableScreen = ({ navigation }) => {
                     flexShrink: 1,
                   }}
                 >
-                  {item.purpose && (
-                    <Text style={styles.purpose}>Purpose: {item.purpose}</Text>
+                  {item[1].purpose && (
+                    <Text style={styles.purpose}>
+                      Purpose: {item[1].purpose}
+                    </Text>
                   )}
-                  {item.description && (
+                  {item[1].description && (
                     <Text style={styles.description}>
-                      Description: {item.description}
+                      Description: {item[1].description}
                     </Text>
                   )}
                   <Text style={styles.description}>
-                    Time: {item.fromTimeString} to {item.toTimeString}
+                    Time: {parseTime(item[1].fromTime)} to{" "}
+                    {parseTime(item[1].toTime)}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -193,7 +179,7 @@ const TimeTableScreen = ({ navigation }) => {
     );
   };
 
-  renderEmptyDate = () => {
+  const renderEmptyDate = () => {
     return (
       <View style={styles.emptyDate}>
         <Text>This is empty date!</Text>

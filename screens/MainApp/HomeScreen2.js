@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  FlatList,
+  Alert,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -14,23 +16,46 @@ import { StatusBar } from "expo-status-bar";
 import {
   readCurrentDateDatabase,
   readProfile,
+  readScheduleDatabase,
   readScheduleExpenses,
 } from "../../components/Database";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
-  const [currentEvent, setCurrentEvent] = useState(null);
+  const [purpose, setPurpose] = useState(null);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [expenses, setExpenses] = useState(null);
 
+  const parseTime = (x) => {
+    function convertTo12HourFormat(timeString) {
+      const [hours, minutes] = timeString.split(":");
+
+      const dateObj = new Date();
+      dateObj.setHours(hours);
+      dateObj.setMinutes(minutes);
+
+      const formattedTime = dateObj.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+
+      return formattedTime;
+    }
+
+    return convertTo12HourFormat(x.split("T")[1].substring(0, 5));
+  };
+
   const loadItems = useCallback(async () => {
     try {
       await readProfile("username", setUsername);
-      const data = await readCurrentDateDatabase();
-      const temp = await readScheduleExpenses();
-      setExpenses(temp);
-      setCurrentEvent(data);
+      const purpose = await readCurrentDateDatabase();
+      const expenses = await readScheduleExpenses("-O1G048GTdkbmCYMfq1e");
+      const schedule = await readScheduleDatabase();
+      console.log("Schedules", Object.keys(schedule));
+      setExpenses(expenses);
+      setPurpose(purpose);
     } catch (error) {
       console.error("Error fetching data:", error.message);
       setCurrentEvent(null);
@@ -54,7 +79,7 @@ const HomeScreen2 = () => {
   }, []);
 
   useEffect(() => {
-    console.log(expenses); // Log expenses whenever it changes
+    console.log(expenses);
   }, [expenses]);
 
   const onNextPressed = () => {
@@ -78,6 +103,46 @@ const HomeScreen2 = () => {
     );
   }
 
+  // Mock data for months
+  const months = [
+    { key: "1", name: "January" },
+    { key: "2", name: "February" },
+    { key: "3", name: "March" },
+    { key: "4", name: "April" },
+    { key: "5", name: "May" },
+    { key: "6", name: "June" },
+    { key: "7", name: "July" },
+    { key: "8", name: "August" },
+    { key: "9", name: "September" },
+    { key: "10", name: "October" },
+    { key: "11", name: "November" },
+    { key: "12", name: "December" },
+  ];
+
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        style={{
+          marginRight: 10,
+          padding: 10,
+          borderWidth: 1,
+          borderRadius: 20,
+          borderColor: "#f3eef6",
+          backgroundColor: "#f3eef6",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 5,
+          elevation: 3,
+          flexShrink: 1,
+        }}
+        onPress={() => Alert.alert(`Selected month: ${item.name}`)}
+      >
+        <Text>{item.name}</Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -86,7 +151,7 @@ const HomeScreen2 = () => {
         <View style={styles.name}>
           <Text style={styles.nameText}>Good Day {username}</Text>
         </View>
-        {!currentEvent ? (
+        {!purpose ? (
           <View style={styles.date}>
             <View style={{ paddingRight: 20 }}>
               <TouchableOpacity onPress={onCalendarPressed}>
@@ -106,10 +171,20 @@ const HomeScreen2 = () => {
             </View>
             <View>
               <Text style={styles.dateText}>Your next event is on</Text>
-              <Text style={styles.dateText}>{currentEvent}</Text>
+              <Text style={styles.dateText}>{parseTime(purpose.fromTime)}</Text>
             </View>
           </View>
         )}
+        <View>
+          <FlatList
+            data={months}
+            keyExtractor={(item) => item.key}
+            contentContainerStyle={{ paddingLeft: 10 }}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderItem}
+          />
+        </View>
         <View style={styles.main}>
           <View style={styles.card}>
             <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
@@ -180,7 +255,6 @@ const styles = StyleSheet.create({
   },
   dashboard: {
     flex: 1,
-    justifyContent: "space-between",
     backgroundColor: "#F0F0F5",
   },
   budget: {

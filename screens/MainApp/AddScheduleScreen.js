@@ -28,8 +28,7 @@ const AddScheduleScreen = () => {
     const unsubscribe = onValue(schedulesRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const schedulesArray = Object.values(data);
-        setSchedules(schedulesArray);
+        setSchedules(Object.entries(data));
       } else {
         setSchedules([]);
       }
@@ -42,9 +41,9 @@ const AddScheduleScreen = () => {
     navigation.navigate("Timetable");
   };
 
-  const onDeletePressed = async (fromDate, toDate) => {
+  const onDeletePressed = async (id) => {
     try {
-      await deleteScheduleDatabase(fromDate, toDate);
+      await deleteScheduleDatabase(id);
     } catch (error) {
       console.error(error);
     }
@@ -57,8 +56,8 @@ const AddScheduleScreen = () => {
     return (
       <Card style={styles.card}>
         <Card.Title
-          title={item.title}
-          subtitle={`Budget: ${item.budget}`}
+          title={item[1].title}
+          subtitle={`Budget: ${item[1].budget}`}
           left={(props) => (
             <TouchableOpacity onPress={onCalendarPressed}>
               <Avatar.Icon {...props} icon="calendar" />
@@ -68,7 +67,7 @@ const AddScheduleScreen = () => {
             <IconButton
               {...props}
               icon="delete"
-              onPress={() => onDeletePressed(item.fromDate, item.toDate)}
+              onPress={() => onDeletePressed(item[0])}
             />
           )}
           titleStyle={styles.cardTitle}
@@ -76,7 +75,7 @@ const AddScheduleScreen = () => {
         />
         <Card.Content>
           <Text style={styles.dateText}>
-            {item.fromDate} to {item.toDate}
+            {item[1].fromDate} to {item[1].toDate}
           </Text>
         </Card.Content>
       </Card>
@@ -92,13 +91,13 @@ const AddScheduleScreen = () => {
   const latestDate = useMemo(() => {
     if (schedules.length === 0) return null;
     return schedules.reduce((latest, item) => {
-      const itemDate = new Date(item.toDate);
+      const itemDate = new Date(item[1].toDate);
       return itemDate > latest ? latest : itemDate;
     }, new Date(schedules[0].toDate));
   }, [schedules]);
 
   const renderItem = ({ item }) => {
-    const itemDate = new Date(item.toDate);
+    const itemDate = new Date(item[1].toDate);
     const isLatestDate = itemDate.getTime() === latestDate.getTime();
     return (
       <View>

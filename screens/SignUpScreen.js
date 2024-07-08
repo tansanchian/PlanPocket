@@ -19,7 +19,7 @@ import { getDatabase } from "@firebase/database";
 import { globalStyles } from "../styles/global";
 import { StatusBar } from "expo-status-bar";
 import { database } from "../App";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function SignUpScreen() {
   const { height } = useWindowDimensions();

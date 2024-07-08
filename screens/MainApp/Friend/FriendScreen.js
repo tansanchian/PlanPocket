@@ -17,6 +17,11 @@ import {
   query,
   where,
   collection,
+  onSnapshot,
+  setDoc,
+  getDoc,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { database } from "../../../App";
 import FriendItem from "./FriendItem";
@@ -62,7 +67,6 @@ const FriendScreen = () => {
         }
       }
       setFriendList(friendsL);
-      console.log(friendsL);
     }
     setIsLoading(false);
   };
@@ -73,58 +77,131 @@ const FriendScreen = () => {
     }
   }, [auth.currentUser]);
 
-  const addFriend = async (friend) => {
+  const refreshFriendList = async () => {
+    if (user.friends && user.friends.length > 0) {
+      let friendsL = [];
+      for (let i = 0; i < user.friends.length; i++) {
+        for (let j = 0; j < users.length; j++) {
+          if (users[j].userId === user.friends[i]) {
+            friendsL.push(users[j]);
+            break;
+          }
+        }
+      }
+      setFriendList(friendsL);
+    }
+  };
+
+  const sendFriendRequest = async (friend) => {
     try {
       let check = "404";
       let friendData = null;
       for (const data of users) {
-        if (friend == data.username) {
+        if (friend === data.username) {
           check = "0";
           friendData = data;
         }
       }
-      if (check == "404") {
-        Alert.alert("Error", "User does not exist");
+      if (check === "404") {
+        Alert.alert("Error", "User does not exist!");
         return false;
       }
-      for (const i of user.friends) {
-        if (i == friendData.userId) {
-          check = "402";
-        }
-      }
-      if (check == "402") {
+      if (user.friends.includes(friendData.userId)) {
         Alert.alert("Error", "User is already your friend!");
         return false;
       }
-      friendData.friends.push(user.userId);
-      user.friends.push(friendData.userId);
-      const friendList = friendData.friends;
-      const userList = user.friends;
+      const friendRequests = friendData.friendRequests || [];
+      if (friendRequests.includes(user.userId)) {
+        Alert.alert("Error", "Pending acception!");
+        return false;
+      }
       const friendRef = doc(database, "users", friendData.userId);
       await updateDoc(friendRef, {
-        friends: friendList,
-      });
-      const userRef = doc(database, "users", user.userId);
-      await updateDoc(userRef, {
-        friends: userList,
+        friendRequests: arrayUnion(user.userId),
       });
       return true;
     } catch (error) {
-      console.error("Error adding friend:", error);
+      console.error("Error sending friend request:", error);
     }
   };
 
-  const handleAddFriend = async () => {
+  const handleSendFriendRequest = async () => {
     if (friendUsername) {
-      const add = await addFriend(friendUsername);
-      if (add) {
-        Alert.alert("Success", `Friend "${friendUsername}" added!`);
+      const sent = await sendFriendRequest(friendUsername);
+      if (sent) {
+        Alert.alert("Success", `Friend request sent to "${friendUsername}"!`);
         setFriendUsername("");
-        getUsers(); // Refresh the users and friend list
       }
     } else {
       Alert.alert("Error", "Please enter a valid username.");
     }
+  };
+
+  const acceptFriendRequest = async (fromUserId) => {
+    try {
+      user.friends.push(fromUserId);
+      const userList = user.friends;
+
+      const friendRef = doc(database, "users", fromUserId);
+      const friendSnap = await getDoc(friendRef);
+      const friendData = friendSnap.data();
+      friendData.friends.push(user.userId);
+      const friendList = friendData.friends;
+
+      const userRef = doc(database, "users", user.userId);
+      await updateDoc(userRef, {
+        friends: userList,
+        friendRequests: arrayRemove(fromUserId),
+      });
+
+      await updateDoc(friendRef, {
+        friends: friendList,
+      });
+
+      await refreshFriendList(); // Refresh friend list
+
+      return true;
+    } catch (error) {
+      console.error("Error accepting friend request:", error);
+    }
+  };
+
+  const getUsername = (userId) => {
+    const user = users.find((x) => x.userId === userId);
+    return user ? user.username : "Unknown";
+  };
+
+  const FriendRequestList = ({ userId }) => {
+    const [friendRequests, setFriendRequests] = useState([]);
+
+    useEffect(() => {
+      const unsubscribe = onSnapshot(doc(database, "users", userId), (doc) => {
+        const data = doc.data();
+        setFriendRequests(data.friendRequests || []);
+      });
+      return () => unsubscribe();
+    }, [userId]);
+
+    const handleAcceptRequest = async (fromUserId) => {
+      const accepted = await acceptFriendRequest(fromUserId);
+      if (accepted) {
+        Alert.alert("Success", "Friend request accepted!");
+      }
+    };
+
+    return (
+      <View>
+        {friendRequests.map((request) => (
+          <View key={request} style={styles.requestItem}>
+            <Text>{`Friend request from ${getUsername(request)}`}</Text>
+            <Button
+              title="Accept"
+              onPress={() => handleAcceptRequest(request)}
+            />
+          </View>
+        ))}
+      </View>
+    );
   };
 
   if (isLoading) {
@@ -143,7 +220,10 @@ const FriendScreen = () => {
         value={friendUsername}
         onChangeText={setFriendUsername}
       />
-      <Button title="Add Friend" onPress={handleAddFriend} />
+      <Button title="Send Friend Request" onPress={handleSendFriendRequest} />
+      <Button title="Refresh" onPress={refreshFriendList} />
+      <Text style={styles.sectionTitle}>Friend Requests</Text>
+      <FriendRequestList userId={auth.currentUser.uid} />
       <Text style={styles.sectionTitle}>All Friends</Text>
       <FlatList
         data={friendList}
@@ -158,7 +238,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    padding: 50,
+    padding: 16,
   },
   searchInput: {
     height: 40,
@@ -177,6 +257,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  requestItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#cccccc",
   },
 });
 

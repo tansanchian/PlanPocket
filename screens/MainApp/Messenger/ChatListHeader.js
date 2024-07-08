@@ -30,12 +30,13 @@ const ChatListHeader = () => {
         </View>
         <Text
           style={{
-            marginLeft: 12,
-            fontSize: 17,
+            marginLeft: 13,
+            textAlign: "center",
             fontWeight: "bold",
+            fontSize: 18,
           }}
         >
-          PlanPocket
+          Plan<Text style={{ color: "#735DA5" }}>Pocket</Text>
         </Text>
       </View>
       <TouchableOpacity

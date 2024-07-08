@@ -20,8 +20,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function ScheduleForm({ route }) {
-  const { titleTT, fromDateTT, toDateTT, budgetTT, mealTT } =
-    route.params || {};
+  const { dataTT } = route.params || {};
 
   const [selected, setSelected] = useState("");
   const data = [
@@ -35,7 +34,6 @@ export default function ScheduleForm({ route }) {
   const navigation = useNavigation();
 
   const [highlightFromDate, setHighlightFromDate] = useState(false);
-  const date = new Date();
   const [fromTime, setFromTime] = useState(new Date());
   const [toTime, setToTime] = useState(() => {
     const currentTime = new Date();
@@ -109,13 +107,13 @@ export default function ScheduleForm({ route }) {
   const onAddSchedulePressed = async () => {
     try {
       const result = await writeScheduleDatabase(
+        dataTT[0],
         selected,
         purpose,
-        description,
-        fromDateTT,
         costs,
-        fromTime,
-        toTime
+        description,
+        fromTime.toISOString(),
+        toTime.toISOString()
       );
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
@@ -139,7 +137,7 @@ export default function ScheduleForm({ route }) {
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
         <StatusBar style="auto" />
-        <Text style={styles.title}>{titleTT}</Text>
+        <Text style={styles.title}>{dataTT[1].title}</Text>
         <View
           style={{
             flexDirection: "row",
@@ -173,7 +171,7 @@ export default function ScheduleForm({ route }) {
             }}
           >
             <View pointerEvents="none">
-              <TextInput value={fromDateTT} />
+              <TextInput value={dataTT[1].fromDate} />
             </View>
           </View>
           <View style={{ flex: 0.05 }}></View>
