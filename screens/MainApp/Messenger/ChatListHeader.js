@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { Ionicons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -43,7 +44,7 @@ const ChatListHeader = () => {
         onPress={() => navigation.navigate("SearchList")}
         style={styles.iconContainer}
       >
-        <AntDesign name="bars" size={20} />
+        <Ionicons name="search" size={20} />
       </TouchableOpacity>
     </View>
   );
@@ -68,7 +69,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3eef6",
   },
   icon: {
     height: 24,

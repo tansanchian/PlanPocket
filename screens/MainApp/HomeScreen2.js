@@ -26,50 +26,77 @@ const HomeScreen2 = () => {
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [expenses, setExpenses] = useState(null);
+  const [scheduleArray, setScheduleArray] = useState([]);
+  const [dashboardSelect, setDashboardSelect] = useState("");
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const parseTime = (x) => {
-    function convertTo12HourFormat(timeString) {
+    const convertTo12HourFormat = (timeString) => {
       const [hours, minutes] = timeString.split(":");
-
       const dateObj = new Date();
       dateObj.setHours(hours);
       dateObj.setMinutes(minutes);
-
-      const formattedTime = dateObj.toLocaleString("en-US", {
+      return dateObj.toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
         hour12: true,
       });
-
-      return formattedTime;
-    }
-
+    };
     return convertTo12HourFormat(x.split("T")[1].substring(0, 5));
+  };
+
+  const parseDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { month: "short", day: "numeric" };
+    return date.toLocaleDateString("en-US", options);
   };
 
   const loadItems = useCallback(async () => {
     try {
       await readProfile("username", setUsername);
-      const purpose = await readCurrentDateDatabase();
-      const expenses = await readScheduleExpenses("-O1G048GTdkbmCYMfq1e");
-      const schedule = await readScheduleDatabase();
-      console.log("Schedules", Object.keys(schedule));
-      setExpenses(expenses);
-      setPurpose(purpose);
+      const purposeData = await readCurrentDateDatabase();
+      setPurpose(purposeData);
+
+      const scheduleData = await readScheduleDatabase();
+      if (!scheduleData) {
+        setScheduleArray([]);
+      } else {
+        const scheduleEntries = Object.entries(scheduleData);
+        setScheduleArray(scheduleEntries);
+
+        if (firstLoad && scheduleEntries.length > 0) {
+          const defaultSelect = String(scheduleEntries[0][0]);
+          setDashboardSelect(defaultSelect);
+          setFirstLoad(false);
+        }
+      }
     } catch (error) {
       console.error("Error fetching data:", error.message);
-      setCurrentEvent(null);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [firstLoad]);
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      console.log(dashboardSelect);
+      if (!dashboardSelect) return;
+      try {
+        const expensesData = await readScheduleExpenses(dashboardSelect);
+        setExpenses(expensesData);
+        console.log(expensesData);
+      } catch (error) {
+        console.error("Error fetching expenses:", error.message);
+      }
+    };
+    fetchExpenses();
+  }, [dashboardSelect]);
 
   useFocusEffect(
     useCallback(() => {
       const timer = setTimeout(() => {
         loadItems();
       }, 1000);
-
       return () => clearTimeout(timer);
     }, [loadItems])
   );
@@ -77,10 +104,6 @@ const HomeScreen2 = () => {
   useEffect(() => {
     return () => setIsLoading(true);
   }, []);
-
-  useEffect(() => {
-    console.log(expenses);
-  }, [expenses]);
 
   const onNextPressed = () => {
     navigation.navigate("HomeScreen");
@@ -103,49 +126,29 @@ const HomeScreen2 = () => {
     );
   }
 
-  // Mock data for months
-  const months = [
-    { key: "1", name: "January" },
-    { key: "2", name: "February" },
-    { key: "3", name: "March" },
-    { key: "4", name: "April" },
-    { key: "5", name: "May" },
-    { key: "6", name: "June" },
-    { key: "7", name: "July" },
-    { key: "8", name: "August" },
-    { key: "9", name: "September" },
-    { key: "10", name: "October" },
-    { key: "11", name: "November" },
-    { key: "12", name: "December" },
-  ];
-
   const renderItem = ({ item }) => {
+    if (!item) {
+      return null;
+    }
+    const values = item[1];
+    const id = String(item[0]);
+    const isSelected = dashboardSelect === item[0];
     return (
       <TouchableOpacity
-        style={{
-          marginRight: 10,
-          padding: 10,
-          borderWidth: 1,
-          borderRadius: 20,
-          borderColor: "#f3eef6",
-          backgroundColor: "#f3eef6",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 5,
-          elevation: 3,
-          flexShrink: 1,
-        }}
-        onPress={() => Alert.alert(`Selected month: ${item.name}`)}
+        style={[
+          styles.cardContainer,
+          isSelected && { backgroundColor: "#E0E0E0" },
+        ]}
+        onPress={() => setDashboardSelect(id)}
       >
-        <Text>{item.name}</Text>
+        <Text>{values.title}</Text>
       </TouchableOpacity>
     );
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Header title="Home" />
       <View style={styles.dashboard}>
         <View style={styles.name}>
@@ -171,76 +174,101 @@ const HomeScreen2 = () => {
             </View>
             <View>
               <Text style={styles.dateText}>Your next event is on</Text>
-              <Text style={styles.dateText}>{parseTime(purpose.fromTime)}</Text>
+              <Text style={styles.dateText}>
+                {parseDate(purpose.eventDate)}{" "}
+                {parseTime(purpose.purpose.fromTime)} to{" "}
+                {parseTime(purpose.purpose.toTime)}
+              </Text>
             </View>
           </View>
         )}
         <View>
           <FlatList
-            data={months}
-            keyExtractor={(item) => item.key}
-            contentContainerStyle={{ paddingLeft: 10 }}
+            data={scheduleArray}
+            keyExtractor={(item) => item[0]}
+            contentContainerStyle={{
+              paddingHorizontal: 10,
+              alignItems: "center",
+            }}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             renderItem={renderItem}
           />
         </View>
-        <View style={styles.main}>
-          <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="wallet" size={24} color="#41afaa" />
+        {expenses ? (
+          <View style={styles.main}>
+            <View style={styles.card}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="wallet" size={24} color="#41afaa" />
+              </View>
+              <Text style={styles.cardText}>Entertainment & Leisure</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Entertainment & Leisure</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"}`}
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="rocket" size={24} color="#466eb4" />
+            <View style={styles.card}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="rocket" size={24} color="#466eb4" />
+              </View>
+              <Text style={styles.cardText}>Transportation</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Transportation</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
+            <View style={styles.card}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
+              </View>
+              <Text style={styles.cardText}>Dining</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Dining</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
-            </Text>
-          </View>
-          <View style={[styles.card, { marginBottom: 0 }]}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="shopping-cart" size={24} color="#e6a532" />
+            <View style={[styles.card, { marginBottom: 0 }]}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="shopping-cart" size={24} color="#e6a532" />
+              </View>
+              <Text style={styles.cardText}>Shopping</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Shopping</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
-            </Text>
-          </View>
-          <View style={styles.card}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="handshake" size={24} color="#d7642c" />
+            <View style={styles.card}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="handshake" size={24} color="#d7642c" />
+              </View>
+              <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"}`}
-            </Text>
-          </View>
-          <View style={[styles.card, { marginBottom: 0 }]}>
-            <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
-              <FontAwesome5 name="tags" size={24} color="#af4b91" />
+            <View style={[styles.card, { marginBottom: 0 }]}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "white" }]}
+              >
+                <FontAwesome5 name="tags" size={24} color="#af4b91" />
+              </View>
+              <Text style={styles.cardText}>Uncategorized</Text>
+              <Text style={styles.amount}>
+                {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
+              </Text>
             </View>
-            <Text style={styles.cardText}>Uncategorized</Text>
-            <Text style={styles.amount}>
-              {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
-            </Text>
           </View>
-        </View>
+        ) : (
+          <View>
+            <Text>Nothing here bruh</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -331,5 +359,23 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  cardContainer: {
+    marginHorizontal: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });

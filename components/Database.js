@@ -202,7 +202,7 @@ export async function createScheduleDatabase(
       }
 
       if (overlap) {
-        return "Error 402";
+        return "402";
       }
     }
 
@@ -235,7 +235,7 @@ export async function readScheduleDatabase() {
         return null;
       }
     } catch (error) {
-      console.error("Error reading Schedule:", error);
+      console.error("Error readScheduleDatabase:", error);
       return null;
     }
   } else {
@@ -260,44 +260,63 @@ export async function readCurrentDateDatabase() {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
-  const currentDate = new Date();
 
-  if (userId) {
-    try {
-      const schedulesRef = ref(db, `/users/${userId}/schedules`);
-      const snapshot = await get(schedulesRef);
+  if (!userId) {
+    console.error("User is not authenticated");
+    return null;
+  }
 
-      const parseDate = (dateString) => {
-        const [year, month, day] = dateString.split("-").map(Number);
-        return new Date(year, month - 1, day);
-      };
-      if (snapshot.exists()) {
-        const schedules = snapshot.val();
-        const scheduleArray = Object.values(schedules);
-        let min = scheduleArray[0];
-        for (const object of scheduleArray) {
-          if (parseDate(object.fromDate) < parseDate(min.fromDate)) {
-            min = object;
-          }
-        }
-        const purposeArray = Object.values(min.purpose);
-        let minPurpose = purposeArray[0];
-        for (const purpose of purposeArray) {
-          if (new Date(purpose.fromTime) < new Date(minPurpose.fromTime)) {
-            minPurpose = purpose;
-          }
-        }
-        return minPurpose;
-      } else {
-        console.log("No data available");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error reading Schedule:", error);
+  try {
+    const schedulesRef = ref(db, `/users/${userId}/schedules`);
+    const snapshot = await get(schedulesRef);
+
+    if (!snapshot.exists()) {
+      console.log("No data available");
       return null;
     }
-  } else {
-    console.error("User is not authenticated");
+
+    const schedules = snapshot.val();
+    const scheduleArray = Object.values(schedules);
+    const parseDate = (dateString) => {
+      const [year, month, day] = dateString.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    };
+
+    let minDateWithPurpose = null;
+    let minEventDate = null;
+
+    for (const schedule of scheduleArray) {
+      if (schedule.purpose != undefined) {
+        if (
+          !minDateWithPurpose ||
+          parseDate(schedule.fromDate) < parseDate(minDateWithPurpose.fromDate)
+        ) {
+          minDateWithPurpose = schedule;
+          minEventDate = schedule.fromDate;
+        }
+      }
+    }
+
+    if (minDateWithPurpose) {
+      const minPurposeArray = Object.values(minDateWithPurpose.purpose);
+      let minPurpose = minPurposeArray[0];
+
+      for (const purpose of minPurposeArray) {
+        if (new Date(purpose.fromTime) < new Date(minPurpose.fromTime)) {
+          minPurpose = purpose;
+        }
+      }
+
+      console.log("Min Purpose:", minPurpose);
+      console.log("Event Date:", minEventDate);
+
+      return { purpose: minPurpose, eventDate: minEventDate };
+    } else {
+      console.log("No data available with purpose");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error reading readCurrentDateDatabase:", error);
     return null;
   }
 }
@@ -342,7 +361,7 @@ export async function readScheduleExpenses(scheduleId) {
         return null;
       }
     } catch (error) {
-      console.error("Error reading Schedule:", error);
+      console.error("Error reading readScheduleExpenses:", error);
       return null;
     }
   } else {

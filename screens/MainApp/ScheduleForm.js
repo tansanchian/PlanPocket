@@ -30,8 +30,17 @@ export default function ScheduleForm({ route }) {
     { key: "5", value: "Shopping" },
     { key: "6", value: "Uncategorized" },
   ];
-
   const navigation = useNavigation();
+
+  function toSGTISOString(fromTime) {
+    const date = new Date(fromTime);
+
+    const utcTime = date.getTime() + date.getTimezoneOffset();
+
+    const sgtTime = new Date(utcTime + 8 * 60 * 60 * 1000);
+
+    return sgtTime.toISOString();
+  }
 
   const [highlightFromDate, setHighlightFromDate] = useState(false);
   const [fromTime, setFromTime] = useState(new Date());
@@ -112,9 +121,12 @@ export default function ScheduleForm({ route }) {
         purpose,
         costs,
         description,
-        fromTime.toISOString(),
-        toTime.toISOString()
+        toSGTISOString(fromTime),
+        toSGTISOString(toTime)
       );
+
+      console.log(fromTime);
+      console.log(toSGTISOString(fromTime));
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("Timetable");
@@ -136,7 +148,7 @@ export default function ScheduleForm({ route }) {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.title}>{dataTT[1].title}</Text>
         <View
           style={{

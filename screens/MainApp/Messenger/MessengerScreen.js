@@ -10,6 +10,7 @@ import {
   Platform,
   TouchableOpacity,
   Text,
+  Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { GiftedChat, Composer, Bubble } from "react-native-gifted-chat";
@@ -25,11 +26,10 @@ import { database } from "../../../App";
 import { useNavigation } from "@react-navigation/native";
 import ChatRoomHeader from "./ChatRoomHeader";
 import { Ionicons } from "@expo/vector-icons";
+import ShareLogic from "../../../components/ShareLogic";
 
 const MessengerScreen = ({ route }) => {
   const { data, item } = route.params;
-  let sharedItem = item;
-  console.log(sharedItem);
   const username = data[0].username;
   const chatId = data[0].chatId;
 
@@ -37,6 +37,14 @@ const MessengerScreen = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [imageUrl, setImageUrl] = useState("");
   const auth = getAuth();
+
+  function formatTimeTo12Hour(dateTimeString) {
+    return new Date(dateTimeString).toLocaleString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
 
   useLayoutEffect(() => {
     const collectionRef = collection(database, chatId);
@@ -82,6 +90,9 @@ const MessengerScreen = ({ route }) => {
       if (!item) {
         return;
       }
+      const purpose = item.purposeValue;
+      const purposeToDate = item.purposeToDate;
+      const purposeFromDate = item.purposeFromDate;
 
       const scheduleMessage = {
         _id: Math.random().toString(36).substring(7),
@@ -95,15 +106,16 @@ const MessengerScreen = ({ route }) => {
         custom: {
           isCustom: true,
           schedule: {
-            date: item.lastDateKey,
+            fromDate: purposeFromDate,
+            toDate: purposeToDate,
             events: [
               {
-                category: item.category,
-                purpose: item.purpose,
-                cost: item.costs,
-                fromTime: item.fromTimeString,
-                toTime: item.toTimeString,
-                description: item.description,
+                category: purpose.category,
+                purpose: purpose.purpose,
+                cost: purpose.costs,
+                fromTime: purpose.fromTime,
+                toTime: purpose.toTime,
+                description: purpose.description,
               },
             ],
           },
@@ -119,8 +131,8 @@ const MessengerScreen = ({ route }) => {
       sharedItem = null;
     };
 
-    sendCustomPrompt(sharedItem);
-  }, [auth?.currentUser?.uid, imageUrl, username, sharedItem, chatId]);
+    sendCustomPrompt(item);
+  }, [auth?.currentUser?.uid, imageUrl, username, item, chatId]);
 
   const CustomComposer = (props) => {
     return (
@@ -132,7 +144,7 @@ const MessengerScreen = ({ route }) => {
               navigation.navigate("ScheduleList", { data });
             }}
           >
-            <Ionicons name="calendar" size={24} color="gray" />
+            <Ionicons name="calendar" size={20} color="gray" />
           </TouchableOpacity>
           <Composer
             {...props}
@@ -145,14 +157,44 @@ const MessengerScreen = ({ route }) => {
     );
   };
 
+  const handleAddSchedule = async (messageData) => {
+    try {
+      const scheduleData = await ShareLogic(messageData);
+
+      Alert.alert(
+        "Add",
+        "Are you sure you want to add this schedule?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "OK",
+            onPress: () => {
+              console.log("Schedule added:", scheduleData);
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    } catch (error) {
+      console.error("Error fetching schedule data:", error);
+      Alert.alert("Error", "Failed to fetch schedule data.");
+    }
+  };
+
   const renderMessage = (props) => {
     const { currentMessage } = props;
+
     if (currentMessage.custom && currentMessage.custom.isCustom) {
+      const messageData = currentMessage.custom.schedule;
       return (
-        <TouchableOpacity onPress={() => alert("Custom prompt pressed!")}>
+        <TouchableOpacity onPress={() => handleAddSchedule(messageData)}>
           <View
             style={{
               backgroundColor: "#e6e6e6",
+              maxWidth: 300,
               borderRadius: 10,
               padding: 10,
               margin: 5,
@@ -162,26 +204,26 @@ const MessengerScreen = ({ route }) => {
               {currentMessage.text}
             </Text>
             {currentMessage.custom.schedule && (
-              <View style={{ marginTop: 10 }}>
+              <View>
                 <Text style={{ color: "#333" }}>
-                  Date: {currentMessage.custom.schedule.date}
+                  Date: {currentMessage.custom.schedule.fromDate} to{" "}
+                  {currentMessage.custom.schedule.toDate}
                 </Text>
                 {currentMessage.custom.schedule.events.map((event, index) => (
                   <View>
                     <Text key={index} style={{ color: "#333" }}>
                       Category: {event.category}
                       {"\n"}
-                      Purpose: {event.purpose}
+                      Purpose: {event.purpose} {"\n"}
                       {event.description && (
                         <>
-                          {"\n"}
                           Description: {event.description}
+                          {"\n"}
                         </>
                       )}
-                      {"\n"}
-                      Costs: {event.cost}
-                      {"\n"}
-                      Time: {event.fromTime} to {event.toTime}
+                      Costs: {event.cost} {"\n"}
+                      Time: {formatTimeTo12Hour(event.fromTime)} to{" "}
+                      {formatTimeTo12Hour(event.toTime)}
                     </Text>
                   </View>
                 ))}
@@ -196,7 +238,7 @@ const MessengerScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <ChatRoomHeader name={username} />
       <View style={styles.internalContainer}>
         <GiftedChat
@@ -210,7 +252,8 @@ const MessengerScreen = ({ route }) => {
           }}
           renderMessage={renderMessage}
           messagesContainerStyle={{
-            backgroundColor: "#fff",
+            padding: 10,
+            backgroundColor: "white",
             paddingBottom: 15,
           }}
           renderComposer={(props) => <CustomComposer {...props} />}
@@ -229,12 +272,12 @@ const styles = StyleSheet.create({
   },
   internalContainer: {
     flex: 1,
-    paddingBottom: Platform.OS === "ios" ? 90 : 60,
   },
   composerContainer: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
+    height: 50,
   },
   textInputWrapper: {
     flexDirection: "row",

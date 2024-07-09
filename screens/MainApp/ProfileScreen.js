@@ -19,7 +19,7 @@ import {
   reauthenticateWithCredential,
   updateEmail,
 } from "firebase/auth";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useForm, Controller } from "react-hook-form";
 import {
   writeProfile,
@@ -30,6 +30,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../App";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
   const [username, setUsername] = useState("");
@@ -44,7 +45,7 @@ export default function ProfileScreen() {
 
   const auth = getAuth();
   const user = auth.currentUser;
-
+  const navigation = useNavigation();
   console.log(user);
   const {
     control,
@@ -327,9 +328,14 @@ export default function ProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar barStyle={"dark-content"} />
         <View style={styles.header}>
           <Text style={styles.headerText}>Profile</Text>
+          <View style={styles.back}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={20} color={"white"} />
+            </TouchableOpacity>
+          </View>
           <View style={styles.edit}>
             <TouchableOpacity onPress={() => setEditable(true)}>
               <Text style={{ fontSize: 18, color: "white" }}>Edit</Text>
@@ -520,6 +526,11 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 40,
     right: 20,
+  },
+  back: {
+    position: "absolute",
+    top: 40,
+    left: 20,
   },
   profileContainer: {
     alignItems: "center",

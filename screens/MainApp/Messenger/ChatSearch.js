@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { Ionicons } from "@expo/vector-icons";
 
 const ChatSearch = ({ setSearch }) => {
   const navigation = useNavigation();
@@ -18,16 +19,14 @@ const ChatSearch = ({ setSearch }) => {
           onPress={() => navigation.navigate("ChatList")}
           style={styles.iconContainer}
         >
-          <AntDesign name="left" size={20} />
+          <Ionicons name="arrow-back" size={20} />
         </TouchableOpacity>
         <TextInput
           placeholder="Search"
           onChangeText={(text) => setSearch(text)}
+          autoFocus={true}
         ></TextInput>
       </View>
-      <TouchableOpacity onPress={() => {}} style={styles.iconContainer}>
-        <AntDesign name="bars" size={20} />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -51,7 +50,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3eef6",
   },
   icon: {
     height: 24,

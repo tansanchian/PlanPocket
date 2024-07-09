@@ -17,7 +17,11 @@ import CustomInput from "../../components/CustomInput";
 import { useForm } from "react-hook-form";
 import { createScheduleDatabase } from "../../components/Database";
 
-export default function DateScreen() {
+export default function CustomDateScreen({ route }) {
+  const { days } = route.params;
+  const customDay = parseInt(days);
+
+  console.log(days);
   const stringifyDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -29,30 +33,58 @@ export default function DateScreen() {
   const onBackPressed = () => {
     navigation.navigate("ChooseDate");
   };
+
   const [meals, setMeals] = useState(2);
   const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
+  const laterDate = new Date();
+  laterDate.setDate(laterDate.getDate() + customDay);
+  const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showToDatePicker, setToShowDatePicker] = useState(false);
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
-  const { control, watch, handleSubmit } = useForm();
-  const budget = watch("Budget");
-  const title = watch("Title");
-  const mealBudget = watch("meal");
   const onDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setShowDatePicker(false);
     setDate(currentDate);
+    const newToDate = new Date(currentDate);
+    newToDate.setDate(newToDate.getDate() + customDay);
+    setToDate(newToDate);
   };
 
   const onPressDatePicker = () => {
     setShowDatePicker(true);
   };
 
+  const onToDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || toDate;
+    setToShowDatePicker(false);
+    setToDate(currentDate);
+    const newFromDate = new Date(currentDate);
+    newFromDate.setDate(newFromDate.getDate() - customDay);
+    setDate(newFromDate);
+  };
+
+  const onToPressDatePicker = () => {
+    setToShowDatePicker(true);
+  };
+
+  const getMinimumToDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + customDay);
+    return today;
+  };
+
   const dismiss = () => {
     Keyboard.dismiss();
   };
+
+  const { control, watch, handleSubmit } = useForm();
+  const budget = watch("Budget");
+  const title = watch("Title");
+  const mealBudget = watch("meal");
 
   const onCreateSchedulePressed = async () => {
     try {
@@ -64,7 +96,7 @@ export default function DateScreen() {
         budget,
         meals,
         stringifyDate(date),
-        stringifyDate(date),
+        stringifyDate(toDate),
         mealBudget
       );
       if (result == true) {
@@ -85,8 +117,8 @@ export default function DateScreen() {
   return (
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
-        <StatusBar style="dark" />
-        <Text style={styles.mainTitle}> 1 Day Plan</Text>
+        <StatusBar style="auto" />
+        <Text style={styles.mainTitle}> {customDay} Day Plan</Text>
         <Text style={styles.firstTitle}>Title</Text>
         <CustomInput
           name="Title"
@@ -186,6 +218,23 @@ export default function DateScreen() {
                 mode="date"
                 onChange={onDateChange}
                 minimumDate={new Date()}
+              />
+            )}
+          </View>
+        </View>
+        <View style={styles.datePicker}>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity onPress={onToPressDatePicker}>
+              <View pointerEvents="none">
+                <TextInput value={toDate.toDateString()} />
+              </View>
+            </TouchableOpacity>
+            {showToDatePicker && (
+              <DateTimePicker
+                value={toDate}
+                mode="date"
+                onChange={onToDateChange}
+                minimumDate={getMinimumToDate()}
               />
             )}
           </View>

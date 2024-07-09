@@ -5,7 +5,7 @@ import {
 } from "react-native-responsive-screen";
 import { useNavigation } from "@react-navigation/native";
 
-export default function SearchItem({ item, noBorder, currentUser }) {
+export default function ChatItem({ item, noBorder, currentUser }) {
   const navigation = useNavigation();
   const handleUserPress = () => {
     const sortedUsernames = [currentUser.userId, item.userId].sort();

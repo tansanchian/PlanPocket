@@ -55,9 +55,6 @@ const TimeTableScreen = ({ navigation }) => {
       const dataArray = Object.entries(data) || [];
       const dataLength = dataArray.length;
       const newItems = {};
-      if (dataArray.length == 0) {
-        return;
-      }
       for (let i = -15; i < 70; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
@@ -115,8 +112,13 @@ const TimeTableScreen = ({ navigation }) => {
     const onPressHandler = () => {
       navigation.navigate("ScheduleForm", dataToSend);
     };
+
     const datas = item.data[1].purpose;
-    const dataArray = Object.entries(datas);
+    let dataArray = [];
+    if (datas != undefined) {
+      dataArray = Object.entries(datas);
+    }
+
     return (
       <View style={styles.card}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -131,7 +133,7 @@ const TimeTableScreen = ({ navigation }) => {
           style={{ flexGrow: 0 }}
           data={dataArray}
           ref={ref}
-          keyExtractor={(items) => items.key}
+          keyExtractor={(item) => item.key}
           contentContainerStyle={{ paddingLeft: 10 }}
           vertical
           renderItem={({ item, index: fIndex }) => {
@@ -186,10 +188,9 @@ const TimeTableScreen = ({ navigation }) => {
       </View>
     );
   };
-
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Header title="Timetable" />
       <Agenda
         items={items}

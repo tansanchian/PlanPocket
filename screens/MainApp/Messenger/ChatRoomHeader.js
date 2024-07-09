@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
+import { Ionicons } from "@expo/vector-icons";
 
 const ChatRoomHeader = ({ name }) => {
   const navigation = useNavigation();
@@ -17,7 +17,7 @@ const ChatRoomHeader = ({ name }) => {
           onPress={() => navigation.navigate("ChatList")}
           style={styles.iconContainer}
         >
-          <AntDesign name="left" size={20} />
+          <Ionicons name="arrow-back" size={20} />
         </TouchableOpacity>
         <View>
           <Image
@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3eef6",
   },
   icon: {
     height: 24,

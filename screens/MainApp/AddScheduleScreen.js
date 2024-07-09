@@ -108,7 +108,7 @@ const AddScheduleScreen = () => {
   };
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Header title="AddSchedule" />
       {schedules.length === 0 ? (
         <View style={styles.internalContainer}>

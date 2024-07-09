@@ -11,7 +11,6 @@ import { database } from "../../../App";
 export default function ChatItem({ item, noBorder, currentUser }) {
   const navigation = useNavigation();
   const [lastMessage, setLastMessage] = useState(undefined);
-  const [id, setId] = useState("");
 
   const handleUserPress = () => {
     const chatId = item.id;

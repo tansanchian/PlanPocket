@@ -7,25 +7,30 @@ import Schedule from "./Schedule";
 import { Platform, View } from "react-native";
 import MessengerNav from "./MessengerNav";
 import FriendScreen from "../screens/MainApp/Friend/FriendScreen";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 
-const screenOptions = {
-  tabBarShowLabel: false,
-  headerShown: false,
-  tabBarActiveTintColor: "#735DA5",
-  tabBarInactiveTintColor: "#D3C5E5",
-  tabBarStyle: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
-    elevation: 0,
-    height: Platform.OS === "ios" ? 90 : 60,
-    backgroundColor: "white",
-  },
-};
+const screenOptions = ({ route }) => {
+  const routeName = getFocusedRouteNameFromRoute(route) ?? "";
 
+  return {
+    tabBarShowLabel: false,
+    headerShown: false,
+    tabBarActiveTintColor: "#735DA5",
+    tabBarInactiveTintColor: "#D3C5E5",
+    tabBarStyle: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      left: 0,
+      elevation: 0,
+      height: Platform.OS === "ios" ? 90 : 60,
+      backgroundColor: "white",
+      display: routeName === "Messenger" ? "none" : "flex",
+    },
+  };
+};
 const Tabs = () => {
   return (
     <Tab.Navigator screenOptions={screenOptions}>

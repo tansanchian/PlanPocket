@@ -5,6 +5,7 @@ import { database } from "../../../App";
 import { getAuth } from "firebase/auth";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import ChatListHeader from "./ChatListHeader";
+import { StatusBar } from "expo-status-bar";
 
 export default function ChatList() {
   const auth = getAuth();
@@ -79,6 +80,7 @@ export default function ChatList() {
 
   return (
     <View style={styles.container}>
+      <StatusBar style="dark" />
       <ChatListHeader />
       {users.length > 0 ? (
         <>
