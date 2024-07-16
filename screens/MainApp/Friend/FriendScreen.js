@@ -83,27 +83,7 @@ const FriendScreen = () => {
     setRefreshing(false);
   };
 
-  const acceptFriendRequest = async (fromUserId) => {
-    try {
-      const newFriendList = [...user.friends, fromUserId];
-      const userRef = doc(database, "users", user.userId);
-      await updateDoc(userRef, {
-        friends: newFriendList,
-        friendRequests: arrayRemove(fromUserId),
-      });
 
-      const friendRef = doc(database, "users", fromUserId);
-      await updateDoc(friendRef, {
-        friends: arrayUnion(user.userId),
-      });
-
-      await getUsers();
-      Alert.alert("Success", "Friend request accepted!");
-    } catch (error) {
-      console.error("Error accepting friend request:", error);
-    }
-  };
-  
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -115,6 +95,7 @@ const FriendScreen = () => {
   return (
     <View style={styles.container}>
       <FriendHeader />
+      <View style={styles.main}>
       <Text style={styles.sectionTitle}>All Friends</Text>
       <FlatList
         data={friendList}
@@ -123,7 +104,9 @@ const FriendScreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-      />
+        contentContainerStyle={styles.listContainer}
+        />
+        </View>
     </View>
   );
 };
@@ -131,32 +114,27 @@ const FriendScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    backgroundColor: 'white'
   },
-  searchInput: {
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingLeft: 8,
-    marginBottom: 16,
+  main: {
+    backgroundColor: "#f3eef6",
+    flex: 1,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 8,
+    marginVertical: 16,
+    marginLeft: 16,
+    color: "#333",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#f3eef6",
   },
-  requestItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#cccccc",
+  listContainer: {
+    paddingHorizontal: 16,
   },
 });
 

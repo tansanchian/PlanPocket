@@ -128,7 +128,8 @@ export default function FriendRequestList() {
       <FlatList
         data={friendRequests}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+              renderItem={renderItem}
+              contentContainerStyle={styles.listContainer}
       />
     </View>
   );
@@ -143,5 +144,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
+    },
+    listContainer: {
+        paddingHorizontal: 16,
+      },
 });
