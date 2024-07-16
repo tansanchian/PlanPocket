@@ -6,7 +6,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Schedule from "./Schedule";
 import { Platform, View } from "react-native";
 import MessengerNav from "./MessengerNav";
-import FriendScreen from "../screens/MainApp/Friend/FriendScreen";
+import FriendNav from "./FriendNav";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
@@ -93,7 +93,7 @@ const Tabs = () => {
       />
       <Tab.Screen
         name="Friend"
-        component={FriendScreen}
+        component={FriendNav}
         options={{
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons

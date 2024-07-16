@@ -25,6 +25,7 @@ import {
 } from "firebase/firestore";
 import { database } from "../../../App";
 import FriendItem from "./FriendItem";
+import FriendHeader from "../Friend/FriendHeader";
 
 const FriendScreen = () => {
   const [friendUsername, setFriendUsername] = useState("");
@@ -32,6 +33,7 @@ const FriendScreen = () => {
   const [users, setUsers] = useState([]);
   const [friendList, setFriendList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const auth = getAuth();
 
   const getUsers = async () => {
@@ -158,8 +160,7 @@ const FriendScreen = () => {
         friends: friendList,
       });
 
-      await refreshFriendList(); // Refresh friend list
-
+      await refreshFriendList();
       return true;
     } catch (error) {
       console.error("Error accepting friend request:", error);
@@ -214,12 +215,7 @@ const FriendScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search"
-        value={friendUsername}
-        onChangeText={setFriendUsername}
-      />
+      <FriendHeader />
       <Button title="Send Friend Request" onPress={handleSendFriendRequest} />
       <Button title="Refresh" onPress={refreshFriendList} />
       <Text style={styles.sectionTitle}>Friend Requests</Text>
@@ -238,10 +234,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#ffffff",
-    padding: 16,
   },
   searchInput: {
-    height: 40,
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 8,

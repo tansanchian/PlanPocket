@@ -1,23 +1,24 @@
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { Ionicons } from "@expo/vector-icons";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { Ionicons } from "@expo/vector-icons";
 
-const FriendHeader = ({ name }) => {
+const FriendHeader = () => {
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("ChatList")}
+          onPress={() => navigation.toggleDrawer()}
           style={styles.iconContainer}
         >
-          <Ionicons name="arrow-back" size={20} />
+          <AntDesign name="bars" size={20} />
         </TouchableOpacity>
         <View>
           <Image
@@ -30,14 +31,21 @@ const FriendHeader = ({ name }) => {
         </View>
         <Text
           style={{
-            marginLeft: 12,
-            fontSize: 17,
+            marginLeft: 13,
+            textAlign: "center",
             fontWeight: "bold",
+            fontSize: 18,
           }}
         >
-          {name}
+          Plan<Text style={{ color: "#735DA5" }}>Pocket</Text>
         </Text>
       </View>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("AddFriendSearchList")}
+        style={styles.iconContainer}
+      >
+        <Ionicons name="search" size={20} />
+      </TouchableOpacity>
     </View>
   );
 };
