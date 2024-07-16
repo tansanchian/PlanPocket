@@ -11,70 +11,48 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { StatusBar } from "expo-status-bar";
-import CustomButton from "../../components/CustomButton";
+import CustomButton from "../../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
-import CustomInput from "../../components/CustomInput";
+import CustomInput from "../../../components/CustomInput";
 import { useForm } from "react-hook-form";
-import { createScheduleDatabase } from "../../components/Database";
+import {
+  createSharedScheduleDatabase,
+  writeScheduleDatabase,
+} from "../../../components/Database";
 
 export default function SharedCustomDateScreen({ route }) {
-  const { days } = route.params;
-  const customDay = parseInt(days);
+  const { messageData } = route.params;
+  const fromDate = messageData.fromDate;
+  const toDate = messageData.toDate;
 
-  const stringifyDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  function dateDifference(dateString1, dateString2) {
+    const date1 = new Date(dateString1);
+    const date2 = new Date(dateString2);
+    return Math.floor(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+  }
+
+  const customDay = parseInt(dateDifference(fromDate, toDate));
 
   const navigation = useNavigation();
   const onBackPressed = () => {
-    navigation.navigate("ChooseDate");
+    navigation.goBack();
   };
 
   const [meals, setMeals] = useState(2);
   const [otherPressed, setOtherPressed] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const laterDate = new Date();
-  laterDate.setDate(laterDate.getDate() + customDay);
-  const [toDate, setToDate] = useState(laterDate);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showToDatePicker, setToShowDatePicker] = useState(false);
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setShowDatePicker(false);
-    setDate(currentDate);
-    const newToDate = new Date(currentDate);
-    newToDate.setDate(newToDate.getDate() + customDay);
-    setToDate(newToDate);
-  };
-
-  const onPressDatePicker = () => {
-    setShowDatePicker(true);
-  };
-
-  const onToDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || toDate;
-    setToShowDatePicker(false);
-    setToDate(currentDate);
-    const newFromDate = new Date(currentDate);
-    newFromDate.setDate(newFromDate.getDate() - customDay);
-    setDate(newFromDate);
-  };
-
-  const onToPressDatePicker = () => {
-    setToShowDatePicker(true);
-  };
-
-  const getMinimumToDate = () => {
-    const today = new Date();
-    today.setDate(today.getDate() + customDay);
-    return today;
-  };
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    };
+    return date.toLocaleDateString("en-US", options);
+  }
 
   const dismiss = () => {
     Keyboard.dismiss();
@@ -90,17 +68,27 @@ export default function SharedCustomDateScreen({ route }) {
       if (otherPressed && meals == 2) {
         return Alert.alert("Please enter the number of meals");
       }
-      const result = await createScheduleDatabase(
+      const result = await createSharedScheduleDatabase(
         title,
         budget,
         meals,
-        stringifyDate(date),
-        stringifyDate(toDate),
+        fromDate,
+        toDate,
         mealBudget
       );
-      if (result == true) {
+
+      if (result != "404" && result != "402" && result != false) {
+        await writeScheduleDatabase(
+          result,
+          messageData.events[0].category,
+          messageData.events[0].purpose,
+          messageData.events[0].cost,
+          messageData.events[0].description,
+          messageData.events[0].fromTime,
+          messageData.events[0].toTime
+        );
         Alert.alert("Success", "Schedule added successfully");
-        navigation.navigate("AddSchedule");
+        navigation.goBack();
       } else if (result == "402") {
         Alert.alert("Error", "Cannot overwrite current schedule!");
       } else if (result == "404") {
@@ -116,7 +104,7 @@ export default function SharedCustomDateScreen({ route }) {
   return (
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.mainTitle}> {customDay} Day Plan</Text>
         <Text style={styles.firstTitle}>Title</Text>
         <CustomInput
@@ -204,42 +192,20 @@ export default function SharedCustomDateScreen({ route }) {
           </View>
         </View>
         <Text style={styles.label}>Date</Text>
-        <View style={styles.datePicker}>
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity onPress={onPressDatePicker}>
-              <View pointerEvents="none">
-                <TextInput value={date.toDateString()} />
-              </View>
-            </TouchableOpacity>
-            {showDatePicker && (
-              <DateTimePicker
-                value={date}
-                mode="date"
-                onChange={onDateChange}
-                minimumDate={new Date()}
-              />
-            )}
-          </View>
-        </View>
-        <View style={styles.datePicker}>
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity onPress={onToPressDatePicker}>
-              <View pointerEvents="none">
-                <TextInput value={toDate.toDateString()} />
-              </View>
-            </TouchableOpacity>
-            {showToDatePicker && (
-              <DateTimePicker
-                value={toDate}
-                mode="date"
-                onChange={onToDateChange}
-                minimumDate={getMinimumToDate()}
-              />
-            )}
-          </View>
-        </View>
+        <CustomInput
+          name="fromDate"
+          control={control}
+          placeholder={formatDate(messageData.fromDate)}
+          editable={false}
+        />
+        <CustomInput
+          name="toDate"
+          control={control}
+          placeholder={formatDate(messageData.toDate)}
+          editable={false}
+        />
         <CustomButton
-          text="Create"
+          text="Next"
           onPress={handleSubmit(onCreateSchedulePressed)}
         />
         <CustomButton text="Back" onPress={onBackPressed} type="TERTIARY" />
@@ -321,9 +287,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   datePicker: {
-    flexDirection: "row",
     backgroundColor: "white",
     width: "100%",
+    height: 40,
     borderColor: "#e8e8e8",
     borderWidth: 1,
     borderRadius: 5,

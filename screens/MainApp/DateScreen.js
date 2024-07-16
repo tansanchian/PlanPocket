@@ -151,11 +151,11 @@ export default function DateScreen() {
               <View style={styles.selectedButton}>
                 <TextInput
                   style={{ textAlign: "center", color: "white" }}
-                  placeholder="Enter"
                   placeholderTextColor={"white"}
                   keyboardType="numeric"
                   value={meals}
                   onChangeText={setMeals}
+                  autoFocus={true}
                 />
               </View>
             ) : (

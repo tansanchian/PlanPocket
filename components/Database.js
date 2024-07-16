@@ -403,3 +403,132 @@ export async function readPurposeDatabase() {
     return null;
   }
 }
+
+export async function checkScheduleOverlap(fromDate, toDate) {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  if (!userId) {
+    return "User not authenticated";
+  }
+
+  try {
+    const schedulesRef = ref(db, `/users/${userId}/schedules`);
+    const schedulesSnapshot = await get(schedulesRef);
+
+    if (!schedulesSnapshot.exists()) {
+      return true;
+    }
+
+    if (schedulesSnapshot.exists()) {
+      const schedules = schedulesSnapshot.val();
+
+      for (const scheduleId in schedules) {
+        const schedule = schedules[scheduleId];
+        const scheduleFromDate = parseDate(schedule.fromDate);
+        const scheduleToDate = parseDate(schedule.toDate);
+
+        if (
+          (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
+          (toDate >= scheduleFromDate && toDate <= scheduleToDate) ||
+          (fromDate <= scheduleFromDate && toDate >= scheduleToDate)
+        ) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error checking Schedule overlap:", error);
+    return false;
+  }
+}
+
+export async function createSharedScheduleDatabase(
+  title,
+  budget,
+  meals,
+  date,
+  toDate,
+  mealBudget
+) {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+
+  if (!userId) {
+    return "User not authenticated";
+  }
+
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  let fromDate = parseDate(date);
+  let todate = parseDate(toDate);
+
+  const timeDiff = todate.getTime() - fromDate.getTime();
+  const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+  const mealExpenses = (daysDiff + 1) * mealBudget * meals;
+
+  const postSchedule = {
+    title: title || "Unknown title",
+    budget: budget !== "" ? budget : "N/A",
+    fromDate: date || "Unknown date",
+    toDate: toDate || "Unknown date",
+    meals: meals || "Unknown meals",
+    mealBudget: mealBudget || "Unknown budget",
+    mealExpenses: mealExpenses || "Unknown budget",
+  };
+
+  const budgetLeft = budget - mealExpenses;
+  if (budgetLeft < 0) {
+    return "404";
+  }
+  postSchedule["budgetLeft"] = budgetLeft;
+
+  try {
+    const schedulesRef = ref(db, `/users/${userId}/schedules`);
+    const schedulesSnapshot = await get(schedulesRef);
+
+    if (schedulesSnapshot.exists()) {
+      const schedules = schedulesSnapshot.val();
+      let overlap = false;
+
+      for (let scheduleId in schedules) {
+        const schedule = schedules[scheduleId];
+        let scheduleFromDate = parseDate(schedule.fromDate);
+        let scheduleToDate = parseDate(schedule.toDate);
+
+        if (
+          (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
+          (todate >= scheduleFromDate && todate <= scheduleToDate) ||
+          (fromDate <= scheduleFromDate && todate >= scheduleToDate)
+        ) {
+          overlap = true;
+          break;
+        }
+      }
+
+      if (overlap) {
+        return "402";
+      }
+    }
+
+    const newScheduleRef = push(schedulesRef);
+    await set(newScheduleRef, postSchedule);
+
+    return newScheduleRef.key;
+  } catch (error) {
+    console.error("Error creating Schedule:", error);
+    return false;
+  }
+}

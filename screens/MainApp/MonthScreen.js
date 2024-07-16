@@ -111,7 +111,7 @@ export default function MonthScreen() {
   return (
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.mainTitle}> 1 Month Plan</Text>
         <Text style={styles.firstTitle}>Title</Text>
         <CustomInput
@@ -177,11 +177,11 @@ export default function MonthScreen() {
               <View style={styles.selectedButton}>
                 <TextInput
                   style={{ textAlign: "center", color: "white" }}
-                  placeholder="Enter"
                   placeholderTextColor={"white"}
                   keyboardType="numeric"
                   value={meals}
                   onChangeText={setMeals}
+                  autoFocus={true}
                 />
               </View>
             ) : (

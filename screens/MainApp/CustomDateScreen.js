@@ -21,7 +21,6 @@ export default function CustomDateScreen({ route }) {
   const { days } = route.params;
   const customDay = parseInt(days);
 
-  console.log(days);
   const stringifyDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -183,11 +182,11 @@ export default function CustomDateScreen({ route }) {
               <View style={styles.selectedButton}>
                 <TextInput
                   style={{ textAlign: "center", color: "white" }}
-                  placeholder="Enter"
                   placeholderTextColor={"white"}
                   keyboardType="numeric"
                   value={meals}
                   onChangeText={setMeals}
+                  autoFocus={true}
                 />
               </View>
             ) : (

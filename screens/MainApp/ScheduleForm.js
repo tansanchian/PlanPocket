@@ -125,8 +125,6 @@ export default function ScheduleForm({ route }) {
         toSGTISOString(toTime)
       );
 
-      console.log(fromTime);
-      console.log(toSGTISOString(fromTime));
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
         navigation.navigate("Timetable");

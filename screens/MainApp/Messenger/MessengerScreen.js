@@ -27,6 +27,8 @@ import { useNavigation } from "@react-navigation/native";
 import ChatRoomHeader from "./ChatRoomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ShareLogic from "../../../components/ShareLogic";
+import { writeScheduleDatabase } from "../../../components/Database";
+import CustomButton from "../../../components/CustomButton";
 
 const MessengerScreen = ({ route }) => {
   const { data, item } = route.params;
@@ -157,6 +159,10 @@ const MessengerScreen = ({ route }) => {
     );
   };
 
+  const onAddSchedulePress = (messageData) => {
+    navigation.navigate("SharedCustomDateScreen", { messageData });
+  };
+
   const handleAddSchedule = async (messageData) => {
     try {
       const scheduleData = await ShareLogic(messageData);
@@ -172,7 +178,12 @@ const MessengerScreen = ({ route }) => {
           {
             text: "OK",
             onPress: () => {
-              console.log("Schedule added:", scheduleData);
+              console.log("Schedule checker:", scheduleData);
+              if (scheduleData) {
+                onAddSchedulePress(messageData);
+              } else {
+                alert("You already have something going on");
+              }
             },
           },
         ],
@@ -189,48 +200,72 @@ const MessengerScreen = ({ route }) => {
 
     if (currentMessage.custom && currentMessage.custom.isCustom) {
       const messageData = currentMessage.custom.schedule;
+      const isOutgoing = currentMessage.user._id === auth?.currentUser?.uid;
       return (
-        <TouchableOpacity onPress={() => handleAddSchedule(messageData)}>
-          <View
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "#dadada",
+            borderRadius: 25,
+            padding: 15,
+            marginBottom: 10,
+            marginTop: 10,
+            alignSelf: isOutgoing ? "flex-end" : "flex-start",
+          }}
+        >
+          <Text style={{ color: "#333", fontWeight: "bold", fontSize: 18 }}>
+            {currentMessage.text}
+          </Text>
+          {currentMessage.custom.schedule && (
+            <View>
+              <Text style={{ color: "#333" }}>
+                Date: {currentMessage.custom.schedule.fromDate} to{" "}
+                {currentMessage.custom.schedule.toDate}
+              </Text>
+              {currentMessage.custom.schedule.events.map((event, index) => (
+                <View>
+                  <Text key={index} style={{ color: "#333" }}>
+                    Category: {event.category}
+                    {"\n"}
+                    Purpose: {event.purpose} {"\n"}
+                    {event.description && (
+                      <>
+                        Description: {event.description}
+                        {"\n"}
+                      </>
+                    )}
+                    Costs: ${event.cost} {"\n"}
+                    Time: {formatTimeTo12Hour(event.fromTime)} to{" "}
+                    {formatTimeTo12Hour(event.toTime)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+          <TouchableOpacity
             style={{
-              backgroundColor: "#e6e6e6",
-              maxWidth: 300,
-              borderRadius: 10,
-              padding: 10,
-              margin: 5,
+              flex: 1,
+              backgroundColor: "black",
+              paddingVertical: 10,
+              paddingHorizontal: 50,
+              borderRadius: 25,
+              marginTop: 10,
+              justifyContent: "center",
+              alignItems: "center",
             }}
+            onPress={() => handleAddSchedule(messageData)}
           >
-            <Text style={{ color: "#333", fontWeight: "bold" }}>
-              {currentMessage.text}
+            <Text
+              style={{
+                fontWeight: "bold",
+                color: "white",
+                textAlign: "center",
+              }}
+            >
+              Add
             </Text>
-            {currentMessage.custom.schedule && (
-              <View>
-                <Text style={{ color: "#333" }}>
-                  Date: {currentMessage.custom.schedule.fromDate} to{" "}
-                  {currentMessage.custom.schedule.toDate}
-                </Text>
-                {currentMessage.custom.schedule.events.map((event, index) => (
-                  <View>
-                    <Text key={index} style={{ color: "#333" }}>
-                      Category: {event.category}
-                      {"\n"}
-                      Purpose: {event.purpose} {"\n"}
-                      {event.description && (
-                        <>
-                          Description: {event.description}
-                          {"\n"}
-                        </>
-                      )}
-                      Costs: {event.cost} {"\n"}
-                      Time: {formatTimeTo12Hour(event.fromTime)} to{" "}
-                      {formatTimeTo12Hour(event.toTime)}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
       );
     }
     return <Bubble {...props} />;
@@ -243,6 +278,23 @@ const MessengerScreen = ({ route }) => {
       <View style={styles.internalContainer}>
         <GiftedChat
           messages={messages}
+          renderBubble={
+            (renderBubble = (props) => {
+              return (
+                <Bubble
+                  {...props}
+                  textStyle={{
+                    right: {
+                      color: "pink",
+                    },
+                    left: {
+                      color: "pink",
+                    },
+                  }}
+                />
+              );
+            })
+          }
           showAvatarForEveryMessage={true}
           onSend={(messages) => onSend(messages)}
           user={{

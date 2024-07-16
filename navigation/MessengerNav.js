@@ -5,6 +5,7 @@ import ChatList from "../screens/MainApp/Messenger/ChatList";
 import ChatItem from "../screens/MainApp/Messenger/ChatItem";
 import SearchList from "../screens/MainApp/Messenger/SearchList";
 import ScheduleList from "../screens/MainApp/Messenger/ScheduleList";
+import SharedCustomDateScreen from "../screens/MainApp/Messenger/SharedCustomDateScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,6 +20,10 @@ const MessengerNav = () => {
       <Stack.Screen name="ChatItem" component={ChatItem} />
       <Stack.Screen name="SearchList" component={SearchList} />
       <Stack.Screen name="ScheduleList" component={ScheduleList} />
+      <Stack.Screen
+        name="SharedCustomDateScreen"
+        component={SharedCustomDateScreen}
+      />
     </Stack.Navigator>
   );
 };

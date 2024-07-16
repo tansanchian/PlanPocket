@@ -8,17 +8,15 @@ import {
   FlatList,
   Alert,
 } from "react-native";
-import { readScheduleDatabase } from "./Database";
+import { checkScheduleOverlap } from "./Database";
 
 export default async function ShareLogic(item) {
   try {
-    const scheduleData = await readScheduleDatabase();
-    console.log("Item", scheduleData);
-
-    if (scheduleData != undefined) {
-      const temp = scheduleData.map((x) => x.fromDate);
-      console.log(temp);
-    }
+    console.log(item);
+    const fromDate = item.fromDate;
+    const toDate = item.toDate;
+    const checkSchedule = await checkScheduleOverlap(fromDate, toDate);
+    return checkSchedule;
   } catch (error) {
     console.error("LoadScheduleError", error);
     throw error;

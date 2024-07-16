@@ -52,7 +52,7 @@ const ChooseDateScreen = () => {
       </View>
       <Modal isVisible={isModalVisible}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Enter number of custom days:</Text>
+          <Text style={styles.modalText}>Enter the number of days:</Text>
           <TextInput
             style={styles.input}
             placeholder="Number of days"
@@ -99,14 +99,14 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#051C60",
     justifyContent: "center",
     margin: 10,
   },
   modalContainer: {
     backgroundColor: "white",
-    padding: 20,
-    borderRadius: 20,
+    padding: 25,
+    borderRadius: 25,
+    justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: "#ddd",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 25,
     paddingHorizontal: 10,
     marginBottom: 15,
   },
@@ -136,9 +136,9 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   button: {
-    backgroundColor: "#051C60",
+    backgroundColor: "#735DA5",
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 25,
     alignItems: "center",
     width: "45%",
   },
