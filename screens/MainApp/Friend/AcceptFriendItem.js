@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, Button, Alert } from "react-native";
 import { getDatabase, ref, child, get } from "firebase/database";
 
-const FriendItem = ({ friend } ) => {
+const AcceptFriendItem = ({ friend, onAccept }) => {
   const [imageUri, setImageUri] = useState(
     "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
   );
@@ -21,9 +21,12 @@ const FriendItem = ({ friend } ) => {
         console.error(error);
       }
     };
-      console.log(friend);
     fetchImage();
   }, [friend.userId]);
+
+    const handleAccept = () => {
+    onAccept(friend.userId);
+  };
 
   return (
     <View style={styles.friendContainer}>
@@ -31,6 +34,7 @@ const FriendItem = ({ friend } ) => {
       <View style={styles.friendInfo}>
         <Text style={styles.friendName}>{friend.username}</Text>
       </View>
+      <Button title="Accept" onPress={handleAccept} />
     </View>
   );
 };
@@ -40,6 +44,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   profileImage: {
     width: 40,
@@ -56,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FriendItem;
+export default AcceptFriendItem;

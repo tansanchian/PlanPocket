@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  Alert,
+  TextInput,
+  Image,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -19,6 +20,7 @@ import {
   readScheduleDatabase,
   readScheduleExpenses,
 } from "../../components/Database";
+import Modal from "react-native-modal";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
@@ -29,6 +31,8 @@ const HomeScreen2 = () => {
   const [scheduleArray, setScheduleArray] = useState([]);
   const [dashboardSelect, setDashboardSelect] = useState("");
   const [firstLoad, setFirstLoad] = useState(true);
+  const [scheduleLoading, setScheduleLoading] = useState(true);
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const parseTime = (x) => {
     const convertTo12HourFormat = (timeString) => {
@@ -58,39 +62,37 @@ const HomeScreen2 = () => {
       setPurpose(purposeData);
 
       const scheduleData = await readScheduleDatabase();
+      setScheduleLoading(true);
       if (!scheduleData) {
         setScheduleArray([]);
       } else {
         const scheduleEntries = Object.entries(scheduleData);
         setScheduleArray(scheduleEntries);
-
-        if (firstLoad && scheduleEntries.length > 0) {
-          const defaultSelect = String(scheduleEntries[0][0]);
-          setDashboardSelect(defaultSelect);
-          setFirstLoad(false);
-        }
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
     } finally {
       setIsLoading(false);
+      setScheduleLoading(false);
     }
-  }, [firstLoad]);
+  }, []);
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      console.log(dashboardSelect);
+      console.log("dashboard", dashboardSelect);
       if (!dashboardSelect) return;
       try {
-        const expensesData = await readScheduleExpenses(dashboardSelect);
+        const expensesData = await readScheduleExpenses(
+          String(dashboardSelect)
+        );
         setExpenses(expensesData);
-        console.log(expensesData);
+        console.log("ExpensesData", expensesData);
       } catch (error) {
         console.error("Error fetching expenses:", error.message);
       }
     };
     fetchExpenses();
-  }, [dashboardSelect]);
+  }, [dashboardSelect, scheduleArray]);
 
   useFocusEffect(
     useCallback(() => {
@@ -105,6 +107,18 @@ const HomeScreen2 = () => {
     return () => setIsLoading(true);
   }, []);
 
+  useEffect(() => {
+    if (scheduleArray.length > 0 && firstLoad) {
+      setDashboardSelect(String(scheduleArray[0][0]));
+      setFirstLoad(false);
+    }
+    if (scheduleArray.length > 0) {
+      setDashboardSelect(String(scheduleArray[0][0]));
+    } else {
+      setDashboardSelect("");
+    }
+  }, [scheduleArray, firstLoad, dashboardSelect]);
+
   const onNextPressed = () => {
     navigation.navigate("HomeScreen");
   };
@@ -113,17 +127,18 @@ const HomeScreen2 = () => {
     navigation.navigate("Timetable");
   };
 
+  const loading = () => {
+    <View
+      style={[
+        styles.container,
+        { justifyContent: "center", alignItems: "center" },
+      ]}
+    >
+      <ActivityIndicator size="large" color="#735DA5" />
+    </View>;
+  };
   if (isLoading) {
-    return (
-      <View
-        style={[
-          styles.container,
-          { justifyContent: "center", alignItems: "center" },
-        ]}
-      >
-        <ActivityIndicator size="large" color="#735DA5" />
-      </View>
-    );
+    return loading;
   }
 
   const renderItem = ({ item }) => {
@@ -183,92 +198,142 @@ const HomeScreen2 = () => {
           </View>
         )}
         <View>
-          <FlatList
-            data={scheduleArray}
-            keyExtractor={(item) => item[0]}
-            contentContainerStyle={{
-              paddingHorizontal: 10,
-              alignItems: "center",
-            }}
-            horizontal={true}
-            showsHorizontalScrollIndicator={false}
-            renderItem={renderItem}
-          />
+          {scheduleLoading ? (
+            loading
+          ) : expenses ? (
+            <View>
+              <FlatList
+                data={scheduleArray}
+                keyExtractor={(item) => item[0]}
+                contentContainerStyle={{
+                  paddingHorizontal: 10,
+                  alignItems: "center",
+                }}
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderItem}
+              />
+              <View style={styles.main}>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
+                  style={styles.card}
+                >
+                  <Modal isVisible={isModalVisible}>
+                    <View style={styles.modalContainer}>
+                      <Text style={styles.modalText}>L</Text>
+                      <TextInput
+                        style={styles.input}
+                        placeholder="Number of days"
+                        keyboardType="numeric"
+                      />
+                      <View style={styles.buttonContainer}>
+                        <TouchableOpacity style={styles.button}>
+                          <Text style={styles.buttonText}>Submit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[styles.button, styles.cancelButton]}
+                          onPress={() => setModalVisible(false)}
+                        >
+                          <Text
+                            style={[styles.buttonText, styles.cancelButtonText]}
+                          >
+                            Cancel
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </Modal>
+
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5 name="wallet" size={24} color="#41afaa" />
+                  </View>
+                  <Text style={styles.cardText}>Entertainment & Leisure</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${
+                      expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"
+                    }`}
+                  </Text>
+                </TouchableOpacity>
+                <View style={styles.card}>
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5 name="rocket" size={24} color="#466eb4" />
+                  </View>
+                  <Text style={styles.cardText}>Transportation</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
+                  </Text>
+                </View>
+                <View style={styles.card}>
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
+                  </View>
+                  <Text style={styles.cardText}>Dining</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
+                  </Text>
+                </View>
+                <View style={[styles.card, { marginBottom: 0 }]}>
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5
+                      name="shopping-cart"
+                      size={24}
+                      color="#e6a532"
+                    />
+                  </View>
+                  <Text style={styles.cardText}>Shopping</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
+                  </Text>
+                </View>
+                <View style={styles.card}>
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5 name="handshake" size={24} color="#d7642c" />
+                  </View>
+                  <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${
+                      expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"
+                    }`}
+                  </Text>
+                </View>
+                <View style={[styles.card, { marginBottom: 0 }]}>
+                  <View
+                    style={[styles.iconContainer, { backgroundColor: "white" }]}
+                  >
+                    <FontAwesome5 name="tags" size={24} color="#af4b91" />
+                  </View>
+                  <Text style={styles.cardText}>Uncategorized</Text>
+                  <Text style={styles.amount}>
+                    {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ) : (
+            <View style={styles.noExpensesContainer}>
+              <Image source={require("../../assets/emptyHome.png")} />
+              <Text style={{ marginTop: 15, fontWeight: "bold", fontSize: 25 }}>
+                WOO!
+              </Text>
+              <Text style={{ marginTop: 10, fontSize: 20 }}>
+                Nothing Here, But Me
+              </Text>
+              <Text style={{ marginTop: 10, fontSize: 20, color: "grey" }}>
+                You dont't have anything planned.
+              </Text>
+            </View>
+          )}
         </View>
-        {expenses ? (
-          <View style={styles.main}>
-            <View style={styles.card}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="wallet" size={24} color="#41afaa" />
-              </View>
-              <Text style={styles.cardText}>Entertainment & Leisure</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-            <View style={styles.card}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="rocket" size={24} color="#466eb4" />
-              </View>
-              <Text style={styles.cardText}>Transportation</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-            <View style={styles.card}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
-              </View>
-              <Text style={styles.cardText}>Dining</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-            <View style={[styles.card, { marginBottom: 0 }]}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="shopping-cart" size={24} color="#e6a532" />
-              </View>
-              <Text style={styles.cardText}>Shopping</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-            <View style={styles.card}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="handshake" size={24} color="#d7642c" />
-              </View>
-              <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-            <View style={[styles.card, { marginBottom: 0 }]}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "white" }]}
-              >
-                <FontAwesome5 name="tags" size={24} color="#af4b91" />
-              </View>
-              <Text style={styles.cardText}>Uncategorized</Text>
-              <Text style={styles.amount}>
-                {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
-              </Text>
-            </View>
-          </View>
-        ) : (
-          <View>
-            <Text>Nothing here bruh</Text>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -376,6 +441,25 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    elevation: 5,
+  },
+  noExpensesContainer: {
+    paddingTop: 130,
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 25,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     elevation: 5,
   },
 });

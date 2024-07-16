@@ -31,7 +31,7 @@ const FriendScreen = () => {
   const [friendList, setFriendList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   const auth = getAuth();
 
   const getUsers = async () => {
@@ -77,93 +77,33 @@ const FriendScreen = () => {
     }
   }, [auth.currentUser]);
 
-  const refreshFriendList = async () => {
-    if (user.friends && user.friends.length > 0) {
-      let friendsL = [];
-      for (let i = 0; i < user.friends.length; i++) {
-        for (let j = 0; j < users.length; j++) {
-          if (users[j].userId === user.friends[i]) {
-            friendsL.push(users[j]);
-            break;
-          }
-        }
-      }
-      setFriendList(friendsL);
-    }
-  };
-
   const onRefresh = async () => {
     setRefreshing(true);
-    await getUsers;
+    await getUsers();
     setRefreshing(false);
-  }
+  };
 
   const acceptFriendRequest = async (fromUserId) => {
     try {
-      user.friends.push(fromUserId);
-      const userList = user.friends;
-
-      const friendRef = doc(database, "users", fromUserId);
-      const friendSnap = await getDoc(friendRef);
-      const friendData = friendSnap.data();
-      friendData.friends.push(user.userId);
-      const friendList = friendData.friends;
-
+      const newFriendList = [...user.friends, fromUserId];
       const userRef = doc(database, "users", user.userId);
       await updateDoc(userRef, {
-        friends: userList,
+        friends: newFriendList,
         friendRequests: arrayRemove(fromUserId),
       });
 
+      const friendRef = doc(database, "users", fromUserId);
       await updateDoc(friendRef, {
-        friends: friendList,
+        friends: arrayUnion(user.userId),
       });
 
-      await refreshFriendList();
-      return true;
+      await getUsers();
+      Alert.alert("Success", "Friend request accepted!");
     } catch (error) {
       console.error("Error accepting friend request:", error);
     }
   };
-
-  const getUsername = (userId) => {
-    const user = users.find((x) => x.userId === userId);
-    return user ? user.username : "Unknown";
-  };
-
-  const FriendRequestList = ({ userId }) => {
-    const [friendRequests, setFriendRequests] = useState([]);
-
-    useEffect(() => {
-      const unsubscribe = onSnapshot(doc(database, "users", userId), (doc) => {
-        const data = doc.data();
-        setFriendRequests(data.friendRequests || []);
-      });
-      return () => unsubscribe();
-    }, [userId]);
-
-    const handleAcceptRequest = async (fromUserId) => {
-      const accepted = await acceptFriendRequest(fromUserId);
-      if (accepted) {
-        Alert.alert("Success", "Friend request accepted!");
-      }
-    };
-
-    return (
-      <View>
-        {friendRequests.map((request) => (
-          <View key={request} style={styles.requestItem}>
-            <Text>{`Friend request from ${getUsername(request)}`}</Text>
-            <Button
-              title="Accept"
-              onPress={() => handleAcceptRequest(request)}
-            />
-          </View>
-        ))}
-      </View>
-    );
-  };
-
+  
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -175,8 +115,6 @@ const FriendScreen = () => {
   return (
     <View style={styles.container}>
       <FriendHeader />
-      <Text style={styles.sectionTitle}>Friend Requests</Text>
-      <FriendRequestList userId={auth.currentUser.uid} />
       <Text style={styles.sectionTitle}>All Friends</Text>
       <FlatList
         data={friendList}
