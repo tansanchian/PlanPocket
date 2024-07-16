@@ -13,9 +13,12 @@ import { readScheduleDatabase } from "./Database";
 export default async function ShareLogic(item) {
   try {
     const scheduleData = await readScheduleDatabase();
-    console.log(scheduleData);
-    console.log("Item", item);
-    return scheduleData;
+    console.log("Item", scheduleData);
+
+    if (scheduleData != undefined) {
+      const temp = scheduleData.map((x) => x.fromDate);
+      console.log(temp);
+    }
   } catch (error) {
     console.error("LoadScheduleError", error);
     throw error;
