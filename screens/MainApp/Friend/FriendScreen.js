@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Button,
   Alert,
-  TextInput,
+  RefreshControl,
   FlatList,
   ActivityIndicator,
 } from "react-native";
@@ -18,22 +18,20 @@ import {
   where,
   collection,
   onSnapshot,
-  setDoc,
   getDoc,
-  arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
 import { database } from "../../../App";
-import FriendItem from "./FriendItem";
 import FriendHeader from "../Friend/FriendHeader";
+import FriendItem from "./FriendItem";
 
 const FriendScreen = () => {
-  const [friendUsername, setFriendUsername] = useState("");
   const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
   const [friendList, setFriendList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  
   const auth = getAuth();
 
   const getUsers = async () => {
@@ -94,50 +92,11 @@ const FriendScreen = () => {
     }
   };
 
-  const sendFriendRequest = async (friend) => {
-    try {
-      let check = "404";
-      let friendData = null;
-      for (const data of users) {
-        if (friend === data.username) {
-          check = "0";
-          friendData = data;
-        }
-      }
-      if (check === "404") {
-        Alert.alert("Error", "User does not exist!");
-        return false;
-      }
-      if (user.friends.includes(friendData.userId)) {
-        Alert.alert("Error", "User is already your friend!");
-        return false;
-      }
-      const friendRequests = friendData.friendRequests || [];
-      if (friendRequests.includes(user.userId)) {
-        Alert.alert("Error", "Pending acception!");
-        return false;
-      }
-      const friendRef = doc(database, "users", friendData.userId);
-      await updateDoc(friendRef, {
-        friendRequests: arrayUnion(user.userId),
-      });
-      return true;
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-    }
-  };
-
-  const handleSendFriendRequest = async () => {
-    if (friendUsername) {
-      const sent = await sendFriendRequest(friendUsername);
-      if (sent) {
-        Alert.alert("Success", `Friend request sent to "${friendUsername}"!`);
-        setFriendUsername("");
-      }
-    } else {
-      Alert.alert("Error", "Please enter a valid username.");
-    }
-  };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getUsers;
+    setRefreshing(false);
+  }
 
   const acceptFriendRequest = async (fromUserId) => {
     try {
@@ -216,8 +175,6 @@ const FriendScreen = () => {
   return (
     <View style={styles.container}>
       <FriendHeader />
-      <Button title="Send Friend Request" onPress={handleSendFriendRequest} />
-      <Button title="Refresh" onPress={refreshFriendList} />
       <Text style={styles.sectionTitle}>Friend Requests</Text>
       <FriendRequestList userId={auth.currentUser.uid} />
       <Text style={styles.sectionTitle}>All Friends</Text>
@@ -225,6 +182,9 @@ const FriendScreen = () => {
         data={friendList}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <FriendItem friend={item} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );
