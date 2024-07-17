@@ -309,8 +309,15 @@ export async function readCurrentDateDatabase() {
 
       console.log("Min Purpose:", minPurpose);
       console.log("Event Date:", minEventDate);
-
-      return { purpose: minPurpose, eventDate: minEventDate };
+      const today = new Date();
+      const formattedToday = today.toISOString().split("T")[0];
+      if (formattedToday <= minEventDate) {
+        console.log("Today is on or before minEventdate. Action can be taken.");
+        return { purpose: minPurpose, eventDate: minEventDate };
+      } else {
+        console.log("Today is after minEventdate. No action should be taken.");
+        return null;
+      }
     } else {
       console.log("No data available with purpose");
       return null;
