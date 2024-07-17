@@ -1,153 +1,123 @@
-import React, { useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  scrollToIndex,
-} from "react-native";
-import { Svg, G, Path, Circle, Text as CText } from "react-native-svg";
+import React from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
+import PieChart from "react-native-pie-chart";
+import { FontAwesome5 } from "@expo/vector-icons";
 
-const HomeScreen = () => {
-  const data = [
-    { key: 1, amount: 30, svg: { fill: "#CCCCCC" }, label: "Other" },
-    { key: 2, amount: 62.5, svg: { fill: "#FF6384" }, label: "Food" },
-    { key: 3, amount: 30, svg: { fill: "#36A2EB" }, label: "Fuel" },
-    { key: 4, amount: 20, svg: { fill: "#FFCE56" }, label: "Health" },
-    { key: 5, amount: 12.5, svg: { fill: "#4BC0C0" }, label: "Others" },
+const HomeScreen = ({ route }) => {
+  const { expenses } = route.params;
+  const expense = Object.entries(expenses);
+  console.log(expense);
+
+  const getTotalCosts = (spendings) => {
+    return Object.values(spendings).reduce((total, category) => {
+      if (category && category.costs) {
+        return total + category.costs;
+      }
+      return total;
+    }, 0);
+  };
+
+  const getIcon = (selectedCategory) => {
+    switch (selectedCategory) {
+      case "Entertainment & Leisure":
+        return "wallet";
+      case "Transportation":
+        return "rocket";
+      case "Dining":
+        return "utensils";
+      case "Shopping":
+        return "shopping-cart";
+      case "Bill, Utilities & Taxes":
+        return "handshake";
+      case "Uncategorized":
+        return "tags";
+    }
+  };
+
+  const colors = [
+    "#FFCCCC", // Light Coral
+    "#FFCC99", // Peach-Orange
+    "#FFEB99", // Light Goldenrod
+    "#FFFF99", // Light Yellow
+    "#CCFFCC", // Pale Green
+    "#99FFCC", // Light Aquamarine
   ];
 
-  const months = [
-    { key: 1, label: "January" },
-    { key: 2, label: "February" },
-    { key: 3, label: "March" },
-    { key: 4, label: "April" },
-    { key: 5, label: "May" },
-    { key: 6, label: "June" },
-    { key: 7, label: "July" },
-    { key: 8, label: "August" },
-    { key: 9, label: "September" },
-    { key: 10, label: "October" },
-    { key: 11, label: "November" },
-    { key: 12, label: "December" },
-  ];
+  const transformData = (item) => {
+    let keyCounter = 1;
+    const data = [];
+
+    for (const [label, value] of item) {
+      data.push({
+        key: keyCounter,
+        amount: value.costs,
+        svg: { fill: colors[(keyCounter - 1) % colors.length] },
+        label: label,
+      });
+      keyCounter++;
+    }
+    return data;
+  };
+
+  const data = transformData(Object.entries(expenses));
+
   const widthAndHeight = 200;
   const series = data.map((item) => item.amount);
   const sliceColor = data.map((item) => item.svg.fill);
-  const radius = widthAndHeight / 2;
-  const innerRadius = 0.6 * radius;
-  const history = [
-    {
-      id: "1",
-      name: "Dropbox",
-      amount: "$750",
-      status: "Sent",
-      icon: "dropbox",
-    },
-    {
-      id: "2",
-      name: "Netflix",
-      amount: "$159.8",
-      status: "Subscription",
-      icon: "netflix",
-    },
-    {
-      id: "3",
-      name: "Lorry Anderson",
-      amount: "$750",
-      status: "Sent",
-      icon: "user",
-    },
-  ];
 
-  const renderItem = ({ item }) => (
-    <View style={styles.historyItem}>
-      <View style={styles.historyIcon}>
-        <Text>{item.icon}</Text>
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.historyItem}>
+        <View style={styles.historyIcon}>
+          <FontAwesome5 name={getIcon(item[0])} size={24} color="black" />
+        </View>
+        <View style={styles.historyText}>
+          <Text style={styles.historyName}>{item[0]}</Text>
+        </View>
+        <Text style={styles.historyAmount}>${item[1].costs}</Text>
       </View>
-      <View style={styles.historyText}>
-        <Text style={styles.historyName}>{item.name}</Text>
-        <Text style={styles.historyStatus}>{item.status}</Text>
-      </View>
-      <Text style={styles.historyAmount}>{item.amount}</Text>
-    </View>
-  );
-  const createDonutChart = () => {
-    const total = data.reduce((sum, item) => sum + item.amount, 0);
-    let cumulativeAngle = 0;
-
-    return data.map((item, index) => {
-      const valueAngle = (item.amount / total) * 2 * Math.PI;
-      const startAngle = cumulativeAngle;
-      const endAngle = cumulativeAngle + valueAngle;
-      cumulativeAngle += valueAngle;
-
-      const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
-
-      const startX = radius + radius * Math.cos(startAngle);
-      const startY = radius - radius * Math.sin(startAngle);
-      const endX = radius + radius * Math.cos(endAngle);
-      const endY = radius - radius * Math.sin(endAngle);
-
-      const innerStartX = radius + innerRadius * Math.cos(startAngle);
-      const innerStartY = radius - innerRadius * Math.sin(startAngle);
-      const innerEndX = radius + innerRadius * Math.cos(endAngle);
-      const innerEndY = radius - innerRadius * Math.sin(endAngle);
-
-      const pathData = [
-        `M ${startX} ${startY}`,
-        `A ${radius} ${radius} 0 ${largeArcFlag} 0 ${endX} ${endY}`,
-        `L ${innerEndX} ${innerEndY}`,
-        `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${innerStartX} ${innerStartY}`,
-        `Z`,
-      ].join(" ");
-
-      return <Path key={index} d={pathData} fill={item.svg.fill} />;
-    });
+    );
   };
-
-  const ref = React.useRef(null);
-  const [activeTab, setActiveTab] = React.useState(0);
-  const [index, setIndex] = useState(0);
-  React.useEffect(() => {
-    ref.current?.scrollToIndex({ index, animated: true });
-  }, [index]);
 
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
       <Header title="HomeScreen" />
       <View style={styles.internalContainer}>
-        <Svg width={widthAndHeight} height={widthAndHeight}>
-          {createDonutChart()}
-          <Circle cx={radius} cy={radius} r={innerRadius} fill="#f3eef6" />
-          <CText
-            x={radius}
-            y={radius}
-            fill="black"
-            fontSize="16"
-            fontWeight="bold"
-            textAnchor="middle"
-            dy=".3em"
+        <View style={{ flexDirection: "row", flex: 1 }}>
+          <View
+            style={{
+              flex: 0.5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            Current
-          </CText>
-          <CText
-            x={radius}
-            y={radius + 20}
-            fill="black"
-            fontSize="16"
-            fontWeight="bold"
-            textAnchor="middle"
-            dy=".3em"
-          >
-            Spend
-          </CText>
-        </Svg>
+            <PieChart
+              widthAndHeight={widthAndHeight}
+              series={series}
+              sliceColor={sliceColor}
+              doughnut={true}
+              coverFill={"#FFF"}
+              coverRadius={0.6}
+            />
+            <View
+              style={{
+                flex: 1,
+                position: "absolute",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{ fontWeight: "bold", textAlign: " center" }}>
+                Total Spendings
+              </Text>
+              <Text style={{ fontWeight: "bold", textAlign: " center" }}>
+                ${getTotalCosts(expenses)}
+              </Text>
+            </View>
+          </View>
+        </View>
         <View style={styles.legend}>
           {data.map((item) => (
             <View key={item.key} style={styles.legendItem}>
@@ -159,42 +129,14 @@ const HomeScreen = () => {
             </View>
           ))}
         </View>
-        <View style={styles.tabs}>
-          <FlatList
-            style={{ flexGrow: 0 }}
-            data={months}
-            ref={ref}
-            keyExtractor={(item) => item.key}
-            contentContainerStyle={{ paddingLeft: 10 }}
-            showsHorizontalScrollIndicator={false}
-            horizontal
-            renderItem={({ item, index: fIndex }) => {
-              return (
-                <TouchableOpacity onPress={() => {}}>
-                  <View
-                    style={{
-                      marginRight: 10,
-                      padding: 10,
-                      borderWidth: 2,
-                      borderRadius: 12,
-                      borderColor: "#abc",
-                    }}
-                  >
-                    <Text>{item.label}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </View>
+        <View style={styles.tabs}></View>
         <View style={styles.historyHeader}>
-          <Text style={styles.historyTitle}>History</Text>
-          <Text style={styles.historySort}>Sort by Recent</Text>
+          <Text style={styles.historyTitle}>History:</Text>
         </View>
         <FlatList
-          data={history}
+          data={expense}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item}
         />
       </View>
     </View>

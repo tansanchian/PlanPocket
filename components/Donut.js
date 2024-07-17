@@ -1,85 +1,156 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { Svg, Path, Circle, Text as CText } from "react-native-svg";
+import { View, Text, StyleSheet } from "react-native";
+import PieChart from "react-native-pie-chart";
 
 const Donut = (item) => {
-  console.log(item.item);
-  const data = [
-    { key: 1, amount: 300, svg: { fill: "#CCCCCC" }, label: "Other" },
-    { key: 2, amount: 62.5, svg: { fill: "#FF6384" }, label: "Food" },
-    { key: 3, amount: 30, svg: { fill: "#36A2EB" }, label: "Fuel" },
-    { key: 4, amount: 20, svg: { fill: "#FFCE56" }, label: "Health" },
-    { key: 5, amount: 12.5, svg: { fill: "#4BC0C0" }, label: "Others" },
+  const datas = item.item;
+  const colors = [
+    "#FFCCCC", // Light Coral
+    "#FFCC99", // Peach-Orange
+    "#FFEB99", // Light Goldenrod
+    "#FFFF99", // Light Yellow
+    "#CCFFCC", // Pale Green
+    "#99FFCC", // Light Aquamarine
+    "#CCFFFF", // Pale Cyan
+    "#99CCFF", // Light Sky Blue
+    "#CCCCFF", // Lavender
+    "#FFCCFF", // Pale Lavender
+    "#FF99CC", // Pale Pink
+    "#FFCCFF", // Light Violet
+    "#FF99FF", // Light Magenta
+    "#CC99FF", // Light Purple
+    "#99CCFF", // Light Slate Blue
+    "#CCCCFF", // Light Blue
+    "#CCFF99", // Light Lime
+    "#FFFFCC", // Light Cream
+    "#FFCCCC", // Light Salmon
+    "#FFCC99", // Light Peach
   ];
 
-  const widthAndHeight = 200;
-  const radius = widthAndHeight / 2;
-  const innerRadius = 0.6 * radius;
+  const convertItem = (item) => {
+    let keyCounter = 1;
+    const data = [];
 
-  const createDonutChart = () => {
-    const total = data.reduce((sum, item) => sum + item.amount, 0);
-    let cumulativeAngle = 0;
+    for (const [label, value] of Object.entries(item)) {
+      if (label !== "costs") {
+        data.push({
+          key: keyCounter,
+          amount: value.subcosts,
+          svg: { fill: colors[(keyCounter - 1) % colors.length] },
+          label: label,
+        });
+        keyCounter++;
+      }
+    }
 
-    return data.map((item, index) => {
-      const valueAngle = (item.amount / total) * 2 * Math.PI;
-      const startAngle = cumulativeAngle;
-      const endAngle = cumulativeAngle + valueAngle;
-      cumulativeAngle += valueAngle;
-
-      const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0;
-
-      const startX = radius + radius * Math.cos(startAngle);
-      const startY = radius - radius * Math.sin(startAngle);
-      const endX = radius + radius * Math.cos(endAngle);
-      const endY = radius - radius * Math.sin(endAngle);
-
-      const innerStartX = radius + innerRadius * Math.cos(startAngle);
-      const innerStartY = radius - innerRadius * Math.sin(startAngle);
-      const innerEndX = radius + innerRadius * Math.cos(endAngle);
-      const innerEndY = radius - innerRadius * Math.sin(endAngle);
-
-      const pathData = [
-        `M ${startX} ${startY}`,
-        `A ${radius} ${radius} 0 ${largeArcFlag} 0 ${endX} ${endY}`,
-        `L ${innerEndX} ${innerEndY}`,
-        `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 1 ${innerStartX} ${innerStartY}`,
-        `Z`,
-      ].join(" ");
-
-      return <Path key={index} d={pathData} fill={item.svg.fill} />;
-    });
+    return data;
   };
 
+  const data = convertItem(datas);
+
+  const widthAndHeight = 200;
+  const series = data.map((item) => item.amount);
+  const sliceColor = data.map((item) => item.svg.fill);
+
   return (
-    <View>
-      <Svg width={widthAndHeight} height={widthAndHeight}>
-        {createDonutChart()}
-        <Circle cx={radius} cy={radius} r={innerRadius} fill="#f3eef6" />
-        <CText
-          x={radius}
-          y={radius}
-          fill="black"
-          fontSize="16"
-          fontWeight="bold"
-          textAnchor="middle"
-          dy=".3em"
+    <View style={styles.internalContainer}>
+      <View style={styles.row}>
+        <View
+          style={{ flex: 0.5, alignItems: "center", justifyContent: "center" }}
         >
-          Current
-        </CText>
-        <CText
-          x={radius}
-          y={radius + 20}
-          fill="black"
-          fontSize="16"
-          fontWeight="bold"
-          textAnchor="middle"
-          dy=".3em"
-        >
-          Spend
-        </CText>
-      </Svg>
+          <PieChart
+            widthAndHeight={widthAndHeight}
+            series={series}
+            sliceColor={sliceColor}
+            doughnut={true}
+            coverFill={"#FFF"}
+            coverRadius={0.6}
+          />
+          <View
+            style={{
+              flex: 1,
+              position: "absolute",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text style={{ fontWeight: "bold", textAlign: " center" }}>
+              Total Spendings
+            </Text>
+            <Text style={{ fontWeight: "bold", textAlign: " center" }}>
+              ${item.item.costs}
+            </Text>
+          </View>
+        </View>
+        {true ? (
+          <View
+            style={{
+              flex: 0.5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Text
+              style={{ padding: 10, fontWeight: "bold", textAlign: " center" }}
+            >
+              Good job! You're spending within your budget.
+            </Text>
+          </View>
+        ) : (
+          <View style={{ flex: 0.5 }}>
+            <Text
+              style={{ padding: 10, fontWeight: "bold", textAlign: " center" }}
+            >
+              Your allocation of budget for this category is too much. Consider
+              cutting down.
+            </Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.legend}>
+        {data.map((item) => (
+          <View key={item.key} style={styles.legendItem}>
+            <View
+              style={[styles.legendColor, { backgroundColor: item.svg.fill }]}
+            />
+            <Text style={styles.legendText}>{item.label}</Text>
+            <Text style={styles.legendAmount}>${item.amount.toFixed(2)}</Text>
+          </View>
+        ))}
+      </View>
     </View>
   );
 };
 
 export default Donut;
+
+const styles = StyleSheet.create({
+  internalContainer: {
+    flex: 1,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  legend: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 20,
+  },
+  legendItem: {
+    alignItems: "center",
+  },
+  legendColor: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginBottom: 5,
+  },
+  legendText: {
+    fontSize: 12,
+  },
+  legendAmount: {
+    fontSize: 12,
+    fontWeight: "bold",
+  },
+});

@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   FlatList,
-  TextInput,
   Image,
   Button,
+  Platform,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -22,7 +22,10 @@ import {
   readScheduleExpenses,
 } from "../../components/Database";
 import Donut from "../../components/Donut";
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
@@ -35,7 +38,6 @@ const HomeScreen2 = () => {
   const [dashboardSelect, setDashboardSelect] = useState("");
   const [firstLoad, setFirstLoad] = useState(true);
   const [scheduleLoading, setScheduleLoading] = useState(true);
-  const [isModalVisible, setModalVisible] = useState(false);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -58,6 +60,23 @@ const HomeScreen2 = () => {
     const date = new Date(dateString);
     const options = { month: "short", day: "numeric" };
     return date.toLocaleDateString("en-US", options);
+  };
+
+  const getIcon = (selectedCategory) => {
+    switch (selectedCategory) {
+      case "Entertainment & Leisure":
+        return "wallet";
+      case "Transportation":
+        return "rocket";
+      case "Dining":
+        return "utensils";
+      case "Shopping":
+        return "shopping-cart";
+      case "Bill, Utilities & Taxes":
+        return "handshake";
+      case "Uncategorized":
+        return "tags";
+    }
   };
 
   const loadItems = useCallback(async () => {
@@ -86,13 +105,11 @@ const HomeScreen2 = () => {
     console.log("handleSheetChanges", index);
   }, []);
 
-  console.log("for me to edit", expenses?.["Transportation"]);
-
   const openBottomSheet = (category) => {
     setSelectedCategory(category);
     setBottomSheetVisible(true);
     if (bottomSheetRef.current) {
-      bottomSheetRef.current.snapToIndex(0);
+      bottomSheetRef.current.snapToIndex(1);
     }
   };
   useEffect(() => {
@@ -136,7 +153,7 @@ const HomeScreen2 = () => {
   }, [scheduleArray, firstLoad, dashboardSelect]);
 
   const onNextPressed = () => {
-    navigation.navigate("HomeScreen");
+    navigation.navigate("HomeScreen", { expenses });
   };
 
   const onCalendarPressed = () => {
@@ -177,6 +194,15 @@ const HomeScreen2 = () => {
     );
   };
 
+  const getTotalCosts = (spendings) => {
+    return Object.values(spendings).reduce((total, category) => {
+      if (category && category.costs) {
+        return total + category.costs;
+      }
+      return total;
+    }, 0);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -213,7 +239,7 @@ const HomeScreen2 = () => {
             </View>
           </View>
         )}
-        <Button title="next" onPress={onNextPressed} />
+
         <View>
           {scheduleLoading ? (
             loading()
@@ -229,6 +255,10 @@ const HomeScreen2 = () => {
                 showsHorizontalScrollIndicator={false}
                 renderItem={renderItem}
               />
+              <View style={styles.row}>
+                <Text>Total Spendings: ${getTotalCosts(expenses)}</Text>
+                <Button title="View" onPress={onNextPressed} />
+              </View>
               <View style={styles.main}>
                 <TouchableOpacity
                   onPress={() => openBottomSheet("Entertainment & Leisure")}
@@ -344,8 +374,8 @@ const HomeScreen2 = () => {
       {isBottomSheetVisible && (
         <BottomSheet
           ref={bottomSheetRef}
-          index={2}
-          snapPoints={["25", "48", "75"]}
+          index={1}
+          snapPoints={["25", "40", "90"]}
           backgroundStyle={{ backgroundColor: "#f3eef6" }}
           onChange={handleSheetChanges}
           enablePanDownToClose
@@ -369,7 +399,8 @@ const HomeScreen2 = () => {
                   <Donut item={expenses[selectedCategory]} />
                 </View>
                 <Text style={styles.subtitle}>History:</Text>
-                <FlatList
+
+                <BottomSheetFlatList
                   data={Object.entries(expenses[selectedCategory]).filter(
                     (item) => item[0] !== "costs"
                   )}
@@ -381,9 +412,9 @@ const HomeScreen2 = () => {
                       <View style={styles.historyItem}>
                         <View style={styles.historyIcon}>
                           <FontAwesome5
-                            name="handshake"
+                            name={getIcon(selectedCategory)}
                             size={24}
-                            color="#3ec191"
+                            color="black"
                           />
                           <Text style={styles.historyText}>{item[0]} </Text>
                         </View>
@@ -411,6 +442,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    marginBottom: Platform.OS === "ios" ? 90 : 60,
   },
   dashboard: {
     padding: 20,
@@ -518,9 +550,9 @@ const styles = StyleSheet.create({
   historyItem: {
     width: "100%",
     flexDirection: "row",
+    backgroundColor: "white",
     justifyContent: "space-between",
     padding: 15,
-    backgroundColor: "#fff",
     marginBottom: 10,
     borderRadius: 10,
   },
