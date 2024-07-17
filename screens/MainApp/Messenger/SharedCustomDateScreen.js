@@ -31,7 +31,10 @@ export default function SharedCustomDateScreen({ route }) {
     return Math.floor(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   }
 
-  const customDay = parseInt(dateDifference(fromDate, toDate));
+  const customDay =
+    parseInt(dateDifference(fromDate, toDate)) == 0
+      ? 1
+      : parseInt(dateDifference(fromDate, toDate));
 
   const navigation = useNavigation();
   const onBackPressed = () => {

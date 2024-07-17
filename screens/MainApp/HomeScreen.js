@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import Header from "../../components/Header";
+import HomeScreenHeader from "./HomeScreenHeader";
 import { StatusBar } from "expo-status-bar";
 import PieChart from "react-native-pie-chart";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -83,7 +83,8 @@ const HomeScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="HomeScreen" />
+      <StatusBar style="dark" />
+      <HomeScreenHeader title="Dashboard" />
       <View style={styles.internalContainer}>
         <View style={{ flexDirection: "row", flex: 1 }}>
           <View

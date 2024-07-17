@@ -97,7 +97,13 @@ const Donut = (item) => {
             </Text>
           </View>
         ) : (
-          <View style={{ flex: 0.5 }}>
+          <View
+            style={{
+              flex: 0.5,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <Text
               style={{ padding: 10, fontWeight: "bold", textAlign: " center" }}
             >

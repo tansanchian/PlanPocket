@@ -138,10 +138,7 @@ const TimeTableScreen = ({ navigation }) => {
           vertical
           renderItem={({ item, index: fIndex }) => {
             return (
-              <TouchableOpacity
-                style={{ paddingBottom: 10 }}
-                onPress={() => Alert.alert("To be implemented")}
-              >
+              <View style={{ paddingBottom: 10 }}>
                 <View
                   style={{
                     marginRight: 10,
@@ -173,7 +170,7 @@ const TimeTableScreen = ({ navigation }) => {
                     {parseTime(item[1].toTime)}
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </View>
             );
           }}
         />

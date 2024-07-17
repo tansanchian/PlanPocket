@@ -69,7 +69,9 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#f3eef6",
   },
+
   icon: {
     height: 24,
     width: 24,

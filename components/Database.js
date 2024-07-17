@@ -146,6 +146,9 @@ export async function createScheduleDatabase(
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
 
+  console.log(date);
+  console.log(toDate);
+
   if (!userId) {
     return "User not authenticated";
   }
@@ -191,6 +194,13 @@ export async function createScheduleDatabase(
         let scheduleFromDate = parseDate(schedule.fromDate);
         let scheduleToDate = parseDate(schedule.toDate);
 
+        console.log("DEBUGGING");
+        console.log(fromDate);
+        console.log(todate);
+        console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
+        console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
+        console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
+        console.log("DEBUGGING");
         if (
           (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
           (todate >= scheduleFromDate && todate <= scheduleToDate) ||
@@ -261,6 +271,10 @@ export async function readCurrentDateDatabase() {
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
 
+  const date = new Date();
+  const today = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+  const formattedToday = today.toISOString().split("T")[0];
+
   if (!userId) {
     console.error("User is not authenticated");
     return null;
@@ -287,36 +301,42 @@ export async function readCurrentDateDatabase() {
 
     for (const schedule of scheduleArray) {
       if (schedule.purpose != undefined) {
-        if (
-          !minDateWithPurpose ||
-          parseDate(schedule.fromDate) < parseDate(minDateWithPurpose.fromDate)
-        ) {
-          minDateWithPurpose = schedule;
-          minEventDate = schedule.fromDate;
+        if (formattedToday <= schedule.fromDate) {
+          if (
+            !minDateWithPurpose ||
+            parseDate(schedule.fromDate) <
+              parseDate(minDateWithPurpose.fromDate)
+          ) {
+            minDateWithPurpose = schedule;
+            minEventDate = schedule.fromDate;
+          }
         }
       }
     }
 
     if (minDateWithPurpose) {
       const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-      let minPurpose = minPurposeArray[0];
+      let minPurpose = null;
 
       for (const purpose of minPurposeArray) {
-        if (new Date(purpose.fromTime) < new Date(minPurpose.fromTime)) {
-          minPurpose = purpose;
+        const purposeTime = new Date(purpose.fromTime);
+        if (purposeTime >= today) {
+          if (
+            minPurpose === null ||
+            purposeTime < new Date(minPurpose.fromTime)
+          ) {
+            minPurpose = purpose;
+          }
         }
       }
 
       console.log("Min Purpose:", minPurpose);
       console.log("Event Date:", minEventDate);
-      const today = new Date();
-      const formattedToday = today.toISOString().split("T")[0];
-      if (formattedToday <= minEventDate) {
-        console.log("Today is on or before minEventdate. Action can be taken.");
+
+      if (minPurpose) {
         return { purpose: minPurpose, eventDate: minEventDate };
       } else {
-        console.log("Today is after minEventdate. No action should be taken.");
-        return null;
+        console.log("All purposes are over");
       }
     } else {
       console.log("No data available with purpose");
@@ -416,7 +436,7 @@ export async function readPurposeDatabase() {
   }
 }
 
-export async function checkScheduleOverlap(fromDate, toDate) {
+export async function checkScheduleOverlap(date, toDate) {
   const auth = getAuth();
   const db = getDatabase();
   const userId = auth.currentUser?.uid;
@@ -425,6 +445,9 @@ export async function checkScheduleOverlap(fromDate, toDate) {
     const [year, month, day] = dateString.split("-").map(Number);
     return new Date(year, month - 1, day);
   };
+
+  let fromDate = parseDate(date);
+  let todate = parseDate(toDate);
 
   if (!userId) {
     return "User not authenticated";
@@ -440,23 +463,37 @@ export async function checkScheduleOverlap(fromDate, toDate) {
 
     if (schedulesSnapshot.exists()) {
       const schedules = schedulesSnapshot.val();
+      let overlap = false;
 
-      for (const scheduleId in schedules) {
+      for (let scheduleId in schedules) {
         const schedule = schedules[scheduleId];
-        const scheduleFromDate = parseDate(schedule.fromDate);
-        const scheduleToDate = parseDate(schedule.toDate);
+        let scheduleFromDate = parseDate(schedule.fromDate);
+        let scheduleToDate = parseDate(schedule.toDate);
+
+        console.log("DEBUGGING");
+        console.log(fromDate);
+        console.log(todate);
+        console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
+        console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
+        console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
+        console.log("DEBUGGING");
 
         if (
           (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
-          (toDate >= scheduleFromDate && toDate <= scheduleToDate) ||
-          (fromDate <= scheduleFromDate && toDate >= scheduleToDate)
+          (todate >= scheduleFromDate && todate <= scheduleToDate) ||
+          (fromDate <= scheduleFromDate && todate >= scheduleToDate)
         ) {
-          return true;
+          overlap = true;
+          break;
         }
+      }
+
+      if (overlap) {
+        return false;
       }
     }
 
-    return false;
+    return true;
   } catch (error) {
     console.error("Error checking Schedule overlap:", error);
     return false;

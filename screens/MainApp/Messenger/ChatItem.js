@@ -7,10 +7,14 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import { collection, orderBy, query, onSnapshot } from "firebase/firestore";
 import { database } from "../../../App";
+import { ref, getDatabase, get, child } from "firebase/database";
 
 export default function ChatItem({ item, noBorder, currentUser }) {
   const navigation = useNavigation();
   const [lastMessage, setLastMessage] = useState(undefined);
+  const [imageUri, setImageUri] = useState(
+    "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+  );
 
   const handleUserPress = () => {
     const chatId = item.id;
@@ -23,6 +27,23 @@ export default function ChatItem({ item, noBorder, currentUser }) {
       data: [dataToSend],
     });
   };
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const dbRef = ref(getDatabase());
+      try {
+        const snapshot = await get(
+          child(dbRef, `users/${item.friend.userId}/Profile/imageUrl`)
+        );
+        if (snapshot.exists() && snapshot.val() !== "") {
+          setImageUri(snapshot.val());
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchImage();
+  }, [item.userId]);
 
   useLayoutEffect(() => {
     if (!item.id) return;
@@ -95,7 +116,7 @@ export default function ChatItem({ item, noBorder, currentUser }) {
       style={[styles.container, noBorder && { borderBottomWidth: 0 }]}
     >
       <Image
-        source={require("../../../assets/icon.png")}
+        source={{ uri: imageUri }}
         style={[styles.image, { height: hp(6), width: hp(6) }]}
       />
       <View style={styles.textContainer}>

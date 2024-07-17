@@ -27,8 +27,6 @@ import { useNavigation } from "@react-navigation/native";
 import ChatRoomHeader from "./ChatRoomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ShareLogic from "../../../components/ShareLogic";
-import { writeScheduleDatabase } from "../../../components/Database";
-import CustomButton from "../../../components/CustomButton";
 
 const MessengerScreen = ({ route }) => {
   const { data, item } = route.params;

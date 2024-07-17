@@ -278,7 +278,7 @@ export default function ScheduleForm({ route }) {
                 <CustomInput
                   name="Purpose"
                   control={control}
-                  placeholder="Others"
+                  placeholder="Purpose"
                   rules={{
                     required: "Purpose is required",
                   }}

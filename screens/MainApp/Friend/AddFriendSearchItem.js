@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+} from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -8,8 +15,12 @@ import { getDatabase, ref, get, child } from "firebase/database";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { database } from "../../../App";
 
-export default function AddFriendSearchItem({ item, noBorder, currentUser, getUsers }) {
-
+export default function AddFriendSearchItem({
+  item,
+  noBorder,
+  currentUser,
+  getUsers,
+}) {
   const sendFriendRequest = async (friend) => {
     try {
       const friendRef = doc(database, "users", friend.userId);
@@ -44,7 +55,10 @@ export default function AddFriendSearchItem({ item, noBorder, currentUser, getUs
       if (sent && sent2) {
         Alert.alert("Success", `Friend request sent to "${item.username}"!`);
       } else {
-        Alert.alert("Error", "Failed to send friend request. Please try again.");
+        Alert.alert(
+          "Error",
+          "Failed to send friend request. Please try again."
+        );
       }
     } else {
       Alert.alert("Error", "Please enter a valid username.");
@@ -86,7 +100,9 @@ export default function AddFriendSearchItem({ item, noBorder, currentUser, getUs
           {item.username}
         </Text>
       </View>
-      <Button title={"Add"} onPress={handleSendFriendRequest} />
+      <TouchableOpacity style={styles.button} onPress={handleSendFriendRequest}>
+        <Text style={styles.text}>Add</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -120,5 +136,21 @@ const styles = StyleSheet.create({
   },
   lastMessagetime: {
     color: "#333333",
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    elevation: 3,
+    backgroundColor: "#735DA5",
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
   },
 });

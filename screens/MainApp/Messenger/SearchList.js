@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, Text, Image } from "react-native";
 import ChatItem from "./ChatItem";
 import { database } from "../../../App";
 import { getAuth } from "firebase/auth";
@@ -52,22 +52,41 @@ export default function SearchList() {
 
   const data = friends.filter((friend) => friend.username.includes(search));
 
+  console.log(friends);
   return (
     <View style={styles.container}>
       <ChatSearch setSearch={setSearch} />
-      <FlatList
-        data={data}
-        contentContainerStyle={{ flex: 1, paddingVertical: 25 }}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <SearchItem
-            noBorder={index + 1 == friends.length}
-            item={item}
-            currentUser={currentUser}
-          />
-        )}
-      />
+      {friends.length != 0 ? (
+        <FlatList
+          data={data}
+          contentContainerStyle={{ flex: 1, paddingVertical: 25 }}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => (
+            <SearchItem
+              noBorder={index + 1 == friends.length}
+              item={item}
+              currentUser={currentUser}
+            />
+          )}
+        />
+      ) : (
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: 200,
+          }}
+        >
+          <Image source={require("../../../assets/noFriends.png")} />
+          <Text style={{ fontWeight: "bold", fontSize: 20, marginTop: 15 }}>
+            You have no contacts yet!
+          </Text>
+          <Text style={{ fontSize: 16 }}>
+            Add friends from PlanPocket to see them here.
+          </Text>
+        </View>
+      )}
     </View>
   );
 }

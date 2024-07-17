@@ -19,30 +19,36 @@ export default function AddFriendSearchList() {
     if (!currentUserId) return;
 
     const userRef = collection(database, "users");
-  
+
     const userQ = query(userRef, where("userId", "==", currentUserId));
     const userQSnapshot = await getDocs(userQ);
     let currentUserData = {};
-  
+
     userQSnapshot.forEach((doc) => {
       currentUserData = { ...doc.data(), id: doc.id };
     });
 
     const currentUserFriends = currentUserData.friends || [];
     const currentUserPending = currentUserData.pending || [];
-  
+
     const usersQ = query(userRef, where("userId", "!=", currentUserId));
     const usersQSnapshot = await getDocs(usersQ);
-  
+
     let allUsersData = [];
-  
+
     usersQSnapshot.forEach((doc) => {
       allUsersData.push({ ...doc.data(), id: doc.id });
     });
 
-    let nonFriendUsers = allUsersData.filter(user => !currentUserFriends.includes(user.userId) && !currentUserPending.includes(user.userId));
-    let pendingUsers = allUsersData.filter(user => currentUserPending.includes(user.userId));
-    
+    let nonFriendUsers = allUsersData.filter(
+      (user) =>
+        !currentUserFriends.includes(user.userId) &&
+        !currentUserPending.includes(user.userId)
+    );
+    let pendingUsers = allUsersData.filter((user) =>
+      currentUserPending.includes(user.userId)
+    );
+
     setUsers(nonFriendUsers);
     setPending(pendingUsers);
   }, [currentUserId]);
@@ -94,7 +100,7 @@ export default function AddFriendSearchList() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   inviteList: {
     flex: 0.6,
@@ -102,13 +108,13 @@ const styles = StyleSheet.create({
   },
   pendingList: {
     backgroundColor: "#f3eef6",
-    flex: 0.4
+    flex: 0.4,
   },
   text: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#051C60",
     paddingTop: 15,
-    paddingLeft: 15
+    paddingLeft: 15,
   },
 });

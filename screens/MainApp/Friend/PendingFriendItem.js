@@ -1,4 +1,12 @@
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Button } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+  Button,
+} from "react-native";
 import { useState, useEffect } from "react";
 import {
   widthPercentageToDP as wp,
@@ -7,7 +15,6 @@ import {
 import { getDatabase, ref, get, child } from "firebase/database";
 
 export default function PendingFriendItem({ item, noBorder, currentUser }) {
-
   const [imageUri, setImageUri] = useState(
     "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
   );
@@ -33,17 +40,15 @@ export default function PendingFriendItem({ item, noBorder, currentUser }) {
   }, [item.userId]);
 
   return (
-    <View
-      style={[styles.container, noBorder && { borderBottomWidth: 0 }]}
-    >
+    <View style={[styles.container, noBorder && { borderBottomWidth: 0 }]}>
       <Image
         source={{ uri: imageUri }}
         style={[styles.image, { height: hp(6), width: hp(6) }]}
       />
       <View style={styles.textContainer}>
-          <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
-            {item.username}
-          </Text>
+        <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
+          {item.username}
+        </Text>
       </View>
     </View>
   );

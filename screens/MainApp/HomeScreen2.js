@@ -7,8 +7,8 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
-  Button,
   Platform,
+  ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -147,7 +147,7 @@ const HomeScreen2 = () => {
       setDashboardSelect(String(scheduleArray[0][0]));
       setFirstLoad(false);
     }
-    if (scheduleArray.length == 1) {
+    if (scheduleArray.length === 1) {
       setDashboardSelect(String(scheduleArray[0][0]));
     }
   }, [scheduleArray, firstLoad, dashboardSelect]);
@@ -160,7 +160,7 @@ const HomeScreen2 = () => {
     navigation.navigate("Timetable");
   };
 
-  const loading = () => {
+  const loading = () => (
     <View
       style={[
         styles.container,
@@ -168,10 +168,11 @@ const HomeScreen2 = () => {
       ]}
     >
       <ActivityIndicator size="large" color="#735DA5" />
-    </View>;
-  };
+    </View>
+  );
+
   if (isLoading) {
-    return loading;
+    return loading();
   }
 
   const renderItem = ({ item }) => {
@@ -244,7 +245,7 @@ const HomeScreen2 = () => {
           {scheduleLoading ? (
             loading()
           ) : expenses ? (
-            <View>
+            <ScrollView showsVerticalScrollIndicator={false}>
               <FlatList
                 data={scheduleArray}
                 keyExtractor={(item) => item[0]}
@@ -256,8 +257,17 @@ const HomeScreen2 = () => {
                 renderItem={renderItem}
               />
               <View style={styles.row}>
-                <Text>Total Spendings: ${getTotalCosts(expenses)}</Text>
-                <Button title="View" onPress={onNextPressed} />
+                <View>
+                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                    Total Budget: ${getTotalCosts(expenses)}
+                  </Text>
+                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                    Total Spendings: ${getTotalCosts(expenses)}
+                  </Text>
+                </View>
+                <TouchableOpacity style={styles.button} onPress={onNextPressed}>
+                  <Text style={styles.text}>View</Text>
+                </TouchableOpacity>
               </View>
               <View style={styles.main}>
                 <TouchableOpacity
@@ -353,7 +363,7 @@ const HomeScreen2 = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </ScrollView>
           ) : (
             <View style={styles.noExpensesContainer}>
               <Image source={require("../../assets/emptyHome.png")} />
@@ -364,7 +374,7 @@ const HomeScreen2 = () => {
                 Nothing Here, But Me
               </Text>
               <Text style={{ marginTop: 10, fontSize: 20, color: "grey" }}>
-                You dont't have anything planned.
+                You don't have anything planned.
               </Text>
             </View>
           )}
@@ -375,7 +385,7 @@ const HomeScreen2 = () => {
         <BottomSheet
           ref={bottomSheetRef}
           index={1}
-          snapPoints={["25", "40", "90"]}
+          snapPoints={["25%", "40%", "90%"]}
           backgroundStyle={{ backgroundColor: "#f3eef6" }}
           onChange={handleSheetChanges}
           enablePanDownToClose
@@ -404,9 +414,7 @@ const HomeScreen2 = () => {
                   data={Object.entries(expenses[selectedCategory]).filter(
                     (item) => item[0] !== "costs"
                   )}
-                  keyExtractor={(item) => {
-                    item[0];
-                  }}
+                  keyExtractor={(item) => item[0]}
                   renderItem={({ item }) => (
                     <View>
                       <View style={styles.historyItem}>
@@ -560,5 +568,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    elevation: 3,
+    backgroundColor: "#735DA5",
+  },
+  text: {
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: "bold",
+    letterSpacing: 0.25,
+    color: "white",
   },
 });

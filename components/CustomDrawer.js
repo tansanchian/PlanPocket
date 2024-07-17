@@ -16,13 +16,8 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import { useNavigation } from "@react-navigation/native";
 import { AuthContext } from "../components/AuthContext";
 
-const onAboutPressed = () => {
-  console.log("onAboutPressed");
-};
-
 const CustomDrawer = (props) => {
   const navigation = useNavigation();
-
   const { logout } = useContext(AuthContext);
 
   const onLogOutPressed = async () => {
@@ -32,6 +27,11 @@ const CustomDrawer = (props) => {
       routes: [{ name: "SignIn" }],
     });
   };
+
+  const onAboutPressed = () => {
+    navigation.navigate("AboutUs");
+  };
+
   const { height, width } = useWindowDimensions();
   return (
     <View style={styles.container}>
@@ -46,8 +46,15 @@ const CustomDrawer = (props) => {
           style={styles.bgImage}
         >
           <Image
-            source={require("../assets/Logo.png")}
-            style={[styles.image, { height: height * 0.1, width: width * 0.2 }]}
+            source={{ uri: props.imageUri }}
+            style={[
+              styles.image,
+              {
+                height: height * 0.1,
+                width: height * 0.1,
+                borderRadius: (height * 0.1) / 2,
+              },
+            ]}
           />
           <Text style={styles.username}>{props.username}</Text>
         </ImageBackground>
@@ -97,9 +104,7 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 50,
     borderColor: "#735DA5",
-    borderWidth: 2,
-    maxWidth: 100,
-    maxHeight: 100,
+    borderWidth: 1,
   },
   username: {
     padding: 10,

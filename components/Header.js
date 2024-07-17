@@ -25,9 +25,9 @@ const Header = ({ title, onPress }) => {
           {title}
         </Text>
       </View>
-      <TouchableOpacity onPress={onPress} style={styles.iconContainer}>
+      {/* <TouchableOpacity onPress={onPress} style={styles.iconContainer}>
         <AntDesign name="ellipsis1" size={20} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 };

@@ -6,16 +6,11 @@ import {
   ActivityIndicator,
   FlatList,
   RefreshControl,
-  ScrollView
+  ScrollView,
 } from "react-native";
-import {
-  getDocs,
-  query,
-  where,
-  collection,
-} from "firebase/firestore";
+import { getDocs, query, where, collection } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import { database } from "../../../App";
 import FriendHeader from "../Friend/FriendHeader";
 import FriendItem from "./FriendItem";
@@ -89,24 +84,29 @@ const FriendScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FriendHeader count={count}/>
+      <FriendHeader count={count} />
       <View style={styles.main}>
         {friendList.length === 0 ? (
-         <ScrollView
-         contentContainerStyle={styles.emptyContainer}
-         refreshControl={
-           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-         }
-       >
-         <Text style={styles.text}>No Friends</Text>
-       </ScrollView>
+          <ScrollView
+            contentContainerStyle={styles.emptyContainer}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <Text style={styles.text}>No Friends</Text>
+          </ScrollView>
         ) : (
           <>
             <Text style={styles.sectionTitle}>Your Friends</Text>
             <FlatList
               data={friendList}
               keyExtractor={(item) => item.id}
-              renderItem={({ item }) => <FriendItem friend={item} />}
+              renderItem={({ item, index }) => (
+                <FriendItem
+                  noBorder={index + 1 === friendList.length}
+                  friend={item}
+                />
+              )}
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
@@ -141,19 +141,19 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   main: {
     flex: 1,
-    padding: 10,
-    backgroundColor: "#f3eef6",
+    backgroundColor: "white",
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 25,
+    padding: 20,
     fontWeight: "bold",
     color: "#333",
-    marginBottom: 10,
+    marginBottom: 15,
   },
 });
 
