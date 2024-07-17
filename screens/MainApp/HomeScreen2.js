@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   FlatList,
   TextInput,
   Image,
+  Button,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -20,10 +21,12 @@ import {
   readScheduleDatabase,
   readScheduleExpenses,
 } from "../../components/Database";
-import Modal from "react-native-modal";
+import Donut from "../../components/Donut";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
+  const bottomSheetRef = useRef(null);
   const [purpose, setPurpose] = useState(null);
   const [username, setUsername] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +36,8 @@ const HomeScreen2 = () => {
   const [firstLoad, setFirstLoad] = useState(true);
   const [scheduleLoading, setScheduleLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const parseTime = (x) => {
     const convertTo12HourFormat = (timeString) => {
@@ -77,6 +82,19 @@ const HomeScreen2 = () => {
     }
   }, []);
 
+  const handleSheetChanges = useCallback((index) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
+  console.log("for me to edit", expenses?.["Transportation"]);
+
+  const openBottomSheet = (category) => {
+    setSelectedCategory(category);
+    setBottomSheetVisible(true);
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.snapToIndex(0);
+    }
+  };
   useEffect(() => {
     const fetchExpenses = async () => {
       console.log("dashboard", dashboardSelect);
@@ -112,10 +130,8 @@ const HomeScreen2 = () => {
       setDashboardSelect(String(scheduleArray[0][0]));
       setFirstLoad(false);
     }
-    if (scheduleArray.length > 0) {
+    if (scheduleArray.length == 1) {
       setDashboardSelect(String(scheduleArray[0][0]));
-    } else {
-      setDashboardSelect("");
     }
   }, [scheduleArray, firstLoad, dashboardSelect]);
 
@@ -197,16 +213,16 @@ const HomeScreen2 = () => {
             </View>
           </View>
         )}
+        <Button title="next" onPress={onNextPressed} />
         <View>
           {scheduleLoading ? (
-            loading
+            loading()
           ) : expenses ? (
             <View>
               <FlatList
                 data={scheduleArray}
                 keyExtractor={(item) => item[0]}
                 contentContainerStyle={{
-                  paddingHorizontal: 10,
                   alignItems: "center",
                 }}
                 horizontal={true}
@@ -215,35 +231,9 @@ const HomeScreen2 = () => {
               />
               <View style={styles.main}>
                 <TouchableOpacity
-                  onPress={() => setModalVisible(true)}
+                  onPress={() => openBottomSheet("Entertainment & Leisure")}
                   style={styles.card}
                 >
-                  <Modal isVisible={isModalVisible}>
-                    <View style={styles.modalContainer}>
-                      <Text style={styles.modalText}>L</Text>
-                      <TextInput
-                        style={styles.input}
-                        placeholder="Number of days"
-                        keyboardType="numeric"
-                      />
-                      <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.button}>
-                          <Text style={styles.buttonText}>Submit</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[styles.button, styles.cancelButton]}
-                          onPress={() => setModalVisible(false)}
-                        >
-                          <Text
-                            style={[styles.buttonText, styles.cancelButtonText]}
-                          >
-                            Cancel
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </Modal>
-
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
@@ -256,7 +246,10 @@ const HomeScreen2 = () => {
                     }`}
                   </Text>
                 </TouchableOpacity>
-                <View style={styles.card}>
+                <TouchableOpacity
+                  onPress={() => openBottomSheet("Transportation")}
+                  style={styles.card}
+                >
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
@@ -266,8 +259,11 @@ const HomeScreen2 = () => {
                   <Text style={styles.amount}>
                     {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
                   </Text>
-                </View>
-                <View style={styles.card}>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => openBottomSheet("Dining")}
+                  style={styles.card}
+                >
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
@@ -275,29 +271,35 @@ const HomeScreen2 = () => {
                   </View>
                   <Text style={styles.cardText}>Dining</Text>
                   <Text style={styles.amount}>
-                    {`$ ${expenses?.["mealBudget"]?.["costs"] ?? "0"}`}
+                    {`$ ${expenses?.["Dining"]?.["costs"] ?? "0"}`}
                   </Text>
-                </View>
-                <View style={[styles.card, { marginBottom: 0 }]}>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => openBottomSheet("Shopping")}
+                  style={[styles.card, { marginBottom: 0 }]}
+                >
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
                     <FontAwesome5
                       name="shopping-cart"
                       size={24}
-                      color="#e6a532"
+                      color="#fbc02d"
                     />
                   </View>
                   <Text style={styles.cardText}>Shopping</Text>
                   <Text style={styles.amount}>
                     {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
                   </Text>
-                </View>
-                <View style={styles.card}>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => openBottomSheet("Bill, Utilities & Taxes")}
+                  style={[styles.card, { marginBottom: 0 }]}
+                >
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
-                    <FontAwesome5 name="handshake" size={24} color="#d7642c" />
+                    <FontAwesome5 name="handshake" size={24} color="#3ec191" />
                   </View>
                   <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
                   <Text style={styles.amount}>
@@ -305,8 +307,11 @@ const HomeScreen2 = () => {
                       expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"
                     }`}
                   </Text>
-                </View>
-                <View style={[styles.card, { marginBottom: 0 }]}>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => openBottomSheet("Uncategorized")}
+                  style={[styles.card, { marginBottom: 0 }]}
+                >
                   <View
                     style={[styles.iconContainer, { backgroundColor: "white" }]}
                   >
@@ -316,7 +321,7 @@ const HomeScreen2 = () => {
                   <Text style={styles.amount}>
                     {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           ) : (
@@ -335,6 +340,67 @@ const HomeScreen2 = () => {
           )}
         </View>
       </View>
+
+      {isBottomSheetVisible && (
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={2}
+          snapPoints={["25", "48", "75"]}
+          backgroundStyle={{ backgroundColor: "#f3eef6" }}
+          onChange={handleSheetChanges}
+          enablePanDownToClose
+        >
+          <BottomSheetView
+            style={{ flex: 1, alignItems: "center", paddingHorizontal: 15 }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "900",
+                marginBottom: 20,
+              }}
+            >
+              {selectedCategory}
+            </Text>
+
+            {expenses && expenses[selectedCategory] ? (
+              <View>
+                <View style={styles.row}>
+                  <Donut item={expenses[selectedCategory]} />
+                </View>
+                <Text style={styles.subtitle}>History:</Text>
+                <FlatList
+                  data={Object.entries(expenses[selectedCategory]).filter(
+                    (item) => item[0] !== "costs"
+                  )}
+                  keyExtractor={(item) => {
+                    item[0];
+                  }}
+                  renderItem={({ item }) => (
+                    <View>
+                      <View style={styles.historyItem}>
+                        <View style={styles.historyIcon}>
+                          <FontAwesome5
+                            name="handshake"
+                            size={24}
+                            color="#3ec191"
+                          />
+                          <Text style={styles.historyText}>{item[0]} </Text>
+                        </View>
+                        <Text style={styles.historyText}>
+                          ${item[1].subcosts}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                />
+              </View>
+            ) : (
+              <Text>No items found for {selectedCategory}.</Text>
+            )}
+          </BottomSheetView>
+        </BottomSheet>
+      )}
     </View>
   );
 };
@@ -347,12 +413,14 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   dashboard: {
-    flex: 1,
-    backgroundColor: "#F0F0F5",
+    padding: 20,
   },
-  budget: {
-    flex: 0.1,
-    justifyContent: "flex-start",
+  name: {
+    paddingVertical: 10,
+  },
+  nameText: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
   title: {
     fontWeight: "bold",
@@ -360,30 +428,12 @@ const styles = StyleSheet.create({
     color: "#6a1b9a",
   },
   date: {
-    flex: 1,
-    maxHeight: 65,
-    padding: 20,
     flexDirection: "row",
-    justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: "#735DA5",
-  },
-  name: {
-    flex: 1,
-    maxHeight: 60,
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#735DA5",
+    paddingVertical: 10,
   },
   dateText: {
-    fontSize: 20,
-    color: "white",
-  },
-  nameText: {
-    fontSize: 20,
-    color: "white",
+    fontSize: 16,
   },
   main: {
     flex: 0.8,
@@ -447,19 +497,36 @@ const styles = StyleSheet.create({
     paddingTop: 130,
     alignItems: "center",
   },
-  modalContainer: {
-    backgroundColor: "white",
-    padding: 25,
-    borderRadius: 25,
+  row: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  historyText: {
+    color: "#101318",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  historyItem: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 15,
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  historyIcon: {
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
 });

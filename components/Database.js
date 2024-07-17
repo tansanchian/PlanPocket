@@ -335,10 +335,14 @@ export async function readScheduleExpenses(scheduleId) {
         const schedules = snapshot.val();
         const data = {};
         if (schedules) {
-          if (!data["mealBudget"]) {
-            data["mealBudget"] = { costs: 0 };
+          if (!data["dining"]) {
+            data["dining"] = { costs: 0 };
           }
-          data["mealBudget"]["costs"] = schedules.mealExpenses || 0;
+          if (!data["dining"]["mealBudget"]) {
+            data["dining"]["mealBudget"] = { subcosts: 0 };
+          }
+          data["dining"]["mealBudget"]["subcosts"] = schedules.mealExpenses || 0;
+          data["dining"]["costs"] = schedules.mealExpenses || 0;
           if (schedules.purpose) {
             for (let i of Object.values(schedules.purpose)) {
               const category = i.category;

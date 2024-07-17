@@ -1,37 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Button,
-  Alert,
-  RefreshControl,
-  FlatList,
   ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  ScrollView
 } from "react-native";
-import { getAuth } from "firebase/auth";
 import {
-  doc,
-  updateDoc,
   getDocs,
   query,
   where,
   collection,
-  onSnapshot,
-  getDoc,
-  arrayRemove,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { useFocusEffect } from '@react-navigation/native';
 import { database } from "../../../App";
 import FriendHeader from "../Friend/FriendHeader";
 import FriendItem from "./FriendItem";
 
 const FriendScreen = () => {
-  const [user, setUser] = useState({});
-  const [users, setUsers] = useState([]);
   const [friendList, setFriendList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [count, setCount] = useState(0);
   const auth = getAuth();
 
   const getUsers = async () => {
@@ -49,12 +42,11 @@ const FriendScreen = () => {
     querySnapshot.forEach((doc) => {
       data.push({ ...doc.data(), id: doc.id });
     });
-    setUsers(data);
 
     currQSnapshot.forEach((doc) => {
       currData = { ...doc.data(), id: doc.id };
     });
-    setUser(currData);
+    setCount(currData.friendRequests.length);
 
     if (currData.friends && currData.friends.length > 0) {
       let friendsL = [];
@@ -67,22 +59,25 @@ const FriendScreen = () => {
         }
       }
       setFriendList(friendsL);
+    } else {
+      setFriendList([]);
     }
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    if (auth.currentUser) {
-      getUsers();
-    }
-  }, [auth.currentUser]);
+  useFocusEffect(
+    useCallback(() => {
+      if (auth.currentUser) {
+        getUsers();
+      }
+    }, [auth.currentUser])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);
     await getUsers();
     setRefreshing(false);
   };
-
 
   if (isLoading) {
     return (
@@ -94,19 +89,32 @@ const FriendScreen = () => {
 
   return (
     <View style={styles.container}>
-      <FriendHeader />
+      <FriendHeader count={count}/>
       <View style={styles.main}>
-      <Text style={styles.sectionTitle}>All Friends</Text>
-      <FlatList
-        data={friendList}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <FriendItem friend={item} />}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        contentContainerStyle={styles.listContainer}
-        />
-        </View>
+        {friendList.length === 0 ? (
+         <ScrollView
+         contentContainerStyle={styles.emptyContainer}
+         refreshControl={
+           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+         }
+       >
+         <Text style={styles.text}>No Friends</Text>
+       </ScrollView>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>Your Friends</Text>
+            <FlatList
+              data={friendList}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <FriendItem friend={item} />}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              contentContainerStyle={styles.listContainer}
+            />
+          </>
+        )}
+      </View>
     </View>
   );
 };
@@ -114,27 +122,38 @@ const FriendScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
-  },
-  main: {
-    backgroundColor: "#f3eef6",
-    flex: 1,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginVertical: 16,
-    marginLeft: 16,
-    color: "#333",
+    backgroundColor: "white",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f3eef6",
   },
   listContainer: {
     paddingHorizontal: 16,
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#051C60",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  main: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#f3eef6",
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 10,
   },
 });
 

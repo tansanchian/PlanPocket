@@ -1,55 +1,12 @@
-import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Button } from "react-native";
+import { useState, useEffect } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { getDatabase, ref, get, child } from "firebase/database";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { database } from "../../../App";
 
-export default function AddFriendSearchItem({ item, noBorder, currentUser, getUsers }) {
-
-  const sendFriendRequest = async (friend) => {
-    try {
-      const friendRef = doc(database, "users", friend.userId);
-      await updateDoc(friendRef, {
-        friendRequests: arrayUnion(currentUser),
-      });
-      return true;
-    } catch (error) {
-      console.error("Error sending friend request:", error);
-      return false;
-    }
-  };
-
-  const addPending = async (friend) => {
-    try {
-      const userRef = doc(database, "users", currentUser);
-      await updateDoc(userRef, {
-        pending: arrayUnion(friend.userId),
-      });
-      return true;
-    } catch (error) {
-      console.error("Error adding pending friend:", error);
-      return false;
-    }
-  };
-
-  const handleSendFriendRequest = async () => {
-    if (item) {
-      const sent = await sendFriendRequest(item);
-      const sent2 = await addPending(item);
-      await getUsers();
-      if (sent && sent2) {
-        Alert.alert("Success", `Friend request sent to "${item.username}"!`);
-      } else {
-        Alert.alert("Error", "Failed to send friend request. Please try again.");
-      }
-    } else {
-      Alert.alert("Error", "Please enter a valid username.");
-    }
-  };
+export default function PendingFriendItem({ item, noBorder, currentUser }) {
 
   const [imageUri, setImageUri] = useState(
     "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
@@ -76,17 +33,18 @@ export default function AddFriendSearchItem({ item, noBorder, currentUser, getUs
   }, [item.userId]);
 
   return (
-    <View style={[styles.container, noBorder && { borderBottomWidth: 0 }]}>
+    <View
+      style={[styles.container, noBorder && { borderBottomWidth: 0 }]}
+    >
       <Image
         source={{ uri: imageUri }}
         style={[styles.image, { height: hp(6), width: hp(6) }]}
       />
       <View style={styles.textContainer}>
-        <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
-          {item.username}
-        </Text>
+          <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>
+            {item.username}
+          </Text>
       </View>
-      <Button title={"Add"} onPress={handleSendFriendRequest} />
     </View>
   );
 }

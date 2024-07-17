@@ -71,11 +71,10 @@ export default function FriendRequestList() {
       });
       const friendRef = doc(database, "users", fromUserId);
       await updateDoc(friendRef, {
-        friends: arrayUnion(user.userId),
+          friends: arrayUnion(user.userId),
+          pending: arrayRemove(user.userId)
       });
-        const index = friendRequests.indexOf(fromUserId);
-          const temp = friendRequests.splice(index, 1);
-        setFriendRequests(temp);
+      setFriendRequests(friendRequests.filter(request => request.userId !== fromUserId));
       await getUsers();
       Alert.alert("Success", "Friend request accepted!");
     } catch (error) {
@@ -124,13 +123,19 @@ export default function FriendRequestList() {
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      <AcceptFriendHeader />
-      <FlatList
-        data={friendRequests}
-        keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              contentContainerStyle={styles.listContainer}
-      />
+          <AcceptFriendHeader />
+          <View style={styles.main}>
+          {friendRequests.length === 0 ? (
+          <Text style={styles.text}>No Requests</Text>
+        ) : (
+          <FlatList
+            data={friendRequests}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContainer}
+          />
+        )}
+              </View>
     </View>
   );
 }
@@ -147,5 +152,18 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         paddingHorizontal: 16,
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: "bold",
+        color: "#051C60",
+        justifyContent: "center",
+        textAlign: 'center',
+        marginTop: 40,
       },
+    main: {
+        flex: 1,
+        padding: 10,
+        backgroundColor: "#f3eef6"
+    }
 });
