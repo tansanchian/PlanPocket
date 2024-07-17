@@ -398,7 +398,7 @@ const HomeScreen2 = () => {
                 <View style={styles.row}>
                   <Donut item={expenses[selectedCategory]} />
                 </View>
-                <Text style={styles.subtitle}>History:</Text>
+                <Text style={styles.subtitle}>Purposes:</Text>
 
                 <BottomSheetFlatList
                   data={Object.entries(expenses[selectedCategory]).filter(

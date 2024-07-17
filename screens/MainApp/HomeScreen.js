@@ -131,7 +131,7 @@ const HomeScreen = ({ route }) => {
         </View>
         <View style={styles.tabs}></View>
         <View style={styles.historyHeader}>
-          <Text style={styles.historyTitle}>History:</Text>
+          <Text style={styles.historyTitle}>Categories:</Text>
         </View>
         <FlatList
           data={expense}
