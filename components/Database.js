@@ -194,13 +194,13 @@ export async function createScheduleDatabase(
         let scheduleFromDate = parseDate(schedule.fromDate);
         let scheduleToDate = parseDate(schedule.toDate);
 
-        console.log("DEBUGGING");
-        console.log(fromDate);
-        console.log(todate);
-        console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
-        console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
-        console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
-        console.log("DEBUGGING");
+        // console.log("DEBUGGING");
+        // console.log(fromDate);
+        // console.log(todate);
+        // console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
+        // console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
+        // console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
+        // console.log("DEBUGGING");
         if (
           (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
           (todate >= scheduleFromDate && todate <= scheduleToDate) ||
@@ -578,6 +578,51 @@ export async function createSharedScheduleDatabase(
     return newScheduleRef.key;
   } catch (error) {
     console.error("Error creating Schedule:", error);
+    return false;
+  }
+}
+
+export async function updatePurpose(purposeId, data) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const db = getDatabase();
+  const userSchedulesRef = ref(db, `users/${user.uid}/schedules`);
+
+  console.log("id", purposeId);
+
+  try {
+    const snapshot = await get(userSchedulesRef);
+    if (snapshot.exists()) {
+      const schedules = snapshot.val();
+      let purposeRef = null;
+
+      for (const scheduleId in schedules) {
+        if (
+          schedules[scheduleId].purpose &&
+          schedules[scheduleId].purpose[purposeId]
+        ) {
+          purposeRef = ref(
+            db,
+            `users/${user.uid}/schedules/${scheduleId}/purpose/${purposeId}`
+          );
+          break;
+        }
+      }
+
+      if (purposeRef) {
+        await update(purposeRef, data);
+        console.log("Database update successful");
+        return true;
+      } else {
+        console.error("Purpose ID does not exist in any schedule.");
+        return false;
+      }
+    } else {
+      console.error("No schedules found for the user.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error writing to database:", error);
     return false;
   }
 }

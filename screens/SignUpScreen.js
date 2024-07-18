@@ -46,6 +46,14 @@ export default function SignUpScreen() {
   const createProfile = async (response) => {
     const db = getDatabase();
     set(ref(db, `/users/${response.user.uid}/Profile`), { username: username });
+    set(ref(db, `/users/${response.user.uid}/Threshold`), {
+      dining: 0.2,
+      transport: 0.1,
+      entertainment: 0.15,
+      shopping: 0.2,
+      bills: 0.2,
+      others: 0.15,
+    });
   };
 
   const onRegisterPressed = async () => {

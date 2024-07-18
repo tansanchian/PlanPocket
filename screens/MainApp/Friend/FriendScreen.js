@@ -7,6 +7,7 @@ import {
   FlatList,
   RefreshControl,
   ScrollView,
+  Image,
 } from "react-native";
 import { getDocs, query, where, collection } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -41,7 +42,7 @@ const FriendScreen = () => {
     currQSnapshot.forEach((doc) => {
       currData = { ...doc.data(), id: doc.id };
     });
-    setCount(currData.friendRequests.length);
+    setCount(currData.friendRequests ? currData.friendRequests.length : 0);
 
     if (currData.friends && currData.friends.length > 0) {
       let friendsL = [];
@@ -93,7 +94,21 @@ const FriendScreen = () => {
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
           >
-            <Text style={styles.text}>No Friends</Text>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: -200,
+              }}
+            >
+              <Image source={require("../../../assets/noFriends.png")} />
+              <Text style={{ fontWeight: "bold", fontSize: 20, marginTop: 15 }}>
+                You have no contacts yet!
+              </Text>
+              <Text style={{ fontSize: 16 }}>
+                Add friends from PlanPocket to see them here.
+              </Text>
+            </View>
           </ScrollView>
         ) : (
           <>

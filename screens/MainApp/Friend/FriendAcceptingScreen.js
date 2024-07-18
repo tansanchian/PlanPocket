@@ -3,11 +3,11 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
   ActivityIndicator,
   FlatList,
   Alert,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import {
   doc,
@@ -62,8 +62,8 @@ export default function FriendRequestList() {
   };
 
   const acceptFriendRequest = async (fromUserId) => {
-      try {
-          const newFriendList = [...user.friends, fromUserId];
+    try {
+      const newFriendList = [...user.friends, fromUserId];
       const userRef = doc(database, "users", user.userId);
       await updateDoc(userRef, {
         friends: newFriendList,
@@ -71,10 +71,12 @@ export default function FriendRequestList() {
       });
       const friendRef = doc(database, "users", fromUserId);
       await updateDoc(friendRef, {
-          friends: arrayUnion(user.userId),
-          pending: arrayRemove(user.userId)
+        friends: arrayUnion(user.userId),
+        pending: arrayRemove(user.userId),
       });
-      setFriendRequests(friendRequests.filter(request => request.userId !== fromUserId));
+      setFriendRequests(
+        friendRequests.filter((request) => request.userId !== fromUserId)
+      );
       await getUsers();
       Alert.alert("Success", "Friend request accepted!");
     } catch (error) {
@@ -84,14 +86,17 @@ export default function FriendRequestList() {
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
-      const unsubscribe = onSnapshot(doc(database, "users", userId), async (doc) => {
-        const data = doc.data();
-        const requests = data.friendRequests || [];
-        const requestDetails = await Promise.all(
-          requests.map(async (requestId) => await getFriendItem(requestId))
-        );
-        setFriendRequests(requestDetails);
-      });
+      const unsubscribe = onSnapshot(
+        doc(database, "users", userId),
+        async (doc) => {
+          const data = doc.data();
+          const requests = data.friendRequests || [];
+          const requestDetails = await Promise.all(
+            requests.map(async (requestId) => await getFriendItem(requestId))
+          );
+          setFriendRequests(requestDetails);
+        }
+      );
       getUsers();
       return () => unsubscribe();
     };
@@ -114,19 +119,32 @@ export default function FriendRequestList() {
     );
   }
 
-    const renderItem = ({ item }) => {  
-        return <TouchableOpacity onPress={handleAcceptRequest}>
-            <AcceptFriendItem friend={item} onAccept={handleAcceptRequest}/>
-        </TouchableOpacity>
+  const renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity onPress={handleAcceptRequest}>
+        <AcceptFriendItem friend={item} onAccept={handleAcceptRequest} />
+      </TouchableOpacity>
+    );
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-          <AcceptFriendHeader />
-          <View style={styles.main}>
-          {friendRequests.length === 0 ? (
-          <Text style={styles.text}>No Requests</Text>
+      <AcceptFriendHeader />
+      <View style={styles.main}>
+        {friendRequests.length === 0 ? (
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: 200,
+            }}
+          >
+            <Image source={require("../../../assets/noFriends.png")} />
+            <Text style={{ fontWeight: "bold", fontSize: 20, marginTop: 15 }}>
+              You have no friend request currently!
+            </Text>
+          </View>
         ) : (
           <FlatList
             data={friendRequests}
@@ -135,7 +153,7 @@ export default function FriendRequestList() {
             contentContainerStyle={styles.listContainer}
           />
         )}
-              </View>
+      </View>
     </View>
   );
 }
@@ -149,21 +167,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    },
-    listContainer: {
-        paddingHorizontal: 16,
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: "bold",
-        color: "#051C60",
-        justifyContent: "center",
-        textAlign: 'center',
-        marginTop: 40,
-      },
-    main: {
-        flex: 1,
-        padding: 10,
-        backgroundColor: "#f3eef6"
-    }
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#051C60",
+    justifyContent: "center",
+    textAlign: "center",
+    marginTop: 40,
+  },
+  main: {
+    flex: 1,
+    padding: 10,
+  },
 });

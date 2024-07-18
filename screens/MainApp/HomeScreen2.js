@@ -26,6 +26,9 @@ import BottomSheet, {
   BottomSheetView,
   BottomSheetFlatList,
 } from "@gorhom/bottom-sheet";
+import { getAuth } from "firebase/auth";
+import { getDatabase } from "firebase/database";
+import { ref, get, child, update } from "firebase/database";
 
 const HomeScreen2 = () => {
   const navigation = useNavigation();
@@ -40,6 +43,7 @@ const HomeScreen2 = () => {
   const [scheduleLoading, setScheduleLoading] = useState(true);
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [threshold, setThreshold] = useState({});
 
   const parseTime = (x) => {
     const convertTo12HourFormat = (timeString) => {
@@ -54,6 +58,31 @@ const HomeScreen2 = () => {
       });
     };
     return convertTo12HourFormat(x.split("T")[1].substring(0, 5));
+  };
+
+  const readThreshold = async () => {
+    const dbRef = ref(getDatabase());
+    const auth = getAuth();
+    const userId = auth.currentUser?.uid;
+    try {
+      const snapshot = await get(child(dbRef, `users/${userId}/Threshold`));
+      if (snapshot.exists()) {
+        const curr = snapshot.val();
+        console.log("Current values from DB: ", curr);
+        setThreshold({
+          dining: curr.dining || 0,
+          entertainment: curr.entertainment || 0,
+          shopping: curr.shopping || 0,
+          bills: curr.bills || 0,
+          transport: curr.transport || 0,
+          others: curr.others || 0,
+        });
+      } else {
+        console.log("No data available");
+      }
+    } catch (e) {
+      console.error("Error reading threshold: ", e);
+    }
   };
 
   const parseDate = (dateString) => {
@@ -82,6 +111,7 @@ const HomeScreen2 = () => {
   const loadItems = useCallback(async () => {
     try {
       await readProfile("username", setUsername);
+      await readThreshold();
       const purposeData = await readCurrentDateDatabase();
       setPurpose(purposeData);
 
@@ -204,6 +234,13 @@ const HomeScreen2 = () => {
     }, 0);
   };
 
+  const getBudget = (id) => {
+    if (id) {
+      const data = scheduleArray.filter((x) => x[0] == id);
+      return data[0][1].budget;
+    } else return 0;
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -259,7 +296,7 @@ const HomeScreen2 = () => {
               <View style={styles.row}>
                 <View>
                   <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                    Total Budget: ${getTotalCosts(expenses)}
+                    Total Budget: ${getBudget(dashboardSelect)}
                   </Text>
                   <Text style={{ fontWeight: "bold", fontSize: 16 }}>
                     Total Spendings: ${getTotalCosts(expenses)}

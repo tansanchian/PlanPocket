@@ -7,14 +7,18 @@ import {
   FlatList,
   Alert,
   Platform,
+  Button,
 } from "react-native";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Calendar, Agenda } from "react-native-calendars";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import { readScheduleDatabase } from "../../components/Database";
 import { useFocusEffect } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import BottomSheet from "@gorhom/bottom-sheet";
+import TimeTableEditor from "../../components/TimeTableEditor";
+import { Ionicons } from "@expo/vector-icons";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -46,8 +50,83 @@ const parseTime = (x) => {
   return convertTo12HourFormat(x.split("T")[1].substring(0, 5));
 };
 
+const formatTimestamp = (timestamp) => {
+  const dateInput = new Date(timestamp);
+  const date = new Date(dateInput - 8 * 60 * 60 * 1000);
+
+  const getDayOfWeek = (date) => {
+    const daysOfWeek = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    return daysOfWeek[date.getDay()];
+  };
+
+  const getMonthName = (date) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[date.getMonth()];
+  };
+
+  const formatTime12Hour = (date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    return `${hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
+  };
+
+  const formattedDate = `${getDayOfWeek(date)} ${getMonthName(
+    date
+  )} ${date.getDate()} ${formatTime12Hour(date)} (local time)`;
+
+  return formattedDate;
+};
+
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
+  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [flatListItem, setflatListItem] = useState(null);
+  const [edit, setEdit] = useState(false);
+  const bottomSheetRef = useRef(null);
+
+  console.log(flatListItem);
+
+  const onEditPressed = () => {
+    setEdit(true);
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.snapToIndex(2);
+    }
+  };
+
+  const onCancelEditPressed = () => {
+    setEdit(false);
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.snapToIndex(1);
+    }
+  };
+
+  const handleSheetChanges = useCallback((index) => {
+    console.log("handleSheetChanges", index);
+  }, []);
 
   const loadItems = useCallback(async (day) => {
     try {
@@ -101,9 +180,7 @@ const TimeTableScreen = ({ navigation }) => {
     }, [loadItems])
   );
 
-  const ref = React.useRef(null);
-  const [activeTab, setActiveTab] = React.useState(0);
-  const [index, setIndex] = useState(0);
+  const ref = useRef(null);
 
   const renderItem = (item) => {
     const dataToSend = {
@@ -133,12 +210,21 @@ const TimeTableScreen = ({ navigation }) => {
           style={{ flexGrow: 0 }}
           data={dataArray}
           ref={ref}
-          keyExtractor={(item) => item.key}
+          keyExtractor={(item, index) => `${item[0]}-${index}`}
           contentContainerStyle={{ paddingLeft: 10 }}
           vertical
           renderItem={({ item, index: fIndex }) => {
             return (
-              <View style={{ paddingBottom: 10 }}>
+              <TouchableOpacity
+                onPress={() => {
+                  setBottomSheetVisible(true);
+                  setflatListItem(item);
+                  if (bottomSheetRef.current) {
+                    bottomSheetRef.current.snapToIndex(1);
+                  }
+                }}
+                style={{ paddingBottom: 10 }}
+              >
                 <View
                   style={{
                     marginRight: 10,
@@ -170,7 +256,7 @@ const TimeTableScreen = ({ navigation }) => {
                     {parseTime(item[1].toTime)}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           }}
         />
@@ -204,6 +290,104 @@ const TimeTableScreen = ({ navigation }) => {
         }}
         list={(props) => <VirtualizedList {...props} />}
       />
+      {isBottomSheetVisible && flatListItem && (
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={1}
+          snapPoints={["25%", "50%", "90%"]}
+          backgroundStyle={{ backgroundColor: "#f3eef6" }}
+          onChange={handleSheetChanges}
+          enablePanDownToClose
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View style={{ flex: 1 }}></View>
+            <View style={{ flex: 1, alignItems: "center" }}>
+              <Text
+                style={{
+                  fontSize: 20,
+                  fontWeight: "900",
+                  marginBottom: 10,
+                }}
+              >
+                Purpose
+              </Text>
+            </View>
+            <View style={{ flex: 1, alignItems: "flex-end" }}>
+              {!edit ? (
+                <TouchableOpacity
+                  onPress={onEditPressed}
+                  style={styles.iconContainer}
+                >
+                  <Ionicons name="create-outline" size={30} color="black" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={onCancelEditPressed}
+                  style={styles.iconContainer}
+                >
+                  <Ionicons name="close-outline" size={30} color="black" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          <View style={{ marginTop: 10, flex: 1 }}>
+            {edit ? (
+              <View style={{ alignItems: "center" }}>
+                <TimeTableEditor id={flatListItem[0]} />
+              </View>
+            ) : (
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "flex-start",
+                  paddingHorizontal: 20,
+                }}
+              >
+                <View style={styles.purposeItem}>
+                  <Ionicons name="happy-outline" size={30} color="black" />
+                  <Text style={{ marginLeft: 10, fontSize: 20 }}>
+                    {flatListItem[1].category}
+                  </Text>
+                </View>
+                <View style={styles.purposeItem}>
+                  <Ionicons
+                    name="accessibility-outline"
+                    size={30}
+                    color="black"
+                  />
+                  <View style={{ marginLeft: 10, flexDirection: "column" }}>
+                    <Text style={{ fontSize: 20 }}>
+                      {flatListItem[1].purpose}
+                    </Text>
+                    <Text style={{ fontSize: 16, color: "gray" }}>
+                      {formatTimestamp(flatListItem[1].fromTime)}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.purposeItem}>
+                  <Ionicons name="cash-outline" size={30} color="black" />
+                  <Text style={{ marginLeft: 10, fontSize: 20 }}>
+                    ${flatListItem[1].costs}
+                  </Text>
+                </View>
+                <View style={styles.purposeItem}>
+                  <Ionicons name="document-outline" size={30} color="black" />
+                  <Text style={{ marginLeft: 10, fontSize: 20 }}>
+                    {flatListItem[1].description || "Empty..."}
+                  </Text>
+                </View>
+              </View>
+            )}
+          </View>
+        </BottomSheet>
+      )}
     </View>
   );
 };
@@ -256,4 +440,14 @@ const styles = StyleSheet.create({
     fontWeight: "normal",
     color: "black",
   },
+  iconContainer: {
+    marginHorizontal: 16,
+    height: 45,
+    width: 45,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3eef6",
+  },
+  purposeItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
 });

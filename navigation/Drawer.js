@@ -11,7 +11,8 @@ import { useWindowDimensions, View, ActivityIndicator } from "react-native";
 import { readProfile } from "../components/Database";
 import { ref, getDatabase, get, child } from "firebase/database";
 import { getAuth } from "firebase/auth";
-import AboutUsScreen from "../screens/MainApp/AboutUsScreen"; // Import your AboutUsScreen
+import AboutUsScreen from "../screens/MainApp/AboutUsScreen";
+import SettingScreen from "../screens/MainApp/SettingScreen";
 
 const Drawers = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -110,6 +111,16 @@ const Drawer = () => {
                 drawerIcon: ({ color }) => (
                   <FontAwesome name="user-circle-o" color={color} size={20} />
                 ),
+              }}
+            />
+            <Drawers.Screen
+              name="Setting"
+              component={SettingScreen}
+              options={{
+                drawerIcon: ({ color }) => (
+                  <FontAwesome name="cog" color={color} size={20} />
+                ),
+                swipeEnabled: false,
               }}
             />
           </Drawers.Navigator>

@@ -7,20 +7,18 @@ import {
   Switch,
   TextInput,
   TouchableOpacity,
-  Platform,
 } from "react-native";
 import React, { useState } from "react";
-import CustomButton from "../../components/CustomButton";
-import CustomInput from "../../components/CustomInput";
-import { useNavigation } from "@react-navigation/native";
+import CustomButton from "./CustomButton";
+import CustomInput from "./CustomInput";
 import { useForm } from "react-hook-form";
-import { writeScheduleDatabase } from "../../components/Database";
+import { writeScheduleDatabase, updatePurpose } from "./Database";
 import { StatusBar } from "expo-status-bar";
 import { SelectList } from "react-native-dropdown-select-list";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function ScheduleForm({ route }) {
-  const { dataTT } = route.params || {};
+export default function TimeTableEditor({ id }) {
+  console.log(id);
 
   const [selected, setSelected] = useState("");
   const data = [
@@ -31,7 +29,6 @@ export default function ScheduleForm({ route }) {
     { key: "5", value: "Shopping" },
     { key: "6", value: "Uncategorized" },
   ];
-  const navigation = useNavigation();
 
   function toSGTISOString(fromTime) {
     const date = new Date(fromTime);
@@ -114,41 +111,31 @@ export default function ScheduleForm({ route }) {
   const purpose = watch("Purpose");
   const costs = watch("Costs");
 
-  const onAddSchedulePressed = async () => {
+  const onUpdateSchedulePressed = async () => {
     try {
-      const result = await writeScheduleDatabase(
-        dataTT[0],
-        selected,
-        purpose,
-        costs,
-        description,
-        toSGTISOString(fromTime),
-        toSGTISOString(toTime)
-      );
-
-      if (result) {
-        Alert.alert("Success", "Schedule added successfully");
-        navigation.navigate("Timetable");
-      } else {
-        Alert.alert("Error", "There are other events at this time");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to add schedule: " + error.message);
+      const dataToUpdate = {
+        category: selected,
+        costs: costs,
+        description: description || "",
+        fromTime: toSGTISOString(fromTime),
+        purpose: purpose,
+        toTime: toSGTISOString(toTime),
+      };
+      await updatePurpose(id, dataToUpdate);
+      Alert.alert("Update", "Update Completed");
+    } catch (e) {
+      console.error("Updating purpose", e);
     }
   };
 
   const onUndoPressed = () => {
     setSelected("");
   };
-  const onBackPressed = () => {
-    navigation.navigate("Timetable");
-  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.form}>
         <StatusBar style="dark" />
-        <Text style={styles.title}>{dataTT[1].title}</Text>
         <View
           style={{
             flexDirection: "row",
@@ -182,7 +169,7 @@ export default function ScheduleForm({ route }) {
             }}
           >
             <View pointerEvents="none">
-              <TextInput value={dataTT[1].fromDate} />
+              <TextInput value={"asd"} />
             </View>
           </View>
           <View style={{ flex: 0.05 }}></View>
@@ -309,17 +296,15 @@ export default function ScheduleForm({ route }) {
           placeholder="Description"
         />
         <CustomButton
-          text="Add"
+          text="Update"
           onPress={
             highlightFromDate
               ? () => Alert.alert("The end time must be after the start time")
               : selected == ""
               ? () => Alert.alert("Error", "Select an option")
-              : handleSubmit(onAddSchedulePressed)
+              : handleSubmit(onUpdateSchedulePressed)
           }
         />
-
-        <CustomButton text="Back" onPress={onBackPressed} type="TERTIARY" />
       </View>
     </ScrollView>
   );
@@ -330,7 +315,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 50,
     padding: 20,
   },
   title: {
