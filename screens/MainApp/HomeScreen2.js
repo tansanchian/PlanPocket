@@ -142,6 +142,7 @@ const HomeScreen2 = () => {
       bottomSheetRef.current.snapToIndex(1);
     }
   };
+
   const getTotalCosts = (spendings) => {
     return Object.values(spendings).reduce((total, category) => {
       if (category && category.costs) {
@@ -154,8 +155,9 @@ const HomeScreen2 = () => {
   const getBudget = (id) => {
     if (id) {
       const data = scheduleArray.filter((x) => x[0] == id);
-      return data[0][1].budget;
-    } else return 0;
+      return data.length > 0 ? data[0][1].budget : 0;
+    }
+    return 0;
   };
 
   useEffect(() => {
@@ -166,10 +168,14 @@ const HomeScreen2 = () => {
           String(dashboardSelect)
         );
         setExpenses(expensesData);
-        const totalCosts = getTotalCosts(expensesData);
-        const budget = getBudget(dashboardSelect);
-        setExceedSpending(totalCosts > budget);
-        console.log("ExpensesData", expensesData);
+        if (expensesData) {
+          const totalCosts = getTotalCosts(expensesData);
+          const budget = getBudget(dashboardSelect);
+          setExceedSpending(totalCosts > budget);
+          console.log("ExpensesData", expensesData);
+        } else {
+          setExceedSpending(false);
+        }
       } catch (error) {
         console.error("Error fetching expenses:", error.message);
       }
@@ -252,10 +258,13 @@ const HomeScreen2 = () => {
     { name: "Uncategorized", icon: "tags", color: "#af4b91" },
   ];
 
-
   const renderCategoryItem = ({ item }) => {
-    const isExceedingBudget = expenses[item.name] && expenses[item.name].costs > getBudget(dashboardSelect) * threshold[item.name];
-  
+    const isExceedingBudget =
+      expenses &&
+      expenses[item.name] &&
+      expenses[item.name].costs >
+        getBudget(dashboardSelect) * threshold[item.name];
+
     return (
       <TouchableOpacity
         onPress={() => openBottomSheet(item.name)}
@@ -326,10 +335,20 @@ const HomeScreen2 = () => {
               />
               <View style={styles.row}>
                 <View>
-                  <Text style={[{ fontWeight: "bold", fontSize: 16 }, exceedSpending && {color: 'red'}]}>
+                  <Text
+                    style={[
+                      { fontWeight: "bold", fontSize: 16 },
+                      exceedSpending && { color: "#cc0000" },
+                    ]}
+                  >
                     Total Budget: ${getBudget(dashboardSelect)}
                   </Text>
-                  <Text style={[{ fontWeight: "bold", fontSize: 16 }, exceedSpending && {color: 'red'}]}>
+                  <Text
+                    style={[
+                      { fontWeight: "bold", fontSize: 16 },
+                      exceedSpending && { color: "#cc0000" },
+                    ]}
+                  >
                     Total Spendings: ${getTotalCosts(expenses)}
                   </Text>
                 </View>
@@ -389,7 +408,10 @@ const HomeScreen2 = () => {
                 <View style={styles.row}>
                   <Donut
                     item={expenses[selectedCategory]}
-                    isWithinBudget={expenses[selectedCategory].costs <= getBudget(dashboardSelect) * threshold[selectedCategory]}
+                    isWithinBudget={
+                      expenses[selectedCategory].costs <=
+                      getBudget(dashboardSelect) * threshold[selectedCategory]
+                    }
                   />
                 </View>
                 <Text style={styles.subtitle}>Purposes:</Text>

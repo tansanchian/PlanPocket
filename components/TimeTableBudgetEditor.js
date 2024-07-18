@@ -7,7 +7,7 @@ import { updateBudget } from "./Database";
 import { StatusBar } from "expo-status-bar";
 
 export default function TimeTableBudgetEditor({ item }) {
-  const { control, handleSubmit, watch, setValue } = useForm();
+  const { control, handleSubmit, watch, reset } = useForm();
   const title = watch("Title");
   const budget = watch("Budget");
 
@@ -25,11 +25,11 @@ export default function TimeTableBudgetEditor({ item }) {
   };
 
   useEffect(() => {
-    if (item && item.data) {
-      setValue("Title", item[1].title || "");
-      setValue("Budget", item[1].budget || "");
-    }
-  }, [item]);
+    reset({
+      Title: "",
+      Budget: "",
+    });
+  }, []);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>

@@ -17,9 +17,7 @@ import { StatusBar } from "expo-status-bar";
 import { SelectList } from "react-native-dropdown-select-list";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-export default function TimeTableEditor({ id }) {
-  console.log(id);
-
+export default function TimeTableEditor({ id, date }) {
   const [selected, setSelected] = useState("");
   const data = [
     { key: "1", value: "Entertainment & Leisure" },
@@ -169,7 +167,7 @@ export default function TimeTableEditor({ id }) {
             }}
           >
             <View pointerEvents="none">
-              <TextInput value={"asd"} />
+              <TextInput value={date} />
             </View>
           </View>
           <View style={{ flex: 0.05 }}></View>

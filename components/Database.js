@@ -626,3 +626,34 @@ export async function updatePurpose(purposeId, data) {
     return false;
   }
 }
+
+export async function updateBudget(id, data) {
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const db = getDatabase();
+  const userSchedulesRef = ref(db, `users/${user.uid}/schedules/${id}`);
+
+  try {
+    const snapshot = await get(userSchedulesRef);
+    if (snapshot.exists()) {
+      const schedules = snapshot.val();
+
+      console.log("asdas", schedules);
+
+      const updatedData = {
+        title: data.title || schedules.title,
+        budget: data.budget || schedules.budget,
+      };
+
+      await update(userSchedulesRef, updatedData);
+      console.log("Database update successful");
+      return true;
+    } else {
+      console.error("No schedules found for the user.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error writing to database:", error);
+    return false;
+  }
+}
