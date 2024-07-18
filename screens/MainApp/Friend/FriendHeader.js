@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import IconWithBadge from "../../../components/IconWithBadge";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -17,7 +18,7 @@ const FriendHeader = ({ count }) => {
           onPress={() => navigation.navigate("FriendAcceptingScreen")}
           style={styles.iconContainer}
         >
-          <Ionicons name="notifications-outline" size={20} />
+          <IconWithBadge name="notifications-outline" size={24} badgeCount={count} color="#000" />
         </TouchableOpacity>
         <View>
           <Image

@@ -6,7 +6,7 @@ import PieChart from "react-native-pie-chart";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 const HomeScreen = ({ route }) => {
-  const { expenses } = route.params;
+  const { expenses, exceedSpending } = route.params;
   const expense = Object.entries(expenses);
   console.log(expense);
 
@@ -76,7 +76,7 @@ const HomeScreen = ({ route }) => {
         <View style={styles.historyText}>
           <Text style={styles.historyName}>{item[0]}</Text>
         </View>
-        <Text style={styles.historyAmount}>${item[1].costs}</Text>
+        <Text style={styles.historyAmount}>${item[1].costs.toFixed(2)}</Text>
       </View>
     );
   };
@@ -86,40 +86,25 @@ const HomeScreen = ({ route }) => {
       <StatusBar style="dark" />
       <HomeScreenHeader title="Dashboard" />
       <View style={styles.internalContainer}>
-        <View style={{ flexDirection: "row", flex: 1 }}>
-          <View
-            style={{
-              flex: 0.5,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <PieChart
-              widthAndHeight={widthAndHeight}
-              series={series}
-              sliceColor={sliceColor}
-              doughnut={true}
-              coverFill={"#FFF"}
-              coverRadius={0.6}
-            />
-            <View
-              style={{
-                flex: 1,
-                position: "absolute",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text style={{ fontWeight: "bold", textAlign: " center" }}>
-                Total Spendings
-              </Text>
-              <Text style={{ fontWeight: "bold", textAlign: " center" }}>
-                ${getTotalCosts(expenses)}
-              </Text>
-            </View>
+        <View style={styles.chartContainer}>
+          <PieChart
+            widthAndHeight={widthAndHeight}
+            series={series}
+            sliceColor={sliceColor}
+            doughnut={true}
+            coverFill={"#FFF"}
+            coverRadius={0.6}
+          />
+          <View style={styles.chartOverlay}>
+            <Text style={[styles.totalSpendingText, exceedSpending && { color: 'red'}]}>
+              Total Spendings
+            </Text>
+            <Text style={[styles.totalSpendingAmount, exceedSpending && { color: 'red'}]}>
+              ${getTotalCosts(expenses).toFixed(2)}
+            </Text>
           </View>
         </View>
-        <View style={styles.legend}>
+        <View style={styles.legendContainer}>
           {data.map((item) => (
             <View key={item.key} style={styles.legendItem}>
               <View
@@ -130,14 +115,19 @@ const HomeScreen = ({ route }) => {
             </View>
           ))}
         </View>
-        <View style={styles.tabs}></View>
+        {exceedSpending &&
+          <View style={styles.exceedWarning}>
+            <Text style={styles.exceedWarningText}>
+              You have exceeded your budget! Update your budget or reduce your expenses.
+            </Text>
+        </View>}
         <View style={styles.historyHeader}>
           <Text style={styles.historyTitle}>Categories:</Text>
         </View>
         <FlatList
           data={expense}
           renderItem={renderItem}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item[0]}
         />
       </View>
     </View>
@@ -159,42 +149,41 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
   },
-  legend: {
+  chartContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  chartOverlay: {
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  legendContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    flexWrap: "wrap",
+    justifyContent: "center",
     marginVertical: 20,
   },
   legendItem: {
+    flexDirection: "row",
     alignItems: "center",
+    marginHorizontal: 5,
   },
   legendColor: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginBottom: 5,
+    width: 15,
+    height: 15,
+    borderRadius: 7.5,
+    marginRight: 5,
   },
   legendText: {
     fontSize: 12,
+    fontWeight: "600",
   },
   legendAmount: {
     fontSize: 12,
     fontWeight: "bold",
-  },
-  tabs: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 20,
-  },
-  tab: {
-    fontSize: 16,
-    color: "#888",
-    marginHorizontal: 10,
-  },
-  tabActive: {
-    fontSize: 16,
-    color: "#000",
-    fontWeight: "bold",
-    marginHorizontal: 10,
+    marginLeft: 5,
   },
   historyHeader: {
     flexDirection: "row",
@@ -204,10 +193,6 @@ const styles = StyleSheet.create({
   historyTitle: {
     fontSize: 18,
     fontWeight: "bold",
-  },
-  historySort: {
-    fontSize: 14,
-    color: "#888",
   },
   historyItem: {
     flexDirection: "row",
@@ -227,13 +212,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  historyStatus: {
-    fontSize: 14,
-    color: "#888",
-  },
   historyAmount: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  totalSpendingText: {
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 13,
+  },
+  totalSpendingAmount: {
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 15,
+  },
+  exceedWarning: {
+    padding: 10,
+    backgroundColor: "#FFCCCC",
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  exceedWarningText: {
+    color: "red",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 

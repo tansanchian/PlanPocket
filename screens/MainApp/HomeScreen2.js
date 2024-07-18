@@ -8,7 +8,6 @@ import {
   FlatList,
   Image,
   Platform,
-  ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -44,6 +43,7 @@ const HomeScreen2 = () => {
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [threshold, setThreshold] = useState({});
+  const [exceedSpending, setExceedSpending] = useState(false);
 
   const parseTime = (x) => {
     const convertTo12HourFormat = (timeString) => {
@@ -70,12 +70,12 @@ const HomeScreen2 = () => {
         const curr = snapshot.val();
         console.log("Current values from DB: ", curr);
         setThreshold({
-          dining: curr.dining || 0,
-          entertainment: curr.entertainment || 0,
-          shopping: curr.shopping || 0,
-          bills: curr.bills || 0,
-          transport: curr.transport || 0,
-          others: curr.others || 0,
+          Dining: curr["Dining"] || 0,
+          "Entertainment & Leisure": curr["Entertainment & Leisure"] || 0,
+          Shopping: curr["Shopping"] || 0,
+          "Bill, Utilities & Taxes": curr["Bill, Utilities & Taxes"] || 0,
+          Transportation: curr["Transportation"] || 0,
+          Uncategorized: curr["Uncategorized"] || 0,
         });
       } else {
         console.log("No data available");
@@ -142,15 +142,33 @@ const HomeScreen2 = () => {
       bottomSheetRef.current.snapToIndex(1);
     }
   };
+  const getTotalCosts = (spendings) => {
+    return Object.values(spendings).reduce((total, category) => {
+      if (category && category.costs) {
+        return total + category.costs;
+      }
+      return total;
+    }, 0);
+  };
+
+  const getBudget = (id) => {
+    if (id) {
+      const data = scheduleArray.filter((x) => x[0] == id);
+      return data[0][1].budget;
+    } else return 0;
+  };
+
   useEffect(() => {
     const fetchExpenses = async () => {
-      console.log("dashboard", dashboardSelect);
       if (!dashboardSelect) return;
       try {
         const expensesData = await readScheduleExpenses(
           String(dashboardSelect)
         );
         setExpenses(expensesData);
+        const totalCosts = getTotalCosts(expensesData);
+        const budget = getBudget(dashboardSelect);
+        setExceedSpending(totalCosts > budget);
         console.log("ExpensesData", expensesData);
       } catch (error) {
         console.error("Error fetching expenses:", error.message);
@@ -183,7 +201,7 @@ const HomeScreen2 = () => {
   }, [scheduleArray, firstLoad, dashboardSelect]);
 
   const onNextPressed = () => {
-    navigation.navigate("HomeScreen", { expenses });
+    navigation.navigate("HomeScreen", { expenses, exceedSpending });
   };
 
   const onCalendarPressed = () => {
@@ -225,20 +243,33 @@ const HomeScreen2 = () => {
     );
   };
 
-  const getTotalCosts = (spendings) => {
-    return Object.values(spendings).reduce((total, category) => {
-      if (category && category.costs) {
-        return total + category.costs;
-      }
-      return total;
-    }, 0);
-  };
+  const categories = [
+    { name: "Entertainment & Leisure", icon: "wallet", color: "#41afaa" },
+    { name: "Transportation", icon: "rocket", color: "#466eb4" },
+    { name: "Dining", icon: "utensils", color: "#00a0e1" },
+    { name: "Shopping", icon: "shopping-cart", color: "#fbc02d" },
+    { name: "Bill, Utilities & Taxes", icon: "handshake", color: "#3ec191" },
+    { name: "Uncategorized", icon: "tags", color: "#af4b91" },
+  ];
 
-  const getBudget = (id) => {
-    if (id) {
-      const data = scheduleArray.filter((x) => x[0] == id);
-      return data[0][1].budget;
-    } else return 0;
+
+  const renderCategoryItem = ({ item }) => {
+    const isExceedingBudget = expenses[item.name] && expenses[item.name].costs > getBudget(dashboardSelect) * threshold[item.name];
+  
+    return (
+      <TouchableOpacity
+        onPress={() => openBottomSheet(item.name)}
+        style={[styles.card, isExceedingBudget && styles.exceedingBudgetCard]}
+      >
+        <View style={[styles.iconContainer, { backgroundColor: "white" }]}>
+          <FontAwesome5 name={item.icon} size={24} color={item.color} />
+        </View>
+        <Text style={styles.cardText}>{item.name}</Text>
+        <Text style={styles.amount}>
+          {`$ ${expenses?.[item.name]?.["costs"] ?? "0"}`}
+        </Text>
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -282,7 +313,7 @@ const HomeScreen2 = () => {
           {scheduleLoading ? (
             loading()
           ) : expenses ? (
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <View>
               <FlatList
                 data={scheduleArray}
                 keyExtractor={(item) => item[0]}
@@ -295,10 +326,10 @@ const HomeScreen2 = () => {
               />
               <View style={styles.row}>
                 <View>
-                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                  <Text style={[{ fontWeight: "bold", fontSize: 16 }, exceedSpending && {color: 'red'}]}>
                     Total Budget: ${getBudget(dashboardSelect)}
                   </Text>
-                  <Text style={{ fontWeight: "bold", fontSize: 16 }}>
+                  <Text style={[{ fontWeight: "bold", fontSize: 16 }, exceedSpending && {color: 'red'}]}>
                     Total Spendings: ${getTotalCosts(expenses)}
                   </Text>
                 </View>
@@ -306,101 +337,15 @@ const HomeScreen2 = () => {
                   <Text style={styles.text}>View</Text>
                 </TouchableOpacity>
               </View>
-              <View style={styles.main}>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Entertainment & Leisure")}
-                  style={styles.card}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5 name="wallet" size={24} color="#41afaa" />
-                  </View>
-                  <Text style={styles.cardText}>Entertainment & Leisure</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${
-                      expenses?.["Entertainment & Leisure"]?.["costs"] ?? "0"
-                    }`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Transportation")}
-                  style={styles.card}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5 name="rocket" size={24} color="#466eb4" />
-                  </View>
-                  <Text style={styles.cardText}>Transportation</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${expenses?.["Transportation"]?.["costs"] ?? "0"}`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Dining")}
-                  style={styles.card}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5 name="utensils" size={24} color="#00a0e1" />
-                  </View>
-                  <Text style={styles.cardText}>Dining</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${expenses?.["Dining"]?.["costs"] ?? "0"}`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Shopping")}
-                  style={[styles.card, { marginBottom: 0 }]}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5
-                      name="shopping-cart"
-                      size={24}
-                      color="#fbc02d"
-                    />
-                  </View>
-                  <Text style={styles.cardText}>Shopping</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${expenses?.["Shopping"]?.["costs"] ?? "0"}`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Bill, Utilities & Taxes")}
-                  style={[styles.card, { marginBottom: 0 }]}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5 name="handshake" size={24} color="#3ec191" />
-                  </View>
-                  <Text style={styles.cardText}>Bill, Utilities & Taxes</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${
-                      expenses?.["Bill, Utilities & Taxes"]?.["costs"] ?? "0"
-                    }`}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => openBottomSheet("Uncategorized")}
-                  style={[styles.card, { marginBottom: 0 }]}
-                >
-                  <View
-                    style={[styles.iconContainer, { backgroundColor: "white" }]}
-                  >
-                    <FontAwesome5 name="tags" size={24} color="#af4b91" />
-                  </View>
-                  <Text style={styles.cardText}>Uncategorized</Text>
-                  <Text style={styles.amount}>
-                    {`$ ${expenses?.["Uncategorized"]?.["costs"] ?? "0"}`}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+              <FlatList
+                data={categories}
+                keyExtractor={(item) => item.name}
+                renderItem={renderCategoryItem}
+                numColumns={2}
+                columnWrapperStyle={{ justifyContent: "space-between" }}
+                contentContainerStyle={{ paddingHorizontal: 10 }}
+              />
+            </View>
           ) : (
             <View style={styles.noExpensesContainer}>
               <Image source={require("../../assets/emptyHome.png")} />
@@ -439,14 +384,15 @@ const HomeScreen2 = () => {
             >
               {selectedCategory}
             </Text>
-
             {expenses && expenses[selectedCategory] ? (
               <View>
                 <View style={styles.row}>
-                  <Donut item={expenses[selectedCategory]} />
+                  <Donut
+                    item={expenses[selectedCategory]}
+                    isWithinBudget={expenses[selectedCategory].costs <= getBudget(dashboardSelect) * threshold[selectedCategory]}
+                  />
                 </View>
                 <Text style={styles.subtitle}>Purposes:</Text>
-
                 <BottomSheetFlatList
                   data={Object.entries(expenses[selectedCategory]).filter(
                     (item) => item[0] !== "costs"
@@ -533,6 +479,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+  },
+  exceedingBudgetCard: {
+    borderColor: "red",
+    borderWidth: 2,
   },
   iconContainer: {
     width: 50,

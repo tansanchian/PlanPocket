@@ -42,7 +42,8 @@ const FriendScreen = () => {
     currQSnapshot.forEach((doc) => {
       currData = { ...doc.data(), id: doc.id };
     });
-    setCount(currData.friendRequests ? currData.friendRequests.length : 0);
+    
+    setCount(currData.friendRequests != undefined ? currData.friendRequests.length : 0);
 
     if (currData.friends && currData.friends.length > 0) {
       let friendsL = [];

@@ -19,12 +19,12 @@ const SettingScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [sliderValues, setSliderValues] = useState({
-    dining: 0,
-    entertainment: 0,
-    shopping: 0,
-    bills: 0,
-    transport: 0,
-    others: 0,
+   "Dining": 0.2,
+   "Transportation": 0.1,
+   "Entertainment & Leisure": 0.15,
+   "Shopping": 0.2,
+   "Bill, Utilities & Taxes": 0.2,
+   "Uncategorized": 0.15,
   });
 
   const roundToStep = (value) => {
@@ -41,12 +41,12 @@ const SettingScreen = () => {
         const curr = snapshot.val();
         console.log("Current values from DB: ", curr);
         setSliderValues({
-          dining: roundToStep(curr.dining || 0),
-          entertainment: roundToStep(curr.entertainment || 0),
-          shopping: roundToStep(curr.shopping || 0),
-          bills: roundToStep(curr.bills || 0),
-          transport: roundToStep(curr.transport || 0),
-          others: roundToStep(curr.others || 0),
+          "Dining": roundToStep(curr["Dining"] || 0),
+          "Entertainment & Leisure": roundToStep(curr["Entertainment & Leisure"] || 0),
+          "Shopping": roundToStep(curr["Shopping"] || 0),
+          "Bill, Utilities & Taxes": roundToStep(curr["Bill, Utilities & Taxes"] || 0),
+          "Transportation": roundToStep(curr["Transportation"] || 0),
+          "Uncategorized": roundToStep(curr["Uncategorized"] || 0),
         });
       } else {
         console.log("No data available");
@@ -57,6 +57,7 @@ const SettingScreen = () => {
       setLoading(false);
     }
   };
+  
 
   const writeThreshold = async () => {
     const auth = getAuth();
@@ -93,12 +94,12 @@ const SettingScreen = () => {
   };
 
   const data = [
-    { category: "dining", label: "Dining" },
-    { category: "entertainment", label: "Entertainment" },
-    { category: "shopping", label: "Shopping" },
-    { category: "bills", label: "Bills" },
-    { category: "transport", label: "Transportation" },
-    { category: "others", label: "Others" },
+    { category: "Dining", label: "Dining" },
+    { category: "Entertainment & Leisure", label: "Entertainment & Leisure" },
+    { category: "Shopping", label: "Shopping" },
+    { category: "Bill, Utilities & Taxes", label: "Bill, Utilities & Taxes" },
+    { category: "Transportation", label: "Transportation" },
+    { category: "Uncategorized", label: "Others" },
   ];
 
   const groupedData = [];
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#333",
     marginBottom: 10,
+    textAlign: 'center'
   },
   slider: {
     width: "100%",

@@ -19,6 +19,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import BottomSheet from "@gorhom/bottom-sheet";
 import TimeTableEditor from "../../components/TimeTableEditor";
 import { Ionicons } from "@expo/vector-icons";
+import TimeTableBudgetEditor from "../../components/TimeTableBudgetEditor";
 
 const timeToString = (time) => {
   const date = new Date(time);
@@ -54,37 +55,6 @@ const formatTimestamp = (timestamp) => {
   const dateInput = new Date(timestamp);
   const date = new Date(dateInput - 8 * 60 * 60 * 1000);
 
-  const getDayOfWeek = (date) => {
-    const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    return daysOfWeek[date.getDay()];
-  };
-
-  const getMonthName = (date) => {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    return months[date.getMonth()];
-  };
-
   const formatTime12Hour = (date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
@@ -94,21 +64,34 @@ const formatTimestamp = (timestamp) => {
     return `${hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
   };
 
-  const formattedDate = `${getDayOfWeek(date)} ${getMonthName(
-    date
-  )} ${date.getDate()} ${formatTime12Hour(date)} (local time)`;
+  const formattedDate = `${formatTime12Hour(date)} (local time)`;
 
   return formattedDate;
 };
+
+function getDay(dateString) {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  return `${day}`;
+}
+
+function getShortDay(dateString) {
+  const date = new Date(dateString);
+  const options = { weekday: "short" };
+  const weekday = new Intl.DateTimeFormat("en-US", options).format(date);
+  return `${weekday}`;
+}
 
 const TimeTableScreen = ({ navigation }) => {
   const [items, setItems] = useState({});
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [flatListItem, setflatListItem] = useState(null);
   const [edit, setEdit] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
   const bottomSheetRef = useRef(null);
-
-  console.log(flatListItem);
+  const bottomSheetEditBudgetRef = useRef(null);
+  const [editBudget, setEditBudget] = useState(false);
+  const [budgetItem, setBudgetItem] = useState(null);
 
   const onEditPressed = () => {
     setEdit(true);
@@ -126,6 +109,10 @@ const TimeTableScreen = ({ navigation }) => {
 
   const handleSheetChanges = useCallback((index) => {
     console.log("handleSheetChanges", index);
+  }, []);
+
+  const handleSheetEditBudgetChanges = useCallback((index) => {
+    console.log("handleSheetEditBudgetChanges", index);
   }, []);
 
   const loadItems = useCallback(async (day) => {
@@ -183,27 +170,70 @@ const TimeTableScreen = ({ navigation }) => {
   const ref = useRef(null);
 
   const renderItem = (item) => {
+    console.log(item);
     const dataToSend = {
       dataTT: item.data,
+      dateTT: item.currDateTT,
     };
+
     const onPressHandler = () => {
       navigation.navigate("ScheduleForm", dataToSend);
     };
 
     const datas = item.data[1].purpose;
+    let currDateTT = null;
     let dataArray = [];
     if (datas != undefined) {
+      currDateTT = [item.currDateTT];
       dataArray = Object.entries(datas);
+      dataArray.forEach((entry, index) => {
+        if (entry[1] !== undefined && currDateTT[index] !== undefined) {
+          entry[1].date = currDateTT[index];
+        }
+      });
     }
 
     return (
       <View style={styles.card}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={styles.title}>Title: {item.data[1].title}</Text>
-          <View style={{ alignSelf: "center" }}>
-            <TouchableOpacity onPress={onPressHandler}>
-              <FontAwesome name="plus" size={20} color="#735DA5" />
-            </TouchableOpacity>
+        <View
+          style={{
+            flexDirection: "row",
+            flex: 1,
+            alignContent: "center",
+            justifyContent: "center",
+          }}
+        >
+          <View style={{ flex: 0.5, alignItems: "flex-start" }}>
+            <Text style={styles.title}>Title: {item.data[1].title}</Text>
+          </View>
+          <View style={{ flex: 0.5, alignItems: "flex-end" }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                style={{ paddingHorizontal: 20 }}
+                onPress={() => {
+                  setBudgetItem(item.data);
+                  setEditBudget(true);
+                  setBottomSheetVisible(false);
+                  if (bottomSheetEditBudgetRef.current) {
+                    bottomSheetEditBudgetRef.current.snapToIndex(1);
+                  }
+                }}
+              >
+                <Text
+                  style={{ fontSize: 20, fontWeight: "bold", color: "#735DA5" }}
+                >
+                  Edit
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onPressHandler}>
+                <Ionicons name="add-circle-outline" size={20} color="#735DA5" />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
         <FlatList
@@ -219,6 +249,8 @@ const TimeTableScreen = ({ navigation }) => {
                 onPress={() => {
                   setBottomSheetVisible(true);
                   setflatListItem(item);
+                  setEditBudget(false);
+                  setSelectedDate(item[1].date);
                   if (bottomSheetRef.current) {
                     bottomSheetRef.current.snapToIndex(1);
                   }
@@ -229,8 +261,10 @@ const TimeTableScreen = ({ navigation }) => {
                   style={{
                     marginRight: 10,
                     padding: 10,
+                    marginTop: 10,
+                    marginLeft: 5,
                     borderWidth: 1,
-                    borderRadius: 20,
+                    borderRadius: 5,
                     borderColor: "#f3eef6",
                     backgroundColor: "#f3eef6",
                     shadowColor: "#000",
@@ -290,12 +324,40 @@ const TimeTableScreen = ({ navigation }) => {
         }}
         list={(props) => <VirtualizedList {...props} />}
       />
+      {editBudget && (
+        <BottomSheet
+          ref={bottomSheetEditBudgetRef}
+          index={1}
+          snapPoints={["25%", "50%", "90%"]}
+          backgroundStyle={styles.bottomSheetBackground}
+          onChange={handleSheetEditBudgetChanges}
+          enablePanDownToClose
+        >
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "900",
+                marginBottom: 10,
+              }}
+            >
+              Edit Budget
+            </Text>
+          </View>
+          <TimeTableBudgetEditor item={budgetItem} />
+        </BottomSheet>
+      )}
       {isBottomSheetVisible && flatListItem && (
         <BottomSheet
           ref={bottomSheetRef}
           index={1}
           snapPoints={["25%", "50%", "90%"]}
-          backgroundStyle={{ backgroundColor: "#f3eef6" }}
+          backgroundStyle={styles.bottomSheetBackground}
           onChange={handleSheetChanges}
           enablePanDownToClose
         >
@@ -306,7 +368,26 @@ const TimeTableScreen = ({ navigation }) => {
               alignItems: "center",
             }}
           >
-            <View style={{ flex: 1 }}></View>
+            <View style={{ flex: 1, alignItems: "flex-start" }}>
+              <View style={styles.iconContainer}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "900",
+                  }}
+                >
+                  {getDay(selectedDate)}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "900",
+                  }}
+                >
+                  {getShortDay(selectedDate)}
+                </Text>
+              </View>
+            </View>
             <View style={{ flex: 1, alignItems: "center" }}>
               <Text
                 style={{
@@ -340,7 +421,7 @@ const TimeTableScreen = ({ navigation }) => {
           <View style={{ marginTop: 10, flex: 1 }}>
             {edit ? (
               <View style={{ alignItems: "center" }}>
-                <TimeTableEditor id={flatListItem[0]} />
+                <TimeTableEditor id={flatListItem[0]} date={selectedDate} />
               </View>
             ) : (
               <View
@@ -404,7 +485,7 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 10,
     backgroundColor: "#fff",
-    borderRadius: 25,
+    borderRadius: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -447,7 +528,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3eef6",
   },
-  purposeItem: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  purposeItem: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  bottomSheetBackground: {
+    backgroundColor: "white",
+    borderRadius: 25,
+  },
 });

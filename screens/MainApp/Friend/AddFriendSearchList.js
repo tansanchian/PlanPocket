@@ -30,6 +30,7 @@ export default function AddFriendSearchList() {
 
     const currentUserFriends = currentUserData.friends || [];
     const currentUserPending = currentUserData.pending || [];
+    const currentUserRequest = currentUserData.friendRequests || [];
 
     const usersQ = query(userRef, where("userId", "!=", currentUserId));
     const usersQSnapshot = await getDocs(usersQ);
@@ -43,7 +44,8 @@ export default function AddFriendSearchList() {
     let nonFriendUsers = allUsersData.filter(
       (user) =>
         !currentUserFriends.includes(user.userId) &&
-        !currentUserPending.includes(user.userId)
+        !currentUserPending.includes(user.userId) &&
+        !currentUserRequest.includes(user.userId)
     );
     let pendingUsers = allUsersData.filter((user) =>
       currentUserPending.includes(user.userId)

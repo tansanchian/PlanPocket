@@ -2,8 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import PieChart from "react-native-pie-chart";
 
-const Donut = (item) => {
-  const datas = item.item;
+const Donut = ({ item, isWithinBudget }) => {
   const colors = [
     "#FFCCCC", // Light Coral
     "#FFCC99", // Peach-Orange
@@ -30,7 +29,6 @@ const Donut = (item) => {
   const convertItem = (item) => {
     let keyCounter = 1;
     const data = [];
-
     for (const [label, value] of Object.entries(item)) {
       if (label !== "costs") {
         data.push({
@@ -42,12 +40,10 @@ const Donut = (item) => {
         keyCounter++;
       }
     }
-
     return data;
   };
 
-  const data = convertItem(datas);
-
+  const data = convertItem(item);
   const widthAndHeight = 200;
   const series = data.map((item) => item.amount);
   const sliceColor = data.map((item) => item.svg.fill);
@@ -74,15 +70,25 @@ const Donut = (item) => {
               justifyContent: "center",
             }}
           >
-            <Text style={{ fontWeight: "bold", textAlign: " center" }}>
+            {isWithinBudget ? (
+              <>
+                <Text style={{ fontWeight: "bold", textAlign: "center" }}>
               Total Spendings
             </Text>
-            <Text style={{ fontWeight: "bold", textAlign: " center" }}>
-              ${item.item.costs}
+            <Text style={{ fontWeight: "bold", textAlign: "center" }}>
+              ${item.costs}
+                </Text>
+              </>) : (
+                  <><Text style={{ fontWeight: "bold", textAlign: "center", color: 'red'}}>
+              Total Spendings
             </Text>
+            <Text style={{ fontWeight: "bold", textAlign: "center", color: 'red'}}>
+              ${item.costs}
+            </Text></>)}
+            
           </View>
         </View>
-        {true ? (
+        {isWithinBudget ? (
           <View
             style={{
               flex: 0.5,
@@ -91,7 +97,7 @@ const Donut = (item) => {
             }}
           >
             <Text
-              style={{ padding: 10, fontWeight: "bold", textAlign: " center" }}
+              style={{ padding: 10, fontWeight: "bold", textAlign: "center" }}
             >
               Good job! You're spending within your budget.
             </Text>
@@ -105,10 +111,10 @@ const Donut = (item) => {
             }}
           >
             <Text
-              style={{ padding: 10, fontWeight: "bold", textAlign: " center" }}
+              style={{ padding: 10, fontWeight: "bold", textAlign: "center", color: 'red' }}
             >
-              Your allocation of budget for this category is too much. Consider
-              cutting down.
+                Your spending in this category exceeds your allocated proportion. Consider reducing expenses
+                or visit the settings screen to adjust your budget allocation for each category.
             </Text>
           </View>
         )}

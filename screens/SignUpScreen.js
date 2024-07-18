@@ -47,12 +47,12 @@ export default function SignUpScreen() {
     const db = getDatabase();
     set(ref(db, `/users/${response.user.uid}/Profile`), { username: username });
     set(ref(db, `/users/${response.user.uid}/Threshold`), {
-      dining: 0.2,
-      transport: 0.1,
-      entertainment: 0.15,
-      shopping: 0.2,
-      bills: 0.2,
-      others: 0.15,
+      "Dining": 0.2,
+      "Transportation": 0.1,
+      "Entertainment & Leisure": 0.15,
+      "Shopping": 0.2,
+      "Bill, Utilities & Taxes": 0.2,
+      "Uncategorized": 0.15,
     });
   };
 

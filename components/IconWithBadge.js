@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import { Ionicons } from "@expo/vector-icons";
 
-const IconWithBadge = ({ name, badgeCount, color, size }) => {
+const IconWithBadge = ({ name, badgeCount = 0, color, size }) => {
   return (
-    <View style={styles.iconContainer}>
-      <AntDesign name={name} size={size} color={color} />
+    <View style={[styles.iconContainer, { width: size, height: size }]}>
+      <Ionicons name={name} size={size} color={color} />
       {badgeCount > 0 && (
         <View style={styles.badgeContainer}>
           <Text style={styles.badgeText}>{badgeCount}</Text>
@@ -17,9 +17,9 @@ const IconWithBadge = ({ name, badgeCount, color, size }) => {
 
 const styles = StyleSheet.create({
   iconContainer: {
-    width: 30,
-    height: 30,
     margin: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   badgeContainer: {
     position: 'absolute',
