@@ -38,6 +38,21 @@ export default function TimeTableEditor({ id, date }) {
     return sgtTime.toISOString();
   }
 
+  const fixTime = (time, date) => {
+    const eventDate = new Date(date);
+    const eventTime = new Date(time);
+
+    const hours = eventTime.getHours();
+    const minutes = eventTime.getMinutes();
+    const seconds = eventTime.getSeconds();
+
+    eventDate.setHours(hours);
+    eventDate.setMinutes(minutes);
+    eventDate.setSeconds(seconds);
+
+    return eventDate;
+  };
+
   const [highlightFromDate, setHighlightFromDate] = useState(false);
   const [fromTime, setFromTime] = useState(new Date());
   const [toTime, setToTime] = useState(() => {
@@ -53,6 +68,7 @@ export default function TimeTableEditor({ id, date }) {
 
     return currentTime;
   });
+
   const [showFromTimePicker, setShowFromTimePicker] = useState(false);
   const [showToTimePicker, setToShowTimePicker] = useState(false);
   const [isAllDayEnabled, setIsAllDayEnabled] = useState(false);
@@ -115,9 +131,9 @@ export default function TimeTableEditor({ id, date }) {
         category: selected,
         costs: costs,
         description: description || "",
-        fromTime: toSGTISOString(fromTime),
+        fromTime: toSGTISOString(fixTime(fromTime, date)),
         purpose: purpose,
-        toTime: toSGTISOString(toTime),
+        toTime: toSGTISOString(fixTime(toTime, date)),
       };
       await updatePurpose(id, dataToUpdate);
       Alert.alert("Update", "Update Completed");

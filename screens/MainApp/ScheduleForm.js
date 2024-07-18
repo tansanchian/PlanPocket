@@ -33,6 +33,21 @@ export default function ScheduleForm({ route }) {
   ];
   const navigation = useNavigation();
 
+  const fixTime = (time, date) => {
+    const eventDate = new Date(date);
+    const eventTime = new Date(time);
+
+    const hours = eventTime.getHours();
+    const minutes = eventTime.getMinutes();
+    const seconds = eventTime.getSeconds();
+
+    eventDate.setHours(hours);
+    eventDate.setMinutes(minutes);
+    eventDate.setSeconds(seconds);
+
+    return eventDate;
+  };
+
   function toSGTISOString(fromTime) {
     const date = new Date(fromTime);
 
@@ -122,8 +137,8 @@ export default function ScheduleForm({ route }) {
         purpose,
         costs,
         description,
-        toSGTISOString(fromTime),
-        toSGTISOString(toTime)
+        toSGTISOString(fixTime(fromTime, dataTT[1].fromDate)),
+        toSGTISOString(fixTime(toTime, dataTT[1].fromDate))
       );
 
       if (result) {

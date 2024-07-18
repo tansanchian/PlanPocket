@@ -309,38 +309,37 @@ export async function readCurrentDateDatabase() {
           ) {
             minDateWithPurpose = schedule;
             minEventDate = schedule.fromDate;
+            if (minDateWithPurpose) {
+              const minPurposeArray = Object.values(minDateWithPurpose.purpose);
+              let minPurpose = null;
+
+              for (const purpose of minPurposeArray) {
+                const purposeTime = new Date(purpose.fromTime);
+
+                if (
+                  minPurpose === null ||
+                  purposeTime < new Date(minPurpose.fromTime)
+                ) {
+                  minPurpose = purpose;
+                  console.log("asdasdasdasdaisdfjioasdj", minPurpose);
+                }
+              }
+
+              console.log("Min Purpose:", minPurpose);
+              console.log("Event Date:", minEventDate);
+
+              if (minPurpose) {
+                return { purpose: minPurpose, eventDate: minEventDate };
+              } else {
+                console.log("All purposes are over");
+              }
+            } else {
+              console.log("No data available with purpose");
+              return null;
+            }
           }
         }
       }
-    }
-
-    if (minDateWithPurpose) {
-      const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-      let minPurpose = null;
-
-      for (const purpose of minPurposeArray) {
-        const purposeTime = new Date(purpose.fromTime);
-        if (purposeTime >= today) {
-          if (
-            minPurpose === null ||
-            purposeTime < new Date(minPurpose.fromTime)
-          ) {
-            minPurpose = purpose;
-          }
-        }
-      }
-
-      console.log("Min Purpose:", minPurpose);
-      console.log("Event Date:", minEventDate);
-
-      if (minPurpose) {
-        return { purpose: minPurpose, eventDate: minEventDate };
-      } else {
-        console.log("All purposes are over");
-      }
-    } else {
-      console.log("No data available with purpose");
-      return null;
     }
   } catch (error) {
     console.error("Error reading readCurrentDateDatabase:", error);
