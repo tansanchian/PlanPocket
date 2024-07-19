@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 const Schedule = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="AddSchedule"
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="AddSchedule" component={AddScheduleScreen} />

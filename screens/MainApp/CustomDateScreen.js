@@ -37,7 +37,7 @@ export default function CustomDateScreen({ route }) {
   const [otherPressed, setOtherPressed] = useState(false);
   const [date, setDate] = useState(new Date());
   const laterDate = new Date();
-  laterDate.setDate(laterDate.getDate() + customDay);
+  laterDate.setDate(laterDate.getDate() + customDay - 1);
   const [toDate, setToDate] = useState(laterDate);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showToDatePicker, setToShowDatePicker] = useState(false);
@@ -49,7 +49,7 @@ export default function CustomDateScreen({ route }) {
     setShowDatePicker(false);
     setDate(currentDate);
     const newToDate = new Date(currentDate);
-    newToDate.setDate(newToDate.getDate() + customDay);
+    newToDate.setDate(newToDate.getDate() + customDay - 1);
     setToDate(newToDate);
   };
 
@@ -62,7 +62,7 @@ export default function CustomDateScreen({ route }) {
     setToShowDatePicker(false);
     setToDate(currentDate);
     const newFromDate = new Date(currentDate);
-    newFromDate.setDate(newFromDate.getDate() - customDay);
+    newFromDate.setDate(newFromDate.getDate() - customDay - 1);
     setDate(newFromDate);
   };
 
@@ -72,7 +72,7 @@ export default function CustomDateScreen({ route }) {
 
   const getMinimumToDate = () => {
     const today = new Date();
-    today.setDate(today.getDate() + customDay);
+    today.setDate(today.getDate() + customDay - 1);
     return today;
   };
 

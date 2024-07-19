@@ -14,7 +14,6 @@ const HomeScreenNav = () => {
     >
       <Stack.Screen name="HomeScreen2" component={HomeScreen2} />
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      <Stack.Screen name="Timetable" component={Timetable} />
     </Stack.Navigator>
   );
 };

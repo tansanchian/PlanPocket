@@ -116,7 +116,8 @@ const HomeScreen2 = () => {
       const purposeData = await readCurrentDateDatabase();
       setPurpose(purposeData);
       if (purposeData) {
-        setJump(new Date(purposeData.purpose.fromTime));
+        console.log("Purposejump", purposeData);
+        setJump(purposeData.eventDate);
       }
       const scheduleData = await readScheduleDatabase();
       setScheduleLoading(true);

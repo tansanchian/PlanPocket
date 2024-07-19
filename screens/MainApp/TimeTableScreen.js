@@ -129,7 +129,6 @@ const TimeTableScreen = ({ route }) => {
   useEffect(() => {
     if (jump && jump.jump) {
       const date = new Date(jump.jump);
-      console.log(date);
       setJumpDate(date);
     }
   }, [jump]);

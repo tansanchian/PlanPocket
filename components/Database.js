@@ -311,15 +311,15 @@ export async function readCurrentDateDatabase() {
         if (formattedToday <= schedule.fromDate) {
           minDateWithPurpose = schedule;
           const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-          minPurposeArray.sort(
-            (a, b) => new Date(a.fromTime) - new Date(b.fromTime)
-          );
+          const filteredArray = minPurposeArray
+            .sort((a, b) => new Date(a.fromTime) - new Date(b.fromTime))
+            .filter((x) => new Date(x.fromTime) >= today);
 
-          const purposeTime = new Date(minPurposeArray[0].fromTime);
+          const purposeTime = new Date(filteredArray[0].fromTime);
           if (today <= purposeTime) {
             return {
-              purpose: minPurposeArray[0],
-              eventDate: extractDate(minPurposeArray[0].fromTime),
+              purpose: filteredArray[0],
+              eventDate: extractDate(filteredArray[0].fromTime),
             };
           }
         }
