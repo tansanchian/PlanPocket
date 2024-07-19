@@ -27,6 +27,7 @@ import { useNavigation } from "@react-navigation/native";
 import ChatRoomHeader from "./ChatRoomHeader";
 import { Ionicons } from "@expo/vector-icons";
 import ShareLogic from "../../../components/ShareLogic";
+import SharedPurposeDirectly from "./SharedPurposeDirectly";
 
 const MessengerScreen = ({ route }) => {
   const { data, item } = route.params;
@@ -157,8 +158,22 @@ const MessengerScreen = ({ route }) => {
     );
   };
 
-  const onAddSchedulePress = (messageData) => {
+  const onAddSchedulePress = async (messageData) => {
     navigation.navigate("SharedCustomDateScreen", { messageData });
+  };
+
+  const onAddDirectlySchedulePress = async (messageData) => {
+    try {
+      const result = await SharedPurposeDirectly({ messageData });
+      if (result == null) {
+        return navigation.navigate("SharedPurposeDirectlyIfNull", {
+          messageData,
+        });
+      }
+      Alert.alert("Success", "Purpose added successfully");
+    } catch (e) {
+      console.error("Error addScheduledPressed", e);
+    }
   };
 
   const handleAddSchedule = async (messageData) => {
@@ -180,7 +195,7 @@ const MessengerScreen = ({ route }) => {
               if (scheduleData) {
                 onAddSchedulePress(messageData);
               } else {
-                alert("You already have something going on");
+                onAddDirectlySchedulePress(messageData);
               }
             },
           },

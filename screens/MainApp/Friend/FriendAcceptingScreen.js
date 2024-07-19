@@ -119,10 +119,14 @@ export default function FriendRequestList() {
     );
   }
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item, index }) => {
     return (
       <TouchableOpacity onPress={handleAcceptRequest}>
-        <AcceptFriendItem friend={item} onAccept={handleAcceptRequest} />
+        <AcceptFriendItem
+          noBorder={index + 1 === friendRequests.length}
+          friend={item}
+          onAccept={handleAcceptRequest}
+        />
       </TouchableOpacity>
     );
   };

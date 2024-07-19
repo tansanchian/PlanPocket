@@ -453,13 +453,13 @@ export async function checkScheduleOverlap(date, toDate) {
         let scheduleFromDate = parseDate(schedule.fromDate);
         let scheduleToDate = parseDate(schedule.toDate);
 
-        console.log("DEBUGGING");
-        console.log(fromDate);
-        console.log(todate);
-        console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
-        console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
-        console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
-        console.log("DEBUGGING");
+        // console.log("DEBUGGING");
+        // console.log(fromDate);
+        // console.log(todate);
+        // console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
+        // console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
+        // console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
+        // console.log("DEBUGGING");
 
         if (
           (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
@@ -637,6 +637,61 @@ export async function updateBudget(id, data) {
     }
   } catch (error) {
     console.error("Error writing to database:", error);
+    return false;
+  }
+}
+
+export async function createDirectlySharedScheduleDatabase(date, toDate) {
+  const auth = getAuth();
+  const db = getDatabase();
+  const userId = auth.currentUser?.uid;
+
+  if (!userId) {
+    return "User not authenticated";
+  }
+
+  const parseDate = (dateString) => {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  let fromDate = parseDate(date);
+  let todate = parseDate(toDate);
+
+  let id = null;
+
+  try {
+    const schedulesRef = ref(db, `/users/${userId}/schedules`);
+    const schedulesSnapshot = await get(schedulesRef);
+
+    if (schedulesSnapshot.exists()) {
+      const schedules = schedulesSnapshot.val();
+
+      for (let scheduleId in schedules) {
+        const schedule = schedules[scheduleId];
+        let scheduleFromDate = parseDate(schedule.fromDate);
+        let scheduleToDate = parseDate(schedule.toDate);
+
+        // console.log("DEBUGGING");
+        // console.log(fromDate);
+        // console.log(todate);
+        // console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
+        // console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
+        // console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
+        // console.log("DEBUGGING");
+
+        if (
+          (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
+          (todate >= scheduleFromDate && todate <= scheduleToDate) ||
+          (fromDate <= scheduleFromDate && todate >= scheduleToDate)
+        ) {
+          return scheduleId;
+        }
+      }
+      return null;
+    }
+  } catch (error) {
+    console.error("Error finding Schedule:", error);
     return false;
   }
 }

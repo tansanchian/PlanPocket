@@ -346,7 +346,7 @@ const TimeTableScreen = ({ route }) => {
   const renderEmptyDate = () => {
     return (
       <View style={styles.emptyDate}>
-        <Text>This is empty date!</Text>
+        <Text>No event scheduled.</Text>
       </View>
     );
   };

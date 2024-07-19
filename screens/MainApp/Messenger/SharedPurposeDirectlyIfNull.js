@@ -20,16 +20,21 @@ import {
   writeScheduleDatabase,
 } from "../../../components/Database";
 
-export default function SharedCustomDateScreen({ route }) {
+export default function SharedPurposeDirectlyIfNull({ route }) {
   const { messageData } = route.params;
-  const fromDate = messageData.fromDate;
-  const toDate = messageData.toDate;
+
+  function formatDatez(timestamp) {
+    return timestamp.split("T")[0];
+  }
 
   function dateDifference(dateString1, dateString2) {
     const date1 = new Date(dateString1);
     const date2 = new Date(dateString2);
     return Math.floor(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   }
+
+  const fromDate = formatDatez(messageData.events[0].fromTime);
+  const toDate = formatDatez(messageData.events[0].fromTime);
 
   const customDay = parseInt(dateDifference(fromDate, toDate)) + 1;
 
@@ -195,13 +200,13 @@ export default function SharedCustomDateScreen({ route }) {
         <CustomInput
           name="fromDate"
           control={control}
-          placeholder={formatDate(messageData.fromDate)}
+          placeholder={formatDate(fromDate)}
           editable={false}
         />
         <CustomInput
           name="toDate"
           control={control}
-          placeholder={formatDate(messageData.toDate)}
+          placeholder={formatDate(toDate)}
           editable={false}
         />
         <CustomButton
