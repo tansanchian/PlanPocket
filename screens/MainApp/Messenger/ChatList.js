@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useFocusEffect, useCallback } from "react";
 import { View, FlatList, StyleSheet, Text } from "react-native";
 import ChatItem from "./ChatItem";
 import { database } from "../../../App";
@@ -71,12 +71,14 @@ export default function ChatList() {
     });
   };
 
-  useEffect(() => {
-    if (currentUserId) {
-      const unsubscribe = getFriends();
-      return unsubscribe;
-    }
-  }, [currentUserId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (currentUserId) {
+        const unsubscribe = getFriends();
+        return unsubscribe;
+      }
+    }, [currentUserId])
+  );
 
   return (
     <View style={styles.container}>
