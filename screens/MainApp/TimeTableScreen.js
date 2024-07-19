@@ -14,7 +14,7 @@ import { Calendar, Agenda } from "react-native-calendars";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import { readScheduleDatabase } from "../../components/Database";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import BottomSheet from "@gorhom/bottom-sheet";
 import TimeTableEditor from "../../components/TimeTableEditor";
@@ -82,7 +82,8 @@ function getShortDay(dateString) {
   return `${weekday}`;
 }
 
-const TimeTableScreen = ({ navigation }) => {
+const TimeTableScreen = ({ route }) => {
+  const navigation = useNavigation();
   const [items, setItems] = useState({});
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [flatListItem, setflatListItem] = useState(null);
@@ -92,6 +93,18 @@ const TimeTableScreen = ({ navigation }) => {
   const bottomSheetEditBudgetRef = useRef(null);
   const [editBudget, setEditBudget] = useState(false);
   const [budgetItem, setBudgetItem] = useState(null);
+  const [bottomSheetDate, setBottomSheetDate] = useState("");
+  const [jumpDate, setJumpDate] = useState(new Date());
+
+  const jump = route.params || new Date();
+
+  useEffect(() => {
+    if (jump && jump.jump) {
+      const date = new Date(jump.jump);
+      console.log(date);
+      setJumpDate(date);
+    }
+  }, [jump]);
 
   const onEditPressed = () => {
     setEdit(true);
@@ -121,32 +134,34 @@ const TimeTableScreen = ({ navigation }) => {
       const dataArray = Object.entries(data) || [];
       const dataLength = dataArray.length;
       const newItems = {};
+
       for (let i = -15; i < 70; i++) {
         const time = day.timestamp + i * 24 * 60 * 60 * 1000;
         const strTime = timeToString(time);
+
         if (!newItems[strTime]) {
           newItems[strTime] = [];
+
           if (dataLength != 0) {
-            for (let i = 0; i < dataLength; i++) {
-              if (!dataArray[i][1]) continue;
-              if (dataArray[i][1].fromDate === strTime) {
-                let curr = parseDate(dataArray[i][1].fromDate);
-                const end = parseDate(dataArray[i][1].toDate);
+            for (let j = 0; j < dataLength; j++) {
+              if (!dataArray[j][1]) continue;
+
+              if (dataArray[j][1].fromDate === strTime) {
+                let curr = parseDate(dataArray[j][1].fromDate);
+                const end = parseDate(dataArray[j][1].toDate);
+
                 while (curr <= end) {
                   const currStr = timeToString(curr.getTime());
+
                   if (!newItems[currStr]) {
                     newItems[currStr] = [];
                   }
+
                   newItems[currStr].push({
                     currDateTT: currStr,
-                    fromDateTT: dataArray[i][1].fromDate,
-                    setToDateTT: dataArray[i][1].toDate,
-                    setBudgetTT: dataArray[i][1].budget,
-                    setMealTT: dataArray[i][1].meals,
-                    descriptionTT: dataArray[i][1][currStr]?.description,
-                    purposeTT: dataArray[i][1][currStr]?.purpose,
-                    data: dataArray[i],
+                    data: dataArray[j],
                   });
+
                   curr.setDate(curr.getDate() + 1);
                 }
               }
@@ -154,6 +169,7 @@ const TimeTableScreen = ({ navigation }) => {
           }
         }
       }
+
       setItems(newItems);
     } catch (e) {
       console.error(e.message);
@@ -170,7 +186,6 @@ const TimeTableScreen = ({ navigation }) => {
   const ref = useRef(null);
 
   const renderItem = (item) => {
-    console.log(item);
     const dataToSend = {
       dataTT: item.data,
       dateTT: item.currDateTT,
@@ -181,18 +196,20 @@ const TimeTableScreen = ({ navigation }) => {
     };
 
     const datas = item.data[1].purpose;
-    let currDateTT = null;
     let dataArray = [];
-    if (datas != undefined) {
-      currDateTT = [item.currDateTT];
-      dataArray = Object.entries(datas);
-      dataArray.forEach((entry, index) => {
-        if (entry[1] !== undefined && currDateTT[index] !== undefined) {
-          entry[1].date = currDateTT[index];
+    if (datas !== undefined) {
+      dataArray = Object.entries(datas).filter((entry) => {
+        return (
+          new Date(entry[1].fromTime).toISOString().split("T")[0] ===
+          item.currDateTT
+        );
+      });
+      dataArray.forEach((entry) => {
+        if (entry[1] !== undefined) {
+          entry[1].date = item.currDateTT;
         }
       });
     }
-
     return (
       <View style={styles.card}>
         <View
@@ -251,6 +268,7 @@ const TimeTableScreen = ({ navigation }) => {
                   setflatListItem(item);
                   setEditBudget(false);
                   setSelectedDate(item[1].date);
+                  setBottomSheetDate(item[1].date);
                   if (bottomSheetRef.current) {
                     bottomSheetRef.current.snapToIndex(1);
                   }
@@ -313,7 +331,7 @@ const TimeTableScreen = ({ navigation }) => {
         items={items}
         showClosingKnob={true}
         loadItemsForMonth={loadItems}
-        selected={new Date()}
+        selected={jumpDate}
         renderItem={renderItem}
         renderEmptyDate={renderEmptyDate}
         theme={{
@@ -376,7 +394,7 @@ const TimeTableScreen = ({ navigation }) => {
                     fontWeight: "900",
                   }}
                 >
-                  {getDay(selectedDate)}
+                  {getDay(bottomSheetDate)}
                 </Text>
                 <Text
                   style={{

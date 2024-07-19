@@ -275,6 +275,11 @@ export async function readCurrentDateDatabase() {
   const today = new Date(date.getTime() + 8 * 60 * 60 * 1000);
   const formattedToday = today.toISOString().split("T")[0];
 
+  function extractDate(datetimeString) {
+    const dateObject = new Date(datetimeString);
+    return dateObject.toISOString().split("T")[0];
+  }
+
   if (!userId) {
     console.error("User is not authenticated");
     return null;
@@ -306,10 +311,16 @@ export async function readCurrentDateDatabase() {
         if (formattedToday <= schedule.fromDate) {
           minDateWithPurpose = schedule;
           const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-          for (const purpose of minPurposeArray) {
-            const purposeTime = new Date(purpose.fromTime);
-            if (today <= purposeTime)
-              return { purpose: purpose, eventDate: schedule.fromDate };
+          minPurposeArray.sort(
+            (a, b) => new Date(a.fromTime) - new Date(b.fromTime)
+          );
+
+          const purposeTime = new Date(minPurposeArray[0].fromTime);
+          if (today <= purposeTime) {
+            return {
+              purpose: minPurposeArray[0],
+              eventDate: extractDate(minPurposeArray[0].fromTime),
+            };
           }
         }
       }

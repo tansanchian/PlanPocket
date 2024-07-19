@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet, Text, Image } from "react-native";
-import ChatItem from "./ChatItem";
 import { database } from "../../../App";
 import { getAuth } from "firebase/auth";
 import { query, where, getDocs, collection } from "firebase/firestore";
@@ -52,7 +51,6 @@ export default function SearchList() {
 
   const data = friends.filter((friend) => friend.username.includes(search));
 
-  console.log(friends);
   return (
     <View style={styles.container}>
       <ChatSearch setSearch={setSearch} />

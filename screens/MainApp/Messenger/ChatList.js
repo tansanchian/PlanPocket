@@ -1,5 +1,6 @@
-import React, { useState, useFocusEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { View, FlatList, StyleSheet, Text } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import ChatItem from "./ChatItem";
 import { database } from "../../../App";
 import { getAuth } from "firebase/auth";

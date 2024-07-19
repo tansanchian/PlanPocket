@@ -13,6 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import { Card, IconButton } from "react-native-paper";
 import { getDatabase, ref, onValue } from "firebase/database";
 import { getAuth } from "firebase/auth";
+import HomeScreenHeader from "../HomeScreenHeader";
 
 const ScheduleList = ({ route }) => {
   const { data } = route.params;
@@ -134,10 +135,10 @@ const ScheduleList = ({ route }) => {
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
-      <Header title="Share Schedule" />
-      {schedules.length === 0 ? (
+      <HomeScreenHeader title="Share Schedule" />
+      {purpose.length === 0 ? (
         <View style={styles.internalContainer}>
-          <Text style={styles.text}>No Current Schedule</Text>
+          <Text style={styles.text}>No Current Purpose</Text>
         </View>
       ) : (
         <FlatList

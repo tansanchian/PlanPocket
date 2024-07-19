@@ -20,7 +20,7 @@ import { SelectList } from "react-native-dropdown-select-list";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function ScheduleForm({ route }) {
-  const { dataTT } = route.params || {};
+  const { dataTT, dateTT } = route.params || {};
 
   const [selected, setSelected] = useState("");
   const data = [
@@ -137,8 +137,8 @@ export default function ScheduleForm({ route }) {
         purpose,
         costs,
         description,
-        toSGTISOString(fixTime(fromTime, dataTT[1].fromDate)),
-        toSGTISOString(fixTime(toTime, dataTT[1].fromDate))
+        toSGTISOString(fixTime(fromTime, dateTT)),
+        toSGTISOString(fixTime(toTime, dateTT))
       );
 
       if (result) {
@@ -197,7 +197,7 @@ export default function ScheduleForm({ route }) {
             }}
           >
             <View pointerEvents="none">
-              <TextInput value={dataTT[1].fromDate} />
+              <TextInput value={dateTT} />
             </View>
           </View>
           <View style={{ flex: 0.05 }}></View>

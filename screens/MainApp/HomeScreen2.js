@@ -44,6 +44,7 @@ const HomeScreen2 = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [threshold, setThreshold] = useState({});
   const [exceedSpending, setExceedSpending] = useState(false);
+  const [jump, setJump] = useState(new Date());
 
   const parseTime = (x) => {
     const convertTo12HourFormat = (timeString) => {
@@ -114,7 +115,9 @@ const HomeScreen2 = () => {
       await readThreshold();
       const purposeData = await readCurrentDateDatabase();
       setPurpose(purposeData);
-
+      if (purposeData) {
+        setJump(new Date(purposeData.purpose.fromTime));
+      }
       const scheduleData = await readScheduleDatabase();
       setScheduleLoading(true);
       if (!scheduleData) {
@@ -211,7 +214,7 @@ const HomeScreen2 = () => {
   };
 
   const onCalendarPressed = () => {
-    navigation.navigate("Timetable");
+    navigation.navigate("Timetable", { jump: jump });
   };
 
   const loading = () => (

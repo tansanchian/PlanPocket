@@ -37,8 +37,8 @@ const AddScheduleScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  const onCalendarPressed = () => {
-    navigation.navigate("Timetable");
+  const onCalendarPressed = (data) => {
+    navigation.navigate("Timetable", { jump: data });
   };
 
   const onDeletePressed = async (id) => {
@@ -59,7 +59,9 @@ const AddScheduleScreen = () => {
           title={item[1].title}
           subtitle={`Budget: ${item[1].budget}`}
           left={(props) => (
-            <TouchableOpacity onPress={onCalendarPressed}>
+            <TouchableOpacity
+              onPress={() => onCalendarPressed(item[1].fromDate)}
+            >
               <Avatar.Icon {...props} icon="calendar" />
             </TouchableOpacity>
           )}
