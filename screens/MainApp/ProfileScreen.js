@@ -328,7 +328,7 @@ export default function ProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={styles.container}>
-        <StatusBar barStyle={"dark-content"} />
+        <StatusBar barStyle={"dark"} />
         <View style={styles.header}>
           <Text style={styles.headerText}>Profile</Text>
           <View style={styles.back}>

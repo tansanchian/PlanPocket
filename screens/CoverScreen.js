@@ -27,7 +27,7 @@ const CoverScreen = () => {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Image
           source={require("../assets/Logo.png")}
           style={{ resizeMode: "contain", height: 500 }}

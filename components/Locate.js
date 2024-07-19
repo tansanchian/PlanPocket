@@ -51,7 +51,7 @@ export default function Locate() {
         title="Reverse Geocode Current Location"
         onPress={reverseGeocode}
       />
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </View>
   );
 }

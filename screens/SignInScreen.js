@@ -79,7 +79,7 @@ export default function SignInScreen() {
       >
         <View style={globalStyles.globalContainer}>
           <View style={styles.container}>
-            <StatusBar style="auto" />
+            <StatusBar style="dark" />
             <Image
               source={require("../assets/Logo.png")}
               style={[styles.img, { height: height * 0.3 }]}

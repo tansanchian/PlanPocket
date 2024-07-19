@@ -12,8 +12,6 @@ import { checkScheduleOverlap } from "./Database";
 
 export default async function ShareLogic(item) {
   try {
-    console.log("asdasdasdasdsadasdas", item.fromDate);
-    console.log("asdasdasdasdsadasdas", item.toDate);
     const fromDate = item.fromDate;
     const toDate = item.toDate;
     const checkSchedule = await checkScheduleOverlap(fromDate, toDate);

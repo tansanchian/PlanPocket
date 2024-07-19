@@ -116,7 +116,7 @@ export default function CustomDateScreen({ route }) {
   return (
     <TouchableWithoutFeedback onPress={dismiss}>
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.mainTitle}> {customDay} Day Plan</Text>
         <Text style={styles.firstTitle}>Title</Text>
         <CustomInput

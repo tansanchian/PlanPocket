@@ -40,7 +40,7 @@ export default function FogotPassword() {
       style={styles.scrollContainer}
     >
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
         <Text style={styles.title}>Reset your password</Text>
         <CustomInput
           name="email"
