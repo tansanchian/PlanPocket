@@ -147,29 +147,7 @@ export default function SignInScreen() {
                 onPress={handleSubmit(onSignInPressed)}
               />
             )}
-            <Text
-              style={{
-                fontSize: 18,
-                color: "gray",
-                textAlign: "center",
-                fontWeight: "bold",
-                marginVertical: 10,
-              }}
-            >
-              Or Login with
-            </Text>
-            <CustomButton
-              text="Sign In with Google"
-              onPress={onSignInGoogle}
-              bgColor="#FAE9EA"
-              fgColor="#DD4D44"
-            />
-            <CustomButton
-              text="Sign In with Facebook"
-              onPress={onSignInFacebook}
-              bgColor="#FAE9EA"
-              fgColor="#DD4D44"
-            />
+
             <CustomButton
               text="Don't have an account? Register"
               onPress={onSignUpPressed}

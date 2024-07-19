@@ -47,12 +47,12 @@ export default function SignUpScreen() {
     const db = getDatabase();
     set(ref(db, `/users/${response.user.uid}/Profile`), { username: username });
     set(ref(db, `/users/${response.user.uid}/Threshold`), {
-      "Dining": 0.2,
-      "Transportation": 0.1,
+      Dining: 0.2,
+      Transportation: 0.1,
       "Entertainment & Leisure": 0.15,
-      "Shopping": 0.2,
+      Shopping: 0.2,
       "Bill, Utilities & Taxes": 0.2,
-      "Uncategorized": 0.15,
+      Uncategorized: 0.15,
     });
   };
 
@@ -178,19 +178,6 @@ export default function SignUpScreen() {
               Privacy Policy
             </Text>
           </Text>
-          <CustomButton
-            text="Sign Up with Google"
-            onPress={onSignInGoogle}
-            bgColor="#FAE9EA"
-            fgColor="#DD4D44"
-          />
-          <CustomButton
-            text="Sign Up with Facebook"
-            onPress={onSignInFacebook}
-            bgColor="#FAE9EA"
-            fgColor="#DD4D44"
-          />
-
           <CustomButton
             text="Have an account? Sign in"
             onPress={onSignInPressed}
