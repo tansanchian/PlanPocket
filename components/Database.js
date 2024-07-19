@@ -291,52 +291,25 @@ export async function readCurrentDateDatabase() {
 
     const schedules = snapshot.val();
     const scheduleArray = Object.values(schedules);
+
     const parseDate = (dateString) => {
       const [year, month, day] = dateString.split("-").map(Number);
       return new Date(year, month - 1, day);
     };
 
     let minDateWithPurpose = null;
-    let minEventDate = null;
+
+    scheduleArray.sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
 
     for (const schedule of scheduleArray) {
       if (schedule.purpose != undefined) {
         if (formattedToday <= schedule.fromDate) {
-          if (
-            !minDateWithPurpose ||
-            parseDate(schedule.fromDate) <
-              parseDate(minDateWithPurpose.fromDate)
-          ) {
-            minDateWithPurpose = schedule;
-            minEventDate = schedule.fromDate;
-            if (minDateWithPurpose) {
-              const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-              let minPurpose = null;
-
-              for (const purpose of minPurposeArray) {
-                const purposeTime = new Date(purpose.fromTime);
-
-                if (
-                  minPurpose === null ||
-                  purposeTime < new Date(minPurpose.fromTime)
-                ) {
-                  minPurpose = purpose;
-                  console.log("asdasdasdasdaisdfjioasdj", minPurpose);
-                }
-              }
-
-              console.log("Min Purpose:", minPurpose);
-              console.log("Event Date:", minEventDate);
-
-              if (minPurpose) {
-                return { purpose: minPurpose, eventDate: minEventDate };
-              } else {
-                console.log("All purposes are over");
-              }
-            } else {
-              console.log("No data available with purpose");
-              return null;
-            }
+          minDateWithPurpose = schedule;
+          const minPurposeArray = Object.values(minDateWithPurpose.purpose);
+          for (const purpose of minPurposeArray) {
+            const purposeTime = new Date(purpose.fromTime);
+            if (today <= purposeTime)
+              return { purpose: purpose, eventDate: schedule.fromDate };
           }
         }
       }
