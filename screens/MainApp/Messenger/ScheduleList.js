@@ -40,7 +40,6 @@ const ScheduleList = ({ route }) => {
     const auth = getAuth();
     const db = getDatabase();
     const userId = auth.currentUser?.uid;
-
     const schedulesRef = ref(db, `/users/${userId}/schedules`);
     const unsubscribe = onValue(schedulesRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -67,6 +66,7 @@ const ScheduleList = ({ route }) => {
 
         setPurpose(allPurposes);
         setSchedules(Object.entries(data));
+        
       } else {
         setSchedules([]);
       }
@@ -93,6 +93,43 @@ const ScheduleList = ({ route }) => {
       { cancelable: true }
     );
   };
+  const formatTimestamp = (timestamp) => {
+    const dateInput = new Date(timestamp);
+    const date = new Date(dateInput.getTime() - 8 * 60 * 60 * 1000);
+  
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+  
+    const dayOfWeek = dayNames[date.getDay()];
+    const monthName = monthNames[date.getMonth()];
+    const day = date.getDate();
+  
+    const formattedDate = `${dayOfWeek}, ${monthName} ${day}`;
+  
+    return formattedDate;
+  };
+  
 
   const renderComponentOne = ({ item }) => {
     if (!item.purposeValue) {
@@ -113,6 +150,7 @@ const ScheduleList = ({ route }) => {
           titleStyle={styles.cardTitle}
         />
         <Card.Content>
+          <Text style={styles.dateText}>Date: {formatTimestamp(data.fromTime)}</Text>
           <Text style={styles.dateText}>Purpose: {data.purpose}</Text>
           <Text style={styles.dateText}>Cost: ${data.costs}</Text>
           {data.description !== "" && (
