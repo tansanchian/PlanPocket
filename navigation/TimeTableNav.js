@@ -12,8 +12,6 @@ const TimeTableNav = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Timetable" component={Timetable} />
       <Stack.Screen name="ScheduleForm" component={Schedule} />
-      <Stack.Screen name="AddScheduleScreen" component={AddScheduleScreen} />
-      <Stack.Screen name="HomeScreen2" component={HomeScreen2} />
     </Stack.Navigator>
   );
 };

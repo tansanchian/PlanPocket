@@ -297,34 +297,17 @@ export async function readCurrentDateDatabase() {
     const schedules = snapshot.val();
     const scheduleArray = Object.values(schedules);
 
-    const parseDate = (dateString) => {
-      const [year, month, day] = dateString.split("-").map(Number);
-      return new Date(year, month - 1, day);
-    };
-
-    let minDateWithPurpose = null;
-
-    scheduleArray.sort((a, b) => new Date(a.fromDate) - new Date(b.fromDate));
-
-    for (const schedule of scheduleArray) {
-      if (schedule.purpose != undefined) {
-        if (formattedToday <= schedule.fromDate) {
-          minDateWithPurpose = schedule;
-          const minPurposeArray = Object.values(minDateWithPurpose.purpose);
-          const filteredArray = minPurposeArray
-            .sort((a, b) => new Date(a.fromTime) - new Date(b.fromTime))
-            .filter((x) => new Date(x.fromTime) >= today);
-
-          const purposeTime = new Date(filteredArray[0].fromTime);
-          if (today <= purposeTime) {
-            return {
-              purpose: filteredArray[0],
-              eventDate: extractDate(filteredArray[0].fromTime),
-            };
-          }
+    const allPurposes = scheduleArray
+      .reduce((acc, item) => {
+        if (item.purpose !== undefined) {
+          acc.push(...Object.values(item.purpose));
         }
-      }
-    }
+        return acc;
+      }, [])
+      .filter((x) => new Date(x.fromTime) >= today)
+      .sort((a, b) => new Date(a.fromTime) - new Date(b.fromTime))[0];
+
+    return allPurposes;
   } catch (error) {
     console.error("Error reading readCurrentDateDatabase:", error);
     return null;

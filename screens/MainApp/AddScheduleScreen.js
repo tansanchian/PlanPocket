@@ -70,7 +70,7 @@ const AddScheduleScreen = () => {
   }, []);
 
   const onCalendarPressed = (data) => {
-    navigation.navigate("Timetable", { jump: data });
+    navigation.navigate("TimeTableScreen", { jump: data });
   };
 
   const onDeletePressed = async (id) => {

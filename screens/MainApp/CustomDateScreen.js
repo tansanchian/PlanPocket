@@ -90,6 +90,7 @@ export default function CustomDateScreen({ route }) {
       if (otherPressed && meals == 2) {
         return Alert.alert("Please enter the number of meals");
       }
+
       const result = await createScheduleDatabase(
         title,
         budget,

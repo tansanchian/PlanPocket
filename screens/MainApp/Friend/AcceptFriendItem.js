@@ -43,7 +43,10 @@ const AcceptFriendItem = ({ friend, onAccept, noBorder }) => {
     <View
       style={[styles.friendContainer, noBorder && { borderBottomWidth: 0 }]}
     >
-      <Image source={{ uri: imageUri }} style={styles.profileImage} />
+      <Image
+        source={{ uri: imageUri }}
+        style={[styles.image, { height: hp(6), width: hp(6) }]}
+      />
       <View style={styles.friendInfo}>
         <Text style={styles.friendName}>{friend.username}</Text>
       </View>
@@ -66,15 +69,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#d3d3d3",
   },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 12,
+  image: {
+    borderRadius: hp(3),
   },
   friendInfo: {
     flex: 1,
-    gap: hp(2),
+    gap: hp(1),
   },
   friendName: {
     fontSize: 16,

@@ -43,20 +43,35 @@ export default function SharedPurposeDirectlyIfNull({ route }) {
     navigation.goBack();
   };
 
+  const stringifyDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const [meals, setMeals] = useState(2);
   const [otherPressed, setOtherPressed] = useState(false);
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
 
-  function formatDate(dateString) {
-    const date = new Date(dateString);
+  function formatDateToCustom(isoString) {
+    const date = new Date(isoString);
+
     const options = {
       weekday: "short",
-      month: "short",
-      day: "numeric",
       year: "numeric",
+      month: "short",
+      day: "2-digit",
     };
-    return date.toLocaleDateString("en-US", options);
+
+    const formattedDate = date.toLocaleDateString("en-US", options);
+    return formattedDate;
+  }
+
+  function getDateOnly(isoString) {
+    const date = new Date(isoString);
+    return date.toISOString().split("T")[0];
   }
 
   const dismiss = () => {
@@ -77,8 +92,8 @@ export default function SharedPurposeDirectlyIfNull({ route }) {
         title,
         budget,
         meals,
-        fromDate,
-        toDate,
+        getDateOnly(new Date(fromDate)),
+        getDateOnly(new Date(toDate)),
         mealBudget
       );
 
@@ -200,13 +215,13 @@ export default function SharedPurposeDirectlyIfNull({ route }) {
         <CustomInput
           name="fromDate"
           control={control}
-          placeholder={formatDate(fromDate)}
+          placeholder={formatDateToCustom(getDateOnly(new Date(fromDate)))}
           editable={false}
         />
         <CustomInput
           name="toDate"
           control={control}
-          placeholder={formatDate(toDate)}
+          placeholder={formatDateToCustom(getDateOnly(new Date(fromDate)))}
           editable={false}
         />
         <CustomButton

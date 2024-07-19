@@ -6,9 +6,40 @@ import {
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
 import { Ionicons } from "@expo/vector-icons";
+import { getDatabase, ref, child, get } from "firebase/database";
+import { getDocs, query, where, collection } from "firebase/firestore";
+import { useState, useEffect } from "react";
+import { database } from "../../../App";
 
-const FriendHeader = ({ name }) => {
+const ChatRoomHeader = ({ name }) => {
   const navigation = useNavigation();
+  const [imageUri, setImageUri] = useState(
+    "https://static.vecteezy.com/system/resources/previews/036/280/651/non_2x/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-illustration-vector.jpg"
+  );
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      const userRef = collection(database, "users");
+      const q = query(userRef, where("username", "==", name));
+      const querySnapshot = await getDocs(q);
+      let data = {};
+      querySnapshot.forEach((doc) => {
+        data = { ...doc.data(), id: doc.id };
+      });
+      const dbRef = ref(getDatabase());
+      try {
+        const snapshot = await get(
+          child(dbRef, `users/${data.userId}/Profile/imageUrl`)
+        );
+        if (snapshot.exists() && snapshot.val() !== "") {
+          setImageUri(snapshot.val());
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchImage();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -21,7 +52,7 @@ const FriendHeader = ({ name }) => {
         </TouchableOpacity>
         <View>
           <Image
-            source={require("../../../assets/icon.png")}
+            source={{ uri: imageUri }}
             style={[
               styles.image,
               { height: hp(4.5), aspectRatio: 1, borderRadius: 100 },
@@ -68,4 +99,4 @@ const styles = StyleSheet.create({
     tintColor: "black",
   },
 });
-export default FriendHeader;
+export default ChatRoomHeader;

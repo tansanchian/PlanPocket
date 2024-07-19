@@ -88,9 +88,36 @@ const HomeScreen2 = () => {
 
   const parseDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { month: "short", day: "numeric" };
-    return date.toLocaleDateString("en-US", options);
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const month = months[date.getUTCMonth()];
+    const day = date.getUTCDate();
+
+    return `${month} ${day}`;
   };
+
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
 
   const getIcon = (selectedCategory) => {
     switch (selectedCategory) {
@@ -117,7 +144,7 @@ const HomeScreen2 = () => {
       setPurpose(purposeData);
       if (purposeData) {
         console.log("Purposejump", purposeData);
-        setJump(purposeData.eventDate);
+        setJump(formatDate(purposeData.fromTime));
       }
       const scheduleData = await readScheduleDatabase();
       setScheduleLoading(true);
@@ -215,7 +242,7 @@ const HomeScreen2 = () => {
   };
 
   const onCalendarPressed = () => {
-    navigation.navigate("Timetable", { jump: jump });
+    navigation.navigate("TimeTableScreen", { jump: jump });
   };
 
   const loading = () => (
@@ -314,9 +341,8 @@ const HomeScreen2 = () => {
             <View>
               <Text style={styles.dateText}>Your next event is on</Text>
               <Text style={styles.dateText}>
-                {parseDate(purpose.eventDate)}{" "}
-                {parseTime(purpose.purpose.fromTime)} to{" "}
-                {parseTime(purpose.purpose.toTime)}
+                {parseDate(purpose.fromTime)} {parseTime(purpose.fromTime)} to{" "}
+                {parseTime(purpose.toTime)}
               </Text>
             </View>
           </View>

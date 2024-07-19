@@ -38,21 +38,29 @@ export default function SharedCustomDateScreen({ route }) {
     navigation.goBack();
   };
 
+  function formatDateToCustom(isoString) {
+    const date = new Date(isoString);
+
+    const options = {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    };
+
+    const formattedDate = date.toLocaleDateString("en-US", options);
+    return formattedDate;
+  }
+
+  function getDateOnly(isoString) {
+    const date = new Date(isoString);
+    return date.toISOString().split("T")[0];
+  }
+
   const [meals, setMeals] = useState(2);
   const [otherPressed, setOtherPressed] = useState(false);
   const [meals2, setMeals2] = useState(true);
   const [meals3, setMeals3] = useState(false);
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const options = {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    };
-    return date.toLocaleDateString("en-US", options);
-  }
 
   const dismiss = () => {
     Keyboard.dismiss();
@@ -72,8 +80,8 @@ export default function SharedCustomDateScreen({ route }) {
         title,
         budget,
         meals,
-        fromDate,
-        toDate,
+        getDateOnly(new Date(fromDate)),
+        getDateOnly(new Date(toDate)),
         mealBudget
       );
 
@@ -195,13 +203,13 @@ export default function SharedCustomDateScreen({ route }) {
         <CustomInput
           name="fromDate"
           control={control}
-          placeholder={formatDate(messageData.fromDate)}
+          placeholder={formatDateToCustom(getDateOnly(new Date(fromDate)))}
           editable={false}
         />
         <CustomInput
           name="toDate"
           control={control}
-          placeholder={formatDate(messageData.toDate)}
+          placeholder={formatDateToCustom(getDateOnly(new Date(fromDate)))}
           editable={false}
         />
         <CustomButton
