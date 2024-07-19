@@ -19,6 +19,38 @@ const AddScheduleScreen = () => {
     navigation.navigate("ChooseDate");
   };
 
+  const formatDate = (dateString) => {
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const date = new Date(dateString);
+
+    const month = monthNames[date.getMonth()];
+    const day = date.getDate();
+
+    return `${month} ${day}`;
+  };
+
+  const getYear = (dateString) => {
+    const date = new Date(dateString);
+
+    const year = date.getFullYear();
+
+    return year.toString();
+  };
+
   useEffect(() => {
     const auth = getAuth();
     const db = getDatabase();
@@ -76,8 +108,9 @@ const AddScheduleScreen = () => {
           subtitleStyle={styles.cardSubtitle}
         />
         <Card.Content>
+          <Text style={styles.dateText}>Year: {getYear(item[1].fromDate)}</Text>
           <Text style={styles.dateText}>
-            {item[1].fromDate} to {item[1].toDate}
+            Date: {formatDate(item[1].fromDate)} to {formatDate(item[1].toDate)}
           </Text>
         </Card.Content>
       </Card>
@@ -156,7 +189,7 @@ const styles = StyleSheet.create({
   },
   card: {
     marginVertical: 10,
-    borderRadius: 50,
+    borderRadius: 25,
     elevation: 2,
     width: 400,
   },
@@ -172,6 +205,7 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 16,
     marginBottom: 5,
+    marginLeft: 5,
   },
   flatListContent: {
     flexGrow: 1,

@@ -53,18 +53,46 @@ const parseTime = (x) => {
 
 const formatTimestamp = (timestamp) => {
   const dateInput = new Date(timestamp);
-  const date = new Date(dateInput - 8 * 60 * 60 * 1000);
+  const date = new Date(dateInput.getTime() - 8 * 60 * 60 * 1000);
 
   const formatTime12Hour = (date) => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
+    hours = hours % 12 || 12;
     return `${hours}:${minutes < 10 ? "0" + minutes : minutes} ${ampm}`;
   };
 
-  const formattedDate = `${formatTime12Hour(date)} (local time)`;
+  const dayNames = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const dayOfWeek = dayNames[date.getDay()];
+  const monthName = monthNames[date.getMonth()];
+  const day = date.getDate();
+  const time = formatTime12Hour(date);
+
+  const formattedDate = `${dayOfWeek}, ${monthName} ${day}, ${time} (local time)`;
 
   return formattedDate;
 };
