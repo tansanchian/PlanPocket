@@ -69,6 +69,7 @@ export default function SignUpScreen() {
         username: username,
         userId: response?.user?.uid,
         friends: [],
+        firstLoggedIn: true
       });
 
       if (response.user) {

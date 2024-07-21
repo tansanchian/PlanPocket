@@ -60,7 +60,14 @@ const AddScheduleScreen = () => {
     const unsubscribe = onValue(schedulesRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        setSchedules(Object.entries(data));
+        const dataArray = Object.entries(data);
+        const sortedArray = dataArray.sort(
+          (x, y) => new Date(x[1].fromDate) - new Date(y[1].fromDate)
+        );
+
+        setSchedules(sortedArray);
+
+        console.log(data);
       } else {
         setSchedules([]);
       }
@@ -70,11 +77,16 @@ const AddScheduleScreen = () => {
   }, []);
 
   const onCalendarPressed = (data) => {
-    navigation.navigate("TimeTableScreen", { jump: data });
+    console.log("Navigating with data:", data);
+    navigation.navigate("TimeTable", {
+      screen: "TimeTableScreen",
+      params: { jump: data },
+    });
   };
 
   const onDeletePressed = async (id) => {
     try {
+      console.log("Deleting", id);
       await deleteScheduleDatabase(id);
     } catch (error) {
       console.error(error);
@@ -153,6 +165,7 @@ const AddScheduleScreen = () => {
       ) : (
         <>
           <FlatList
+            showsVerticalScrollIndicator={false}
             style={styles.flatContainer}
             data={schedules}
             renderItem={renderItem}

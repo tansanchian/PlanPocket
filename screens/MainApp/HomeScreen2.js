@@ -8,6 +8,8 @@ import {
   FlatList,
   Image,
   Platform,
+  Dimensions,
+  ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
@@ -242,7 +244,11 @@ const HomeScreen2 = () => {
   };
 
   const onCalendarPressed = () => {
-    navigation.navigate("TimeTableScreen", { jump: jump });
+    console.log("Navigating with data:", jump);
+    navigation.navigate("TimeTable", {
+      screen: "TimeTableScreen",
+      params: { jump: jump },
+    });
   };
 
   const loading = () => (
@@ -316,6 +322,7 @@ const HomeScreen2 = () => {
     <View style={styles.container}>
       <StatusBar style="dark" />
       <Header title="Home" />
+
       <View style={styles.dashboard}>
         <View style={styles.name}>
           <Text style={styles.nameText}>Good Day {username}</Text>
@@ -348,52 +355,62 @@ const HomeScreen2 = () => {
           </View>
         )}
 
-        <View>
+        <View style={{ flex: 1 }}>
           {scheduleLoading ? (
             loading()
           ) : expenses ? (
-            <View>
-              <FlatList
-                data={scheduleArray}
-                keyExtractor={(item) => item[0]}
-                contentContainerStyle={{
-                  alignItems: "center",
-                }}
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                renderItem={renderItem}
-              />
-              <View style={styles.row}>
-                <View>
-                  <Text
-                    style={[
-                      { fontWeight: "bold", fontSize: 16 },
-                      exceedSpending && { color: "#cc0000" },
-                    ]}
+            <View contentContainerStyle={{ flexGrow: 1 }}>
+              <View>
+                <FlatList
+                  data={scheduleArray}
+                  keyExtractor={(item) => item[0]}
+                  contentContainerStyle={{
+                    alignItems: "center",
+                  }}
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  renderItem={renderItem}
+                />
+                <View style={styles.row}>
+                  <View>
+                    <Text
+                      style={[
+                        { fontWeight: "bold", fontSize: 16 },
+                        exceedSpending && { color: "#cc0000" },
+                      ]}
+                    >
+                      Total Budget: ${getBudget(dashboardSelect)}
+                    </Text>
+                    <Text
+                      style={[
+                        { fontWeight: "bold", fontSize: 16 },
+                        exceedSpending && { color: "#cc0000" },
+                      ]}
+                    >
+                      Total Spendings: ${getTotalCosts(expenses)}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={onNextPressed}
                   >
-                    Total Budget: ${getBudget(dashboardSelect)}
-                  </Text>
-                  <Text
-                    style={[
-                      { fontWeight: "bold", fontSize: 16 },
-                      exceedSpending && { color: "#cc0000" },
-                    ]}
-                  >
-                    Total Spendings: ${getTotalCosts(expenses)}
-                  </Text>
+                    <Text style={styles.text}>View</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.button} onPress={onNextPressed}>
-                  <Text style={styles.text}>View</Text>
-                </TouchableOpacity>
               </View>
-              <FlatList
-                data={categories}
-                keyExtractor={(item) => item.name}
-                renderItem={renderCategoryItem}
-                numColumns={2}
-                columnWrapperStyle={{ justifyContent: "space-between" }}
-                contentContainerStyle={{ paddingHorizontal: 10 }}
-              />
+              <View>
+                <FlatList
+                  showsVerticalScrollIndicator={false}
+                  data={categories}
+                  keyExtractor={(item) => item.name}
+                  renderItem={renderCategoryItem}
+                  numColumns={2}
+                  columnWrapperStyle={{ justifyContent: "space-between" }}
+                  contentContainerStyle={{
+                    paddingHorizontal: 10,
+                  }}
+                />
+              </View>
             </View>
           ) : (
             <View style={styles.noExpensesContainer}>
@@ -417,12 +434,16 @@ const HomeScreen2 = () => {
           ref={bottomSheetRef}
           index={1}
           snapPoints={["25%", "40%", "90%"]}
-          backgroundStyle={{ backgroundColor: "#f3eef6" }}
+          backgroundStyle={{ backgroundColor: "white" }}
           onChange={handleSheetChanges}
           enablePanDownToClose
         >
           <BottomSheetView
-            style={{ flex: 1, alignItems: "center", paddingHorizontal: 15 }}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              paddingHorizontal: 15,
+            }}
           >
             <Text
               style={{
@@ -480,15 +501,16 @@ const HomeScreen2 = () => {
 };
 
 export default HomeScreen2;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    marginBottom: Platform.OS === "ios" ? 90 : 60,
+    paddingBottom: Platform.OS === "ios" ? 60 : 90,
   },
   dashboard: {
-    padding: 20,
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingBottom: Platform.OS === "ios" ? 170 : 200,
   },
   name: {
     paddingVertical: 10,

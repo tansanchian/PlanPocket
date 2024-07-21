@@ -1,5 +1,5 @@
-import React, { useContext } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { View, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignInScreen from "../screens/SignInScreen";
@@ -8,19 +8,24 @@ import ForgotPassword from "../screens/ForgotPassworScreen";
 import CoverScreen from "../screens/CoverScreen";
 import Drawer from "./Drawer";
 import { AuthContext } from "../components/AuthContext";
+import { OnboardingScreen } from "../screens/MainApp/OnboardingScreen";
 
 const Stack = createNativeStackNavigator();
 
 export default function Navigation() {
-  const { isLoading, userToken } = useContext(AuthContext);
+  const { isLoading, userToken, firstLoggedIn } = useContext(AuthContext);
 
+  useEffect(() => {
+    console.log(firstLoggedIn)
+  })
   if (isLoading) {
     return (
-      <View>
-        <ActivityIndicator size={"larger"} />
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }
+
   return (
     <NavigationContainer>
       {userToken === null ? (
@@ -32,7 +37,14 @@ export default function Navigation() {
         </Stack.Navigator>
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Drawer" component={Drawer} />
+          {firstLoggedIn ? (
+            <>
+                <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+                <Stack.Screen name="Drawer" component={Drawer} />
+            </>
+          ) : (
+            <Stack.Screen name="Drawer" component={Drawer} />
+          )}
           <Stack.Screen name="SignIn" component={SignInScreen} />
         </Stack.Navigator>
       )}

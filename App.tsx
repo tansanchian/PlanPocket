@@ -24,7 +24,7 @@ export const storage = getStorage(app);
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
-export const database = getFirestore();
+export const database = getFirestore(app);
 
 export default function App() {
   return (

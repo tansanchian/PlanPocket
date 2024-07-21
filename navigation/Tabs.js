@@ -21,6 +21,7 @@ const screenOptions = ({ route }) => {
     tabBarInactiveTintColor: "#D3C5E5",
     tabBarStyle: {
       position: "absolute",
+      tabBarPosition: "bottom",
       bottom: 0,
       right: 0,
       left: 0,

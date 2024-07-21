@@ -14,7 +14,11 @@ import { Calendar, Agenda } from "react-native-calendars";
 import Header from "../../components/Header";
 import { StatusBar } from "expo-status-bar";
 import { readScheduleDatabase } from "../../components/Database";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import BottomSheet from "@gorhom/bottom-sheet";
 import TimeTableEditor from "../../components/TimeTableEditor";
@@ -110,7 +114,8 @@ function getShortDay(dateString) {
   return `${weekday}`;
 }
 
-const TimeTableScreen = ({ route }) => {
+const TimeTableScreen = () => {
+  const route = useRoute();
   const navigation = useNavigation();
   const [items, setItems] = useState({});
   const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
@@ -124,12 +129,12 @@ const TimeTableScreen = ({ route }) => {
   const [bottomSheetDate, setBottomSheetDate] = useState("");
   const [jumpDate, setJumpDate] = useState(new Date());
 
-  const jump = route.params || new Date();
+  const { jump } = route.params || {};
 
   useEffect(() => {
-    if (jump && jump.jump) {
-      const date = new Date(jump.jump);
-      setJumpDate(date);
+    console.log("Received jump:", jump);
+    if (jump) {
+      setJumpDate(new Date(jump));
     }
   }, [jump]);
 
@@ -158,7 +163,28 @@ const TimeTableScreen = ({ route }) => {
   const loadItems = useCallback(async (day) => {
     try {
       const data = (await readScheduleDatabase()) || {};
-      const dataArray = Object.entries(data) || [];
+
+      function sortPurposesByFromTime(data) {
+        Object.keys(data).forEach((scheduleId) => {
+          const schedule = data[scheduleId];
+          if (schedule.purpose) {
+            const sortedPurposes = Object.entries(schedule.purpose).sort(
+              ([, a], [, b]) => {
+                const timeA = a.fromTime.split(":").map(Number);
+                const timeB = b.fromTime.split(":").map(Number);
+                return timeA[0] - timeB[0] || timeA[1] - timeB[1];
+              }
+            );
+
+            schedule.purpose = Object.fromEntries(sortedPurposes);
+          }
+        });
+
+        return data;
+      }
+      const sortedData = sortPurposesByFromTime(data);
+
+      const dataArray = Object.entries(sortedData) || [];
       const dataLength = dataArray.length;
       const newItems = {};
 

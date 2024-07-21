@@ -30,7 +30,7 @@ const CoverScreen = () => {
         <StatusBar style="dark" />
         <Image
           source={require("../assets/Logo.png")}
-          style={{ resizeMode: "contain", height: 500 }}
+          style={{ resizeMode: "contain", height: 450 }}
         />
         <View
           style={{

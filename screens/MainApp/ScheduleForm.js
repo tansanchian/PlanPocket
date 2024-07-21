@@ -143,7 +143,7 @@ export default function ScheduleForm({ route }) {
 
       if (result) {
         Alert.alert("Success", "Schedule added successfully");
-        navigation.navigate("Timetable");
+        navigation.goBack();
       } else {
         Alert.alert("Error", "There are other events at this time");
       }
@@ -156,7 +156,7 @@ export default function ScheduleForm({ route }) {
     setSelected("");
   };
   const onBackPressed = () => {
-    navigation.navigate("Timetable");
+    navigation.goBack();
   };
 
   return (
