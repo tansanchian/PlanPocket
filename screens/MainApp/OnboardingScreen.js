@@ -33,27 +33,33 @@ export const OnboardingScreen = () => {
         {
           backgroundColor: '#fff',
           image: <Image source={require('../../assets/AddScheduleScreen.jpg')} style={styles.image} />,
-          title: 'Friendly Work Environment',
-          subtitle: 'We offer a friendly and productive work environment.',
+          title: 'Create a Customized Schedule with Ease',
+          subtitle: 'Personalize Your Daily Plans by Adding Unique Schedules',
         },
         {
           backgroundColor: '#fff',
           image: <Image source={require('../../assets/AddPurposeScreen.jpg')} style={styles.image} />,
-          title: 'Join Our Team',
-          subtitle: 'Join our team to achieve more together!',
+          title: 'Enhance Your Schedule with Purpose',
+          subtitle: 'Easily Add Friends and Share Your Plans Effortlessly',
           },
           {
             backgroundColor: '#fff',
             image: <Image source={require('../../assets/SharePurposeScreen.jpg')} style={styles.image} />,
-            title: 'Friendly Work Environment',
-            subtitle: 'We offer a friendly and productive work environment.',
+            title: 'Connecting with Friends and Sharing Schedules',
+            subtitle: 'Easily Add Friends and Share Your Plans Effortlessly',
           },
           {
             backgroundColor: '#fff',
             image: <Image source={require('../../assets/SettingScreen.jpg')} style={styles.image} />,
-            title: 'Friendly Work Environment',
-            subtitle: 'We offer a friendly and productive work environment.',
+            title: 'Adjust Your Budget Allocation to Fit Your Needs',
+            subtitle: 'Customize Your Spending Categories for Better Financial Management in Settings',
           },
+          {
+            backgroundColor: '#fff',
+            image: <Image source={require('../../assets/HomeScreen.jpg')} style={styles.image} />,
+            title: 'Stay Within Budget with Real-Time Alerts',
+            subtitle: 'Visual Indicators to Help You Manage Your Spending',
+          }
       ]}
     />
   );
@@ -61,8 +67,8 @@ export const OnboardingScreen = () => {
 
 const styles = StyleSheet.create({
   image: {
-    width: 300,
-    height: 300,
+    width: 400,
+    height: 400,
     resizeMode: 'contain',
   }
 });
