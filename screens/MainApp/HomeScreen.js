@@ -96,10 +96,20 @@ const HomeScreen = ({ route }) => {
             coverRadius={0.6}
           />
           <View style={styles.chartOverlay}>
-            <Text style={[styles.totalSpendingText, exceedSpending && { color: 'red'}]}>
+            <Text
+              style={[
+                styles.totalSpendingText,
+                exceedSpending && { color: "red" },
+              ]}
+            >
               Total Spendings
             </Text>
-            <Text style={[styles.totalSpendingAmount, exceedSpending && { color: 'red'}]}>
+            <Text
+              style={[
+                styles.totalSpendingAmount,
+                exceedSpending && { color: "red" },
+              ]}
+            >
               ${getTotalCosts(expenses).toFixed(2)}
             </Text>
           </View>
@@ -115,12 +125,14 @@ const HomeScreen = ({ route }) => {
             </View>
           ))}
         </View>
-        {exceedSpending &&
+        {exceedSpending && (
           <View style={styles.exceedWarning}>
             <Text style={styles.exceedWarningText}>
-              You have exceeded your budget! Update your budget or reduce your expenses.
+              You have exceeded your budget! Update your budget or reduce your
+              expenses.
             </Text>
-        </View>}
+          </View>
+        )}
         <View style={styles.historyHeader}>
           <Text style={styles.historyTitle}>Categories:</Text>
         </View>
@@ -142,7 +154,7 @@ const styles = StyleSheet.create({
   internalContainer: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f3eef6",
+    backgroundColor: "#E8ECEF",
   },
   header: {
     fontSize: 24,

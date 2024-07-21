@@ -344,7 +344,7 @@ const MessengerScreen = ({ route }) => {
           renderMessage={renderMessage}
           messagesContainerStyle={{
             padding: 10,
-            backgroundColor: "white",
+            backgroundColor: "#E8ECEF",
             paddingBottom: 15,
           }}
           renderComposer={(props) => <CustomComposer {...props} />}
