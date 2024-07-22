@@ -164,27 +164,22 @@ const TimeTableScreen = () => {
     try {
       const data = (await readScheduleDatabase()) || {};
 
-      function sortPurposesByFromTime(data) {
-        Object.keys(data).forEach((scheduleId) => {
-          const schedule = data[scheduleId];
-          if (schedule.purpose) {
-            const sortedPurposes = Object.entries(schedule.purpose).sort(
-              ([, a], [, b]) => {
-                const timeA = a.fromTime.split(":").map(Number);
-                const timeB = b.fromTime.split(":").map(Number);
-                return timeA[0] - timeB[0] || timeA[1] - timeB[1];
-              }
+      const sortDataByFromTime = (data) => {
+        return data.map(([id, details]) => {
+          if (details.purpose != undefined) {
+            const entries = Object.entries(details.purpose);
+            entries.sort(
+              (a, b) => new Date(a[1].fromTime) - new Date(b[1].fromTime)
             );
-
-            schedule.purpose = Object.fromEntries(sortedPurposes);
+            const sortedData = Object.fromEntries(entries);
+            return [id, { ...details, purpose: sortedData }];
+          } else {
+            return [id, { ...details }];
           }
         });
+      };
 
-        return data;
-      }
-      const sortedData = sortPurposesByFromTime(data);
-
-      const dataArray = Object.entries(sortedData) || [];
+      const dataArray = sortDataByFromTime(Object.entries(data)) || [];
       const dataLength = dataArray.length;
       const newItems = {};
 
@@ -348,7 +343,8 @@ const TimeTableScreen = () => {
                 >
                   {item[1].purpose && (
                     <Text style={styles.purpose}>
-                      Purpose: {item[1].purpose}
+                      <Text style={{ fontWeight: "bold" }}>Purpose:</Text>{" "}
+                      {item[1].purpose}
                     </Text>
                   )}
                   {item[1].description && (
@@ -357,8 +353,8 @@ const TimeTableScreen = () => {
                     </Text>
                   )}
                   <Text style={styles.description}>
-                    Time: {parseTime(item[1].fromTime)} to{" "}
-                    {parseTime(item[1].toTime)}
+                    <Text style={{ fontWeight: "bold" }}>Time:</Text>{" "}
+                    {parseTime(item[1].fromTime)} to {parseTime(item[1].toTime)}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -585,12 +581,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "normal",
     marginBottom: 5,
-    color: "black",
+    color: "#555",
   },
   description: {
     fontSize: 12,
     fontWeight: "normal",
-    color: "black",
+    color: "#555",
   },
   iconContainer: {
     marginHorizontal: 16,
@@ -607,7 +603,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   bottomSheetBackground: {
-    backgroundColor: "white",
-    borderRadius: 25,
+    backgroundColor: "#E0E0E0",
+    borderRadius: 50,
   },
 });

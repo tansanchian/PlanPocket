@@ -434,7 +434,7 @@ const HomeScreen2 = () => {
           ref={bottomSheetRef}
           index={1}
           snapPoints={["25%", "40%", "90%"]}
-          backgroundStyle={{ backgroundColor: "#E8ECEF" }}
+          backgroundStyle={{ backgroundColor: "#E8ECEF", borderRadius: 50 }}
           onChange={handleSheetChanges}
           enablePanDownToClose
         >
