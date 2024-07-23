@@ -604,6 +604,6 @@ const styles = StyleSheet.create({
   },
   bottomSheetBackground: {
     backgroundColor: "#E0E0E0",
-    borderRadius: 50,
+    borderRadius: 30,
   },
 });

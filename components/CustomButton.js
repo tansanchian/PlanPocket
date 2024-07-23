@@ -18,6 +18,7 @@ const CustomButton = ({
 }) => {
   return (
     <TouchableOpacity
+      testID="MyButton:Button:ClickMe"
       onPress={onPress}
       style={[
         styles[`container_${design}`],

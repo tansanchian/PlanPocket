@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomInput renders correctly and matches snapshot 1`] = `
+<View
+  style={
+    [
+      {
+        "backgroundColor": "white",
+        "borderColor": "#e8e8e8",
+        "borderRadius": 25,
+        "borderWidth": 1,
+        "elevation": 5,
+        "marginVertical": 5,
+        "paddingHorizontal": 10,
+        "paddingVertical": 5,
+        "shadowColor": "#000",
+        "shadowOffset": {
+          "height": 2,
+          "width": 0,
+        },
+        "shadowOpacity": 0.1,
+        "shadowRadius": 8,
+        "width": "100%",
+      },
+      {
+        "borderColor": "#e8e8e8",
+      },
+    ]
+  }
+>
+  <TextInput
+    editable={true}
+    onBlur={[Function]}
+    onChangeText={[Function]}
+    placeholder="Enter text"
+    style={{}}
+    value=""
+  />
+</View>
+`;

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomButton renders correctly and matches snapshot 1`] = `
+<View
+  accessibilityState={
+    {
+      "busy": undefined,
+      "checked": undefined,
+      "disabled": undefined,
+      "expanded": undefined,
+      "selected": undefined,
+    }
+  }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
+  accessible={true}
+  collapsable={false}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#735DA5",
+      "borderRadius": 25,
+      "marginVertical": 10,
+      "opacity": 1,
+      "paddingVertical": 15,
+      "width": "100%",
+    }
+  }
+  testID="MyButton:Button:ClickMe"
+>
+  <Text
+    style={
+      [
+        {
+          "color": "white",
+          "fontWeight": "bold",
+        },
+        undefined,
+        {},
+      ]
+    }
+  >
+    Test
+  </Text>
+</View>
+`;
