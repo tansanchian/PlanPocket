@@ -12,6 +12,7 @@ const Header = ({ title, onPress }) => {
         <TouchableOpacity
           onPress={() => navigation.toggleDrawer()}
           style={styles.iconContainer}
+          testID="drawer-toggle"
         >
           <AntDesign name="bars" size={20} />
         </TouchableOpacity>

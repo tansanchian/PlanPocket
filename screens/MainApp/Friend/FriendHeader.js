@@ -18,7 +18,12 @@ const FriendHeader = ({ count }) => {
           onPress={() => navigation.navigate("FriendAcceptingScreen")}
           style={styles.iconContainer}
         >
-          <IconWithBadge name="notifications-outline" size={24} badgeCount={count} color="#000" />
+          <IconWithBadge
+            name="notifications-outline"
+            size={24}
+            badgeCount={count}
+            color="#000"
+          />
         </TouchableOpacity>
         <View>
           <Image

@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const IconWithBadge = ({ name, badgeCount = 0, color, size }) => {
   return (
     <View style={[styles.iconContainer, { width: size, height: size }]}>
-      <Ionicons name={name} size={size} color={color} />
+      <Ionicons name={name} size={size} color={color} testID="icon" />
       {badgeCount > 0 && (
         <View style={styles.badgeContainer}>
           <Text style={styles.badgeText}>{badgeCount}</Text>
@@ -18,24 +18,24 @@ const IconWithBadge = ({ name, badgeCount = 0, color, size }) => {
 const styles = StyleSheet.create({
   iconContainer: {
     margin: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   badgeContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: -6,
     top: -3,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     borderRadius: 6,
     width: 12,
     height: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   badgeText: {
-    color: 'white',
+    color: "white",
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

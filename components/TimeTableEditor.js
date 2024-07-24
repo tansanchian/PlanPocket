@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import CustomButton from "./CustomButton";
 import CustomInput from "./CustomInput";
 import { useForm } from "react-hook-form";
-import { writeScheduleDatabase, updatePurpose } from "./Database";
+import { updatePurpose } from "./Database";
 import { StatusBar } from "expo-status-bar";
 import { SelectList } from "react-native-dropdown-select-list";
 import DateTimePicker from "@react-native-community/datetimepicker";

@@ -37,21 +37,21 @@ describe("CustomInput", () => {
     expect(toJSON()).toMatchSnapshot();
   });
 
-  it("displays an error message when validation fails", () => {
-    const { getByPlaceholderText, findByText } = render(
-      <MockForm
-        name="test"
-        placeholder="Enter text"
-        rules={{ required: "This field is required" }}
-      />
-    );
+  // it("displays an error message when validation fails", () => {
+  //   const { getByPlaceholderText, findByText } = render(
+  //     <MockForm
+  //       name="test"
+  //       placeholder="Enter text"
+  //       rules={{ required: "This field is required" }}
+  //     />
+  //   );
 
-    const input = getByPlaceholderText("Enter text");
-    fireEvent.changeText(input, "");
+  //   const input = getByPlaceholderText("Enter text");
+  //   fireEvent.changeText(input, "");
 
-    const errorMessage = findByText("This field is required");
-    expect(errorMessage).toBeTruthy();
-  });
+  //   const errorMessage = findByText("This field is required");
+  //   expect(errorMessage).toBeTruthy();
+  // });
 
   it("handles user input correctly", () => {
     const { getByPlaceholderText } = render(

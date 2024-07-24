@@ -6,6 +6,7 @@ import { query, where, getDocs, collection } from "firebase/firestore";
 import AddFriendSearchItem from "./AddFriendSearchItem";
 import AddFriendSearchHeader from "./AddFriendSearchHeader";
 import PendingFriendItem from "./PendingFriendItem";
+import { StatusBar } from "expo-status-bar";
 
 export default function AddFriendSearchList() {
   const auth = getAuth();
@@ -63,8 +64,9 @@ export default function AddFriendSearchList() {
 
   return (
     <View style={styles.container}>
+      <AddFriendSearchHeader setSearch={setSearch} />
+      <StatusBar style="dark" />
       <View style={styles.inviteList}>
-        <AddFriendSearchHeader setSearch={setSearch} />
         <FlatList
           data={data}
           contentContainerStyle={{ flexGrow: 1, paddingVertical: 25 }}
@@ -103,6 +105,7 @@ export default function AddFriendSearchList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   inviteList: {
     flex: 0.6,

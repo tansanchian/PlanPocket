@@ -17,6 +17,7 @@ const ChatListHeader = () => {
         <TouchableOpacity
           onPress={() => navigation.toggleDrawer()}
           style={styles.iconContainer}
+          testID="drawer-icon"
         >
           <AntDesign name="bars" size={20} />
         </TouchableOpacity>
@@ -27,6 +28,7 @@ const ChatListHeader = () => {
               styles.image,
               { height: hp(4.5), aspectRatio: 1, borderRadius: 100 },
             ]}
+            testID="header-image"
           />
         </View>
         <Text
@@ -36,6 +38,7 @@ const ChatListHeader = () => {
             fontWeight: "bold",
             fontSize: 18,
           }}
+          testID="header-text"
         >
           Plan<Text style={{ color: "#735DA5" }}>Pocket</Text>
         </Text>
@@ -43,6 +46,7 @@ const ChatListHeader = () => {
       <TouchableOpacity
         onPress={() => navigation.navigate("SearchList")}
         style={styles.iconContainer}
+        testID="search-icon"
       >
         <Ionicons name="search" size={20} />
       </TouchableOpacity>
