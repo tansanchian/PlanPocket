@@ -194,13 +194,6 @@ export async function createScheduleDatabase(
         let scheduleFromDate = parseDate(schedule.fromDate);
         let scheduleToDate = parseDate(schedule.toDate);
 
-        // console.log("DEBUGGING");
-        // console.log(fromDate);
-        // console.log(todate);
-        // console.log(fromDate >= scheduleFromDate && fromDate <= scheduleToDate);
-        // console.log(todate >= scheduleFromDate && todate <= scheduleToDate);
-        // console.log(fromDate <= scheduleFromDate && toDate >= scheduleToDate);
-        // console.log("DEBUGGING");
         if (
           (fromDate >= scheduleFromDate && fromDate <= scheduleToDate) ||
           (todate >= scheduleFromDate && todate <= scheduleToDate) ||
@@ -253,18 +246,6 @@ export async function readScheduleDatabase() {
     return null;
   }
 }
-
-// export async function budgetCalculator() {
-//   const auth = getAuth();
-//   const db = getDatabase();
-//   const userId = auth.currentUser?.uid;
-//   if (userId) {
-//     try {
-//       const schedulesRef = ref(db, `/users/${userId}/schedules`);
-//       const snapshot = await get(schedulesRef);
-//     }
-//   }
-// }
 
 export async function readCurrentDateDatabase() {
   const auth = getAuth();

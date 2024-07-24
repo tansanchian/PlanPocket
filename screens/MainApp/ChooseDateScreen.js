@@ -33,8 +33,12 @@ const ChooseDateScreen = () => {
 
   const handleCustomDaySubmit = () => {
     if (customDays) {
-      navigation.navigate("CustomDayScreen", { days: customDays });
-      setModalVisible(false);
+      if (Number.isInteger(customDays) && customeDays >= 1) {
+        navigation.navigate("CustomDayScreen", { days: customDays });
+        setModalVisible(false);
+      } else {
+        alert("The schedule duration must be at least 1 day and entered as a whole number!")
+      }
     } else {
       alert("Please enter a number of days.");
     }

@@ -8,8 +8,6 @@ import {
   FlatList,
   Image,
   Platform,
-  Dimensions,
-  ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { Avatar } from "react-native-paper";
