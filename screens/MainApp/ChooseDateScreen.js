@@ -4,6 +4,7 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import CustomButton from "../../components/CustomButton";
@@ -32,12 +33,14 @@ const ChooseDateScreen = () => {
   };
 
   const handleCustomDaySubmit = () => {
+    console.log(customDays);
     if (customDays) {
-      if (Number.isInteger(customDays) && customeDays >= 1) {
+      if (Number.isInteger(parseFloat(customDays)) && customDays >= 1) {
         navigation.navigate("CustomDayScreen", { days: customDays });
         setModalVisible(false);
       } else {
-        alert(
+        Alert.alert(
+          "Error",
           "The schedule duration must be at least 1 day and entered as a whole number!"
         );
       }
