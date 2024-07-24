@@ -12,6 +12,7 @@ import Onboarding from "react-native-onboarding-swiper";
 import { database } from "../../App";
 import { getAuth } from "firebase/auth";
 import { updateDoc, doc } from "firebase/firestore";
+import { StatusBar } from "expo-status-bar";
 
 export const OnboardingScreen = () => {
   const navigation = useNavigation();
@@ -65,6 +66,7 @@ export const OnboardingScreen = () => {
 
   return (
     <View style={{ flex: 1 }}>
+      <StatusBar style="dark" />
       <Onboarding
         onDone={onDone}
         showSkip={false}
