@@ -29,7 +29,7 @@ export default function AddFriendSearchList() {
       currentUserData = { ...doc.data(), id: doc.id };
     });
 
-    const currentUserFriends = currentUserData.friends || [];
+    const currentUserFriends = currentUserData.friends ||  [];
     const currentUserPending = currentUserData.pending || [];
     const currentUserRequest = currentUserData.friendRequests || [];
 
