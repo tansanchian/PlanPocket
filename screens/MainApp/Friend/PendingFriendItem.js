@@ -44,6 +44,7 @@ export default function PendingFriendItem({ item, noBorder, currentUser }) {
       <Image
         source={{ uri: imageUri }}
         style={[styles.image, { height: hp(6), width: hp(6) }]}
+        testID="image"
       />
       <View style={styles.textContainer}>
         <Text style={[styles.headerText, { fontSize: hp(1.8) }]}>

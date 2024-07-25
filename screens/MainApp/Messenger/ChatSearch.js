@@ -1,13 +1,5 @@
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  StyleSheet,
-} from "react-native";
-import { useState } from "react";
+import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import AntDesign from "react-native-vector-icons/AntDesign";
 import { Ionicons } from "@expo/vector-icons";
 
 const ChatSearch = ({ setSearch }) => {
@@ -18,6 +10,7 @@ const ChatSearch = ({ setSearch }) => {
         <TouchableOpacity
           onPress={() => navigation.navigate("ChatList")}
           style={styles.iconContainer}
+          testID="back-button"
         >
           <Ionicons name="arrow-back" size={20} />
         </TouchableOpacity>

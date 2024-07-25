@@ -1,18 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import HomeScreenHeader from "./HomeScreenHeader";
 
-const AboutUsScreen = () => {
+const AboutUsScreenTest = () => {
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <StatusBar style="dark" />
-      <HomeScreenHeader title="About Us" />
       <ScrollView contentContainerStyle={styles.container}>
         <Image
-          source={require("../../assets/Logo.png")}
+          source={require("../assets/Logo.png")}
           style={styles.logo}
-          testId="logo"
+          testID="logo"
         />
         <Text style={styles.title}>About Us</Text>
         <View style={styles.paragraphContainer}>
@@ -26,7 +24,7 @@ const AboutUsScreen = () => {
   );
 };
 
-export default AboutUsScreen;
+export default AboutUsScreenTest;
 
 const styles = StyleSheet.create({
   container: {
